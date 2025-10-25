@@ -1,0 +1,31 @@
+{
+  "firestore": {
+    "database": "(default)",
+    "location": "nam5",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "beinn-a7664",
+          "appId": "1:392208399642:android:dbe7653edde76bd9c8c0a3",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "beinn-a7664",
+          "configurations": {
+            "android": "1:392208399642:android:dbe7653edde76bd9c8c0a3",
+            "ios": "1:392208399642:ios:f111bbed3396ce88c8c0a3",
+            "macos": "1:392208399642:ios:f111bbed3396ce88c8c0a3",
+            "web": "1:392208399642:web:d0be8dc71b4e688bc8c0a3",
+            "windows": "1:392208399642:web:1526e6906a267346c8c0a3"
+          }
+        }
+      }
+    }
+  }
+}
