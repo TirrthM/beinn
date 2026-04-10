@@ -1,0 +1,1537 @@
+﻿commit 3a741300c9dfb444f497a63e8017bd24ae1f1c44
+Author: TirrthM <tirrthm@gmail.com>
+Date:   Sat Oct 25 22:28:03 2025 +0530
+
+    Initial Commit - 1st
+
+diff --git a/lib/screens/home.dart b/lib/screens/home.dart
+new file mode 100644
+index 0000000..d89bcda
+--- /dev/null
++++ b/lib/screens/home.dart
+@@ -0,0 +1,1524 @@
++import 'package:flutter/material.dart';
++import 'package:firebase_auth/firebase_auth.dart';
++import 'package:cloud_firestore/cloud_firestore.dart';
++import 'package:shared_preferences/shared_preferences.dart';
++import '../main.dart' as main_app;
++import 'welcome.dart';
++import 'dart:async';
++
++class HomeScreen extends StatefulWidget {
++  @override
++  _HomeScreenState createState() => _HomeScreenState();
++}
++
++class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
++  late AnimationController _fadeController;
++  late AnimationController _slideController;
++  late AnimationController _scaleController;
++  late AnimationController _bannerSlideController;
++  late AnimationController _sectionSwitchController;
++  late Animation<double> _fadeAnimation;
++  late Animation<Offset> _slideAnimation;
++  late Animation<double> _scaleAnimation;
++  late Animation<Offset> _bannerSlideAnimation;
++  late Animation<Offset> _sectionSlideAnimation;
++
++  final FirebaseAuth _auth = FirebaseAuth.instance;
++  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
++
++  User? _currentUser;
++  Map<String, dynamic>? _userData;
++  bool _isLoading = true;
++  bool _showWelcomeCard = true;
++  int _currentBannerIndex = 0;
++  String _selectedSection = 'Clothing';
++  Timer? _bannerTimer;
++
++  PageController _bannerController = PageController();
++  ScrollController _categoriesScrollController = ScrollController();
++  bool _showSeeAll = true; // true for "See All", false for "Back"
++
++  final List<Map<String, dynamic>> _bannerData = [
++    {
++      'title': 'FASHION',
++      'subtitle': 'Summer Collection 2025',
++      'offer': 'Up to 40% off',
++      'image':
++      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop',
++    },
++    {
++      'title': 'NEW ARRIVALS',
++      'subtitle': 'Winter Collection 2025',
++      'offer': 'Up to 50% off',
++      'image':
++      'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=200&fit=crop',
++    },
++    {
++      'title': 'TRENDING',
++      'subtitle': 'Street Style Collection',
++      'offer': 'Up to 30% off',
++      'image':
++      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=200&fit=crop',
++    },
++  ];
++
++  final List<Map<String, dynamic>> _categories = [
++    {
++      'name': 'T-Shirts',
++      'type': 'image',
++      'image':
++      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7Zih6I1qFheS9XELo0orL76keeJi7H.png'
++    },
++    {
++      'name': 'Hoodies',
++      'type': 'image',
++      'image':
++      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Hoodie_appimg.PNG-UkgfqGGPgl1p624MNH8gbsGFus8COx.png'
++    },
++    {
++      'name': 'Sweatshirts',
++      'type': 'image',
++      'image':
++      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Sweatshirt_appimg.PNG-stbgbQ97A0VBOYJiwv3GAzpP8JvyrA.png'
++    },
++    {
++      'name': 'Shirts',
++      'type': 'image',
++      'image':
++      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Shirt_appimg-oLQXEbn3cH36bKsWBRUCk5cHRd8EsE.png'
++    },
++    {
++      'name': 'Polo',
++      'type': 'image',
++      'image':
++      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Polo_appimg-MB1NVY0Jf1xfjqsDV10r7tvAL0dd5O.png'
++    },
++    {
++      'name': 'Tank Tops',
++      'type': 'image',
++      'image':
++      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Tanktop_appimg-Jq79NUJOe18uWn3nknUVIQEzvTrIx8.png'
++    },
++    {
++      'name': 'Sweatpants',
++      'type': 'image',
++      'image':
++      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Sweatpants_appimg-ITYRrT2Y0Ae5LTfoftiIxOl7eosNIU.png'
++    },
++    {
++      'name': 'Shorts',
++      'type': 'image',
++      'image':
++      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Shorts_appimg-CRUDzi32VPDQ3wFWDkgrychI9aTFzD.png'
++    },
++  ];
++
++  final List<Map<String, dynamic>> _featuredProducts = [
++    {
++      'id': '1',
++      'name': 'Premium Cotton T-Shirt',
++      'price': 'Γé╣999',
++      'originalPrice': 'Γé╣1499',
++      'image':
++      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop',
++      'discount': '33% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
++      'colors': ['Black', 'White', 'Navy', 'Gray'],
++      'description':
++      'Premium quality cotton t-shirt with comfortable fit. Perfect for casual wear and daily use.',
++      'details':
++      'Made from 100% organic cotton. Machine washable. Available in multiple sizes and colors.',
++    },
++    {
++      'id': '2',
++      'name': 'Designer Black Dress',
++      'price': 'Γé╣2499',
++      'originalPrice': 'Γé╣3999',
++      'image':
++      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=300&fit=crop',
++      'discount': '37% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1566479179817-c0b5b4b4b1e5?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['XS', 'S', 'M', 'L', 'XL'],
++      'colors': ['Black', 'Navy', 'Burgundy'],
++      'description':
++      'Elegant designer dress perfect for formal occasions and evening events.',
++      'details':
++      'Premium fabric with elegant design. Dry clean only. Perfect fit guaranteed.',
++    },
++    {
++      'id': '3',
++      'name': 'Casual Denim Jacket',
++      'price': 'Γé╣1799',
++      'originalPrice': 'Γé╣2999',
++      'image':
++      'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop',
++      'discount': '40% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['S', 'M', 'L', 'XL'],
++      'colors': ['Blue', 'Black', 'Light Blue'],
++      'description':
++      'Classic denim jacket with modern fit. Perfect for layering and casual outfits.',
++      'details':
++      'High-quality denim fabric. Machine washable. Timeless design.',
++    },
++    {
++      'id': '4',
++      'name': 'Sports Hoodie',
++      'price': 'Γé╣1299',
++      'originalPrice': 'Γé╣1999',
++      'image':
++      'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300&h=300&fit=crop',
++      'discount': '35% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
++      'colors': ['Gray', 'Black', 'Navy', 'Red'],
++      'description':
++      'Comfortable sports hoodie perfect for workouts and casual wear.',
++      'details':
++      'Moisture-wicking fabric. Machine washable. Perfect for active lifestyle.',
++    },
++    {
++      'id': '5',
++      'name': 'Formal White Shirt',
++      'price': 'Γé╣1599',
++      'originalPrice': 'Γé╣2299',
++      'image':
++      'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=300&fit=crop',
++      'discount': '30% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
++      'colors': ['White', 'Light Blue', 'Light Pink'],
++      'description':
++      'Classic formal shirt perfect for office wear and business meetings.',
++      'details': 'Premium cotton blend. Wrinkle-resistant. Professional fit.',
++    },
++    {
++      'id': '6',
++      'name': 'Cargo Pants',
++      'price': 'Γé╣1899',
++      'originalPrice': 'Γé╣2799',
++      'image':
++      'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop',
++      'discount': '32% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['28', '30', '32', '34', '36'],
++      'colors': ['Khaki', 'Black', 'Olive Green', 'Navy'],
++      'description':
++      'Stylish cargo pants with multiple pockets. Perfect for casual and outdoor activities.',
++      'details':
++      'Durable cotton fabric. Multiple utility pockets. Comfortable fit.',
++    },
++    {
++      'id': '7',
++      'name': 'Summer Shorts',
++      'price': 'Γé╣799',
++      'originalPrice': 'Γé╣1199',
++      'image':
++      'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=300&h=300&fit=crop',
++      'discount': '33% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1506629905607-d405b7a30db4?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1555274175-6cbf6f3b137b?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['S', 'M', 'L', 'XL'],
++      'colors': ['Navy', 'Khaki', 'Black', 'Gray'],
++      'description':
++      'Comfortable summer shorts perfect for beach and casual outings.',
++      'details': 'Lightweight fabric. Quick-dry material. Elastic waistband.',
++    },
++    {
++      'id': '8',
++      'name': 'Tank Top',
++      'price': 'Γé╣599',
++      'originalPrice': 'Γé╣899',
++      'image':
++      'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&h=300&fit=crop',
++      'discount': '33% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['S', 'M', 'L', 'XL'],
++      'colors': ['White', 'Black', 'Gray', 'Navy'],
++      'description': 'Comfortable tank top perfect for gym and casual wear.',
++      'details': 'Breathable cotton blend. Moisture-wicking. Athletic fit.',
++    },
++    {
++      'id': '9',
++      'name': 'Sweatpants',
++      'price': 'Γé╣1199',
++      'originalPrice': 'Γé╣1799',
++      'image':
++      'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=300&fit=crop',
++      'discount': '33% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1506629905607-d405b7a30db4?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
++      'colors': ['Gray', 'Black', 'Navy', 'Maroon'],
++      'description':
++      'Comfortable sweatpants perfect for lounging and light workouts.',
++      'details': 'Soft fleece interior. Adjustable drawstring. Relaxed fit.',
++    },
++    {
++      'id': '10',
++      'name': 'Polo Shirt',
++      'price': 'Γé╣1399',
++      'originalPrice': 'Γé╣1999',
++      'image':
++      'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop',
++      'discount': '30% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
++      'colors': ['Navy', 'White', 'Black', 'Red'],
++      'description': 'Classic polo shirt perfect for smart casual occasions.',
++      'details': 'Premium pique cotton. Ribbed collar and cuffs. Regular fit.',
++    },
++    {
++      'id': '11',
++      'name': 'Leather Jacket',
++      'price': 'Γé╣4999',
++      'originalPrice': 'Γé╣7999',
++      'image':
++      'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=300&fit=crop',
++      'discount': '37% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['S', 'M', 'L', 'XL'],
++      'colors': ['Black', 'Brown', 'Dark Brown'],
++      'description':
++      'Premium leather jacket with modern styling. Perfect for casual and semi-formal occasions.',
++      'details': 'Genuine leather. YKK zippers. Quilted lining. Biker style.',
++    },
++    {
++      'id': '12',
++      'name': 'Chinos',
++      'price': 'Γé╣1699',
++      'originalPrice': 'Γé╣2499',
++      'image':
++      'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=300&h=300&fit=crop',
++      'discount': '32% OFF',
++      'images': [
++        'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop',
++        'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=300&fit=crop',
++      ],
++      'sizes': ['28', '30', '32', '34', '36'],
++      'colors': ['Beige', 'Navy', 'Black', 'Olive'],
++      'description':
++      'Classic chinos perfect for smart casual and formal occasions.',
++      'details': 'Premium cotton twill. Slim fit. Belt loops. Side pockets.',
++    },
++  ];
++
++  @override
++  void initState() {
++    super.initState();
++    _initializeAnimations();
++    _loadUserData();
++    _startBannerTimer();
++    _checkWelcomeCardStatus();
++    _setupScrollListener();
++  }
++
++  void _setupScrollListener() {
++    _categoriesScrollController.addListener(() {
++      if (_categoriesScrollController.hasClients) {
++        final maxScrollExtent =
++            _categoriesScrollController.position.maxScrollExtent;
++        final currentScrollPosition = _categoriesScrollController.offset;
++        final threshold = maxScrollExtent * 0.5; // 50% threshold
++
++        setState(() {
++          _showSeeAll = currentScrollPosition < threshold;
++        });
++      }
++    });
++  }
++
++  void _initializeAnimations() {
++    _fadeController = AnimationController(
++      duration: Duration(milliseconds: 800),
++      vsync: this,
++    );
++
++    _slideController = AnimationController(
++      duration: Duration(milliseconds: 600),
++      vsync: this,
++    );
++
++    _scaleController = AnimationController(
++      duration: Duration(milliseconds: 400),
++      vsync: this,
++    );
++
++    _bannerSlideController = AnimationController(
++      duration: Duration(milliseconds: 800),
++      vsync: this,
++    );
++
++    _sectionSwitchController = AnimationController(
++      duration: Duration(milliseconds: 400),
++      vsync: this,
++    );
++
++    _fadeAnimation = Tween<double>(
++      begin: 0.0,
++      end: 1.0,
++    ).animate(CurvedAnimation(
++      parent: _fadeController,
++      curve: Curves.easeInOut,
++    ));
++
++    _slideAnimation = Tween<Offset>(
++      begin: Offset(0, 0.3),
++      end: Offset.zero,
++    ).animate(CurvedAnimation(
++      parent: _slideController,
++      curve: Curves.easeOutCubic,
++    ));
++
++    _scaleAnimation = Tween<double>(
++      begin: 0.8,
++      end: 1.0,
++    ).animate(CurvedAnimation(
++      parent: _scaleController,
++      curve: Curves.elasticOut,
++    ));
++
++    _bannerSlideAnimation = Tween<Offset>(
++      begin: Offset(0, -0.5),
++      end: Offset.zero,
++    ).animate(CurvedAnimation(
++      parent: _bannerSlideController,
++      curve: Curves.easeOutCubic,
++    ));
++
++    _sectionSlideAnimation = Tween<Offset>(
++      begin: Offset(0, 0.3),
++      end: Offset.zero,
++    ).animate(CurvedAnimation(
++      parent: _sectionSwitchController,
++      curve: Curves.easeOutCubic,
++    ));
++
++    _fadeController.forward();
++    _slideController.forward();
++    _scaleController.forward();
++    _sectionSwitchController.forward();
++  }
++
++  void _startBannerTimer() {
++    _bannerTimer = Timer.periodic(Duration(seconds: 7), (timer) {
++      if (_currentBannerIndex < _bannerData.length - 1) {
++        _currentBannerIndex++;
++      } else {
++        _currentBannerIndex = 0;
++      }
++      if (_bannerController.hasClients) {
++        _bannerController.animateToPage(
++          _currentBannerIndex,
++          duration: Duration(milliseconds: 500),
++          curve: Curves.easeInOut,
++        );
++      }
++    });
++  }
++
++  Future<void> _checkWelcomeCardStatus() async {
++    try {
++      final prefs = await SharedPreferences.getInstance();
++      final currentUser = _auth.currentUser;
++      if (currentUser != null) {
++        final welcomeCardKey = 'welcome_card_dismissed_${currentUser.uid}';
++        final isDismissed = prefs.getBool(welcomeCardKey) ?? false;
++        setState(() {
++          _showWelcomeCard = !isDismissed;
++        });
++      }
++    } catch (e) {
++      print('Error checking welcome card status: $e');
++    }
++  }
++
++  Future<void> _dismissWelcomeCard() async {
++    try {
++      final prefs = await SharedPreferences.getInstance();
++      final currentUser = _auth.currentUser;
++      if (currentUser != null) {
++        final welcomeCardKey = 'welcome_card_dismissed_${currentUser.uid}';
++        await prefs.setBool(welcomeCardKey, true);
++        setState(() {
++          _showWelcomeCard = false;
++        });
++        _bannerSlideController.forward();
++      }
++    } catch (e) {
++      print('Error dismissing welcome card: $e');
++    }
++  }
++
++  Future<void> _loadUserData() async {
++    try {
++      _currentUser = _auth.currentUser;
++      if (_currentUser != null) {
++        final userDoc =
++        await _firestore.collection('users').doc(_currentUser!.uid).get();
++        if (userDoc.exists) {
++          setState(() {
++            _userData = userDoc.data();
++            _isLoading = false;
++          });
++        }
++      }
++    } catch (e) {
++      print('Error loading user data: $e');
++      setState(() {
++        _isLoading = false;
++      });
++    }
++  }
++
++  Future<void> _signOut() async {
++    try {
++      // Clear welcome card status for this user
++      final prefs = await SharedPreferences.getInstance();
++      final currentUser = _auth.currentUser;
++      if (currentUser != null) {
++        final welcomeCardKey = 'welcome_card_dismissed_${currentUser.uid}';
++        await prefs.remove(welcomeCardKey);
++      }
++
++      // Clear login status
++      await prefs.setBool('isLoggedIn', false);
++      await prefs.remove('userId');
++
++      // Sign out from Firebase
++      await _auth.signOut();
++
++      Navigator.pushReplacement(
++        context,
++        PageRouteBuilder(
++          pageBuilder: (context, animation, secondaryAnimation) =>
++              WelcomeScreen(),
++          transitionsBuilder: (context, animation, secondaryAnimation, child) {
++            return SlideTransition(
++              position: Tween<Offset>(
++                begin: Offset(-1.0, 0.0),
++                end: Offset.zero,
++              ).animate(CurvedAnimation(
++                parent: animation,
++                curve: Curves.easeInOutCubic,
++              )),
++              child: FadeTransition(
++                opacity: animation,
++                child: child,
++              ),
++            );
++          },
++          transitionDuration: Duration(milliseconds: 400),
++        ),
++      );
++    } catch (e) {
++      print('Error signing out: $e');
++    }
++  }
++
++  void _toggleWishlist(Map<String, dynamic> product) {
++    setState(() {
++      if (main_app.CartManager().isInWishlist(product['id'])) {
++        main_app.CartManager().removeFromWishlist(product['id']);
++        ScaffoldMessenger.of(context).showSnackBar(
++          SnackBar(
++            content: Text(
++              '${product['name']} removed from wishlist',
++              style: TextStyle(color: Colors.white),
++            ),
++            backgroundColor: Colors.grey[800],
++            duration: Duration(seconds: 2),
++            behavior: SnackBarBehavior.floating,
++            shape: RoundedRectangleBorder(
++              borderRadius: BorderRadius.circular(10),
++            ),
++          ),
++        );
++      } else {
++        main_app.CartManager().addToWishlist(product);
++        ScaffoldMessenger.of(context).showSnackBar(
++          SnackBar(
++            content: Text(
++              '${product['name']} is added to your wishlist!',
++              style: TextStyle(color: Colors.white),
++            ),
++            backgroundColor: Color(0xFFD2691E),
++            duration: Duration(seconds: 2),
++            behavior: SnackBarBehavior.floating,
++            shape: RoundedRectangleBorder(
++              borderRadius: BorderRadius.circular(10),
++            ),
++          ),
++        );
++      }
++    });
++  }
++
++  void _removeFromWishlist(String productId) {
++    setState(() {
++      main_app.CartManager().removeFromWishlist(productId);
++    });
++  }
++
++  void _navigateToWishlist() {
++    main_app.navigateToWishlist(
++        context, main_app.CartManager().wishlistItems, _removeFromWishlist);
++  }
++
++  void _scrollToEnd() {
++    if (_categoriesScrollController.hasClients) {
++      final maxScrollExtent =
++          _categoriesScrollController.position.maxScrollExtent;
++      _categoriesScrollController.animateTo(
++        maxScrollExtent,
++        duration: Duration(milliseconds: 2000),
++        curve: Curves.easeInOut,
++      );
++    }
++  }
++
++  void _scrollToStart() {
++    if (_categoriesScrollController.hasClients) {
++      _categoriesScrollController.animateTo(
++        0.0,
++        duration: Duration(milliseconds: 2000),
++        curve: Curves.easeInOut,
++      );
++    }
++  }
++
++  void _handleCategoryScroll() {
++    if (_showSeeAll) {
++      _scrollToEnd();
++    } else {
++      _scrollToStart();
++    }
++  }
++
++  void _switchSection(String section) {
++    if (_selectedSection != section) {
++      _sectionSwitchController.reset();
++      setState(() {
++        _selectedSection = section;
++      });
++      _sectionSwitchController.forward();
++    }
++  }
++
++  Widget _buildFixedHeader() {
++    return Container(
++      color: Colors.black,
++      child: SafeArea(
++        bottom: false,
++        child: ScaleTransition(
++          scale: _scaleAnimation,
++          child: Container(
++            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
++            child: Row(
++              mainAxisAlignment: MainAxisAlignment.spaceBetween,
++              children: [
++                // Logo
++                Container(
++                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
++                  decoration: BoxDecoration(
++                    color: Color(0xFFD2691E).withOpacity(0.1),
++                    borderRadius: BorderRadius.circular(8),
++                    border: Border.all(
++                      color: Color(0xFFD2691E).withOpacity(0.3),
++                      width: 1,
++                    ),
++                  ),
++                  child: Text(
++                    'BEINN',
++                    style: TextStyle(
++                      fontSize: 16,
++                      fontWeight: FontWeight.bold,
++                      color: Color(0xFFD2691E),
++                      letterSpacing: 1.5,
++                    ),
++                  ),
++                ),
++                // Icons
++                Row(
++                  children: [
++                    IconButton(
++                      icon: Icon(Icons.notifications_outlined,
++                          color: Colors.white, size: 24),
++                      onPressed: () {},
++                    ),
++                    Stack(
++                      children: [
++                        IconButton(
++                          icon: Icon(
++                            main_app.CartManager().wishlistItems.isNotEmpty
++                                ? Icons.favorite
++                                : Icons.favorite_outline,
++                            color: main_app.CartManager().wishlistItems.isNotEmpty
++                                ? Color(0xFFD2691E)
++                                : Colors.white,
++                            size: 24,
++                          ),
++                          onPressed: _navigateToWishlist,
++                        ),
++                        if (main_app.CartManager().wishlistItems.isNotEmpty)
++                          Positioned(
++                            right: 6,
++                            top: 6,
++                            child: Container(
++                              padding: EdgeInsets.all(2),
++                              decoration: BoxDecoration(
++                                color: Color(0xFFD2691E),
++                                borderRadius: BorderRadius.circular(10),
++                                border: Border.all(color: Colors.black, width: 1),
++                              ),
++                              constraints: BoxConstraints(
++                                minWidth: 16,
++                                minHeight: 16,
++                              ),
++                              child: Text(
++                                '${main_app.CartManager().wishlistItems.length}',
++                                style: TextStyle(
++                                  color: Colors.white,
++                                  fontSize: 10,
++                                  fontWeight: FontWeight.bold,
++                                ),
++                                textAlign: TextAlign.center,
++                              ),
++                            ),
++                          ),
++                      ],
++                    ),
++                    IconButton(
++                      icon: Icon(Icons.logout, color: Colors.white, size: 24),
++                      onPressed: _signOut,
++                    ),
++                  ],
++                ),
++              ],
++            ),
++          ),
++        ),
++      ),
++    );
++  }
++
++  Widget _buildWelcomeCard() {
++    if (!_showWelcomeCard || _userData == null) return SizedBox.shrink();
++
++    return SlideTransition(
++      position: Tween<Offset>(
++        begin: Offset(0.0, -1.0),
++        end: Offset.zero,
++      ).animate(CurvedAnimation(
++        parent: _slideController,
++        curve: Interval(0.1, 0.5, curve: Curves.easeOutCubic),
++      )),
++      child: AnimatedContainer(
++        duration: Duration(milliseconds: 400),
++        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
++        padding: EdgeInsets.all(20),
++        decoration: BoxDecoration(
++          gradient: LinearGradient(
++            begin: Alignment.topLeft,
++            end: Alignment.bottomRight,
++            colors: [
++              Color(0xFFD2691E).withOpacity(0.1),
++              Color(0xFFD2691E).withOpacity(0.05),
++            ],
++          ),
++          borderRadius: BorderRadius.circular(16),
++          border: Border.all(
++            color: Color(0xFFD2691E).withOpacity(0.2),
++            width: 1,
++          ),
++          boxShadow: [
++            BoxShadow(
++              color: Colors.black.withOpacity(0.2),
++              blurRadius: 8,
++              offset: Offset(0, 4),
++            ),
++          ],
++        ),
++        child: Row(
++          children: [
++            CircleAvatar(
++              radius: 25,
++              backgroundColor: Color(0xFFD2691E).withOpacity(0.2),
++              backgroundImage: _currentUser?.photoURL != null
++                  ? NetworkImage(_currentUser!.photoURL!)
++                  : null,
++              child: _currentUser?.photoURL == null
++                  ? Icon(Icons.person, color: Color(0xFFD2691E), size: 30)
++                  : null,
++            ),
++            SizedBox(width: 16),
++            Expanded(
++              child: Column(
++                crossAxisAlignment: CrossAxisAlignment.start,
++                children: [
++                  Text(
++                    'Welcome back!',
++                    style: TextStyle(
++                      color: Colors.grey[400],
++                      fontSize: 14,
++                    ),
++                  ),
++                  SizedBox(height: 4),
++                  Text(
++                    _userData != null
++                        ? '${_userData!['firstName'] ?? ''} ${_userData!['lastName'] ?? ''}'
++                        .trim()
++                        : _currentUser?.displayName ?? 'User',
++                    style: TextStyle(
++                      color: Colors.white,
++                      fontSize: 18,
++                      fontWeight: FontWeight.w600,
++                    ),
++                  ),
++                  SizedBox(height: 4),
++                  Text(
++                    'Ready to explore premium clothing?',
++                    style: TextStyle(
++                      color: Color(0xFFD2691E),
++                      fontSize: 14,
++                      fontWeight: FontWeight.w500,
++                    ),
++                  ),
++                ],
++              ),
++            ),
++            IconButton(
++              icon: Icon(Icons.close, color: Colors.grey[400], size: 20),
++              onPressed: _dismissWelcomeCard,
++            ),
++          ],
++        ),
++      ),
++    );
++  }
++
++  Widget _buildBannerSection() {
++    return SlideTransition(
++      position: Tween<Offset>(
++        begin: Offset(1.0, 0.0),
++        end: Offset.zero,
++      ).animate(CurvedAnimation(
++        parent: _slideController,
++        curve: Interval(0.2, 0.6, curve: Curves.easeOutCubic),
++      )),
++      child: AnimatedContainer(
++        duration: Duration(milliseconds: 800),
++        curve: Curves.easeOutCubic,
++        margin: EdgeInsets.symmetric(
++          horizontal: 20,
++          vertical: _showWelcomeCard ? 4 : 12,
++        ),
++        child: Container(
++          height: 180,
++          decoration: BoxDecoration(
++            borderRadius: BorderRadius.circular(16),
++            boxShadow: [
++              BoxShadow(
++                color: Colors.black.withOpacity(0.3),
++                blurRadius: 10,
++                offset: Offset(0, 4),
++              ),
++            ],
++          ),
++          child: PageView.builder(
++            controller: _bannerController,
++            onPageChanged: (index) {
++              setState(() {
++                _currentBannerIndex = index;
++              });
++            },
++            itemCount: _bannerData.length,
++            itemBuilder: (context, index) {
++              final banner = _bannerData[index];
++              return Container(
++                decoration: BoxDecoration(
++                  borderRadius: BorderRadius.circular(16),
++                  image: DecorationImage(
++                    image: NetworkImage(banner['image']),
++                    fit: BoxFit.cover,
++                  ),
++                ),
++                child: Container(
++                  decoration: BoxDecoration(
++                    borderRadius: BorderRadius.circular(16),
++                    gradient: LinearGradient(
++                      begin: Alignment.centerLeft,
++                      end: Alignment.centerRight,
++                      colors: [
++                        Colors.black.withOpacity(0.7),
++                        Colors.transparent,
++                      ],
++                    ),
++                  ),
++                  padding: EdgeInsets.all(20),
++                  child: Column(
++                    crossAxisAlignment: CrossAxisAlignment.start,
++                    mainAxisAlignment: MainAxisAlignment.center,
++                    children: [
++                      Text(
++                        banner['title'],
++                        style: TextStyle(
++                          color: Colors.white,
++                          fontSize: 24,
++                          fontWeight: FontWeight.bold,
++                          letterSpacing: 2,
++                        ),
++                      ),
++                      SizedBox(height: 8),
++                      Text(
++                        banner['subtitle'],
++                        style: TextStyle(
++                          color: Colors.white,
++                          fontSize: 16,
++                          fontWeight: FontWeight.w500,
++                        ),
++                      ),
++                      SizedBox(height: 4),
++                      Text(
++                        banner['offer'],
++                        style: TextStyle(
++                          color: Color(0xFFD2691E),
++                          fontSize: 14,
++                          fontWeight: FontWeight.w600,
++                        ),
++                      ),
++                    ],
++                  ),
++                ),
++              );
++            },
++          ),
++        ),
++      ),
++    );
++  }
++
++  Widget _buildBannerIndicators() {
++    return Container(
++      margin: EdgeInsets.only(top: 8),
++      child: Row(
++        mainAxisAlignment: MainAxisAlignment.center,
++        children: _bannerData.asMap().entries.map((entry) {
++          return AnimatedContainer(
++            duration: Duration(milliseconds: 300),
++            width: _currentBannerIndex == entry.key ? 20 : 8,
++            height: 8,
++            margin: EdgeInsets.symmetric(horizontal: 4),
++            decoration: BoxDecoration(
++              borderRadius: BorderRadius.circular(4),
++              color: _currentBannerIndex == entry.key
++                  ? Color(0xFFD2691E)
++                  : Colors.grey[600],
++            ),
++          );
++        }).toList(),
++      ),
++    );
++  }
++
++  Widget _buildSectionToggle() {
++    return SlideTransition(
++      position: Tween<Offset>(
++        begin: Offset(0.0, 1.0),
++        end: Offset.zero,
++      ).animate(CurvedAnimation(
++        parent: _slideController,
++        curve: Interval(0.4, 0.8, curve: Curves.easeOutCubic),
++      )),
++      child: Container(
++        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
++        decoration: BoxDecoration(
++          color: Colors.grey[900],
++          borderRadius: BorderRadius.circular(25),
++          border: Border.all(color: Colors.grey[800]!, width: 1),
++          boxShadow: [
++            BoxShadow(
++              color: Colors.black.withOpacity(0.2),
++              blurRadius: 8,
++              offset: Offset(0, 4),
++            ),
++          ],
++        ),
++        child: Row(
++          children: [
++            Expanded(
++              child: GestureDetector(
++                onTap: () => _switchSection('Clothing'),
++                child: AnimatedContainer(
++                  duration: Duration(milliseconds: 300),
++                  curve: Curves.easeOutCubic,
++                  padding: EdgeInsets.symmetric(vertical: 12),
++                  decoration: BoxDecoration(
++                    color: _selectedSection == 'Clothing'
++                        ? Color(0xFFD2691E)
++                        : Colors.transparent,
++                    borderRadius: BorderRadius.circular(25),
++                    boxShadow: _selectedSection == 'Clothing'
++                        ? [
++                      BoxShadow(
++                        color: Color(0xFFD2691E).withOpacity(0.3),
++                        blurRadius: 8,
++                        offset: Offset(0, 2),
++                      ),
++                    ]
++                        : null,
++                  ),
++                  child: Text(
++                    'Clothing',
++                    style: TextStyle(
++                      color: _selectedSection == 'Clothing'
++                          ? Colors.white
++                          : Colors.grey[400],
++                      fontSize: 16,
++                      fontWeight: FontWeight.w600,
++                    ),
++                    textAlign: TextAlign.center,
++                  ),
++                ),
++              ),
++            ),
++            Expanded(
++              child: GestureDetector(
++                onTap: () => _switchSection('Perfumes'),
++                child: AnimatedContainer(
++                  duration: Duration(milliseconds: 300),
++                  curve: Curves.easeOutCubic,
++                  padding: EdgeInsets.symmetric(vertical: 12),
++                  decoration: BoxDecoration(
++                    color: _selectedSection == 'Perfumes'
++                        ? Color(0xFFD2691E)
++                        : Colors.transparent,
++                    borderRadius: BorderRadius.circular(25),
++                    boxShadow: _selectedSection == 'Perfumes'
++                        ? [
++                      BoxShadow(
++                        color: Color(0xFFD2691E).withOpacity(0.3),
++                        blurRadius: 8,
++                        offset: Offset(0, 2),
++                      ),
++                    ]
++                        : null,
++                  ),
++                  child: Text(
++                    'Perfumes',
++                    style: TextStyle(
++                      color: _selectedSection == 'Perfumes'
++                          ? Colors.white
++                          : Colors.grey[400],
++                      fontSize: 16,
++                      fontWeight: FontWeight.w600,
++                    ),
++                    textAlign: TextAlign.center,
++                  ),
++                ),
++              ),
++            ),
++          ],
++        ),
++      ),
++    );
++  }
++
++  Widget _buildCategoriesSection() {
++    // Only show categories when Clothing is selected
++    if (_selectedSection != 'Clothing') return SizedBox.shrink();
++
++    return SlideTransition(
++      position: Tween<Offset>(
++        begin: Offset(-1.0, 0.0),
++        end: Offset.zero,
++      ).animate(CurvedAnimation(
++        parent: _slideController,
++        curve: Interval(0.3, 0.7, curve: Curves.easeOutCubic),
++      )),
++      child: Container(
++        margin: EdgeInsets.symmetric(vertical: 16),
++        child: Column(
++          crossAxisAlignment: CrossAxisAlignment.start,
++          children: [
++            Padding(
++              padding: EdgeInsets.symmetric(horizontal: 20),
++              child: Row(
++                mainAxisAlignment: MainAxisAlignment.spaceBetween,
++                children: [
++                  Text(
++                    'Categories',
++                    style: TextStyle(
++                      color: Colors.white,
++                      fontSize: 20,
++                      fontWeight: FontWeight.w600,
++                    ),
++                  ),
++                  GestureDetector(
++                    onTap: _handleCategoryScroll,
++                    child: Text(
++                      _showSeeAll ? 'See All' : 'Back',
++                      style: TextStyle(
++                        color: Color(0xFFD2691E),
++                        fontSize: 14,
++                        fontWeight: FontWeight.w500,
++                      ),
++                    ),
++                  ),
++                ],
++              ),
++            ),
++            SizedBox(height: 16),
++            Container(
++              height: 100,
++              child: ListView.builder(
++                controller: _categoriesScrollController,
++                scrollDirection: Axis.horizontal,
++                padding: EdgeInsets.symmetric(horizontal: 16),
++                itemCount: _categories.length,
++                itemBuilder: (context, index) {
++                  final category = _categories[index];
++                  return GestureDetector(
++                    onTap: () => main_app.navigateToCategoryProducts(
++                        context, category['name']),
++                    child: Container(
++                      width: 80,
++                      margin: EdgeInsets.symmetric(horizontal: 4),
++                      child: Column(
++                        children: [
++                          Container(
++                            width: 60,
++                            height: 60,
++                            decoration: BoxDecoration(
++                              color: Color(0xFFD2691E).withOpacity(0.1),
++                              borderRadius: BorderRadius.circular(16),
++                              border: Border.all(
++                                color: Color(0xFFD2691E).withOpacity(0.3),
++                                width: 1,
++                              ),
++                              boxShadow: [
++                                BoxShadow(
++                                  color: Colors.black.withOpacity(0.2),
++                                  blurRadius: 4,
++                                  offset: Offset(0, 2),
++                                ),
++                              ],
++                            ),
++                            child: ClipRRect(
++                              borderRadius: BorderRadius.circular(14),
++                              child: Container(
++                                padding: EdgeInsets.all(8),
++                                child: Image.network(
++                                  category['image'],
++                                  width: 44,
++                                  height: 44,
++                                  fit: BoxFit.contain,
++                                  errorBuilder: (context, error, stackTrace) {
++                                    return Icon(
++                                      Icons.checkroom,
++                                      color: Color(0xFFD2691E),
++                                      size: 28,
++                                    );
++                                  },
++                                  loadingBuilder:
++                                      (context, child, loadingProgress) {
++                                    if (loadingProgress == null) return child;
++                                    return Center(
++                                      child: SizedBox(
++                                        width: 20,
++                                        height: 20,
++                                        child: CircularProgressIndicator(
++                                          color: Color(0xFFD2691E),
++                                          strokeWidth: 2,
++                                        ),
++                                      ),
++                                    );
++                                  },
++                                ),
++                              ),
++                            ),
++                          ),
++                          SizedBox(height: 8),
++                          Text(
++                            category['name'],
++                            style: TextStyle(
++                              color: Colors.white,
++                              fontSize: 12,
++                              fontWeight: FontWeight.w500,
++                            ),
++                            textAlign: TextAlign.center,
++                            maxLines: 1,
++                            overflow: TextOverflow.ellipsis,
++                          ),
++                        ],
++                      ),
++                    ),
++                  );
++                },
++              ),
++            ),
++          ],
++        ),
++      ),
++    );
++  }
++
++  Widget _buildFeaturedProducts() {
++    return SlideTransition(
++      position: _sectionSlideAnimation,
++      child: Container(
++        margin: EdgeInsets.symmetric(vertical: 8),
++        child: Column(
++          crossAxisAlignment: CrossAxisAlignment.start,
++          children: [
++            Padding(
++              padding: EdgeInsets.symmetric(horizontal: 20),
++              child: Text(
++                _selectedSection == 'Clothing'
++                    ? 'Featured Products'
++                    : 'Premium Perfumes',
++                style: TextStyle(
++                  color: Colors.white,
++                  fontSize: 20,
++                  fontWeight: FontWeight.w600,
++                ),
++              ),
++            ),
++            SizedBox(height: 16),
++            _selectedSection == 'Clothing'
++                ? _buildClothingGrid()
++                : _buildPerfumesComingSoon(),
++          ],
++        ),
++      ),
++    );
++  }
++
++  Widget _buildClothingGrid() {
++    return Container(
++      padding: EdgeInsets.symmetric(horizontal: 20),
++      child: GridView.builder(
++        shrinkWrap: true,
++        physics: NeverScrollableScrollPhysics(),
++        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
++          crossAxisCount: 2,
++          crossAxisSpacing: 16,
++          mainAxisSpacing: 16,
++          childAspectRatio: 0.75,
++        ),
++        itemCount: _featuredProducts.length,
++        itemBuilder: (context, index) {
++          final product = _featuredProducts[index];
++          return _buildProductCard(product);
++        },
++      ),
++    );
++  }
++
++  Widget _buildPerfumesComingSoon() {
++    return Container(
++      margin: EdgeInsets.symmetric(horizontal: 20),
++      padding: EdgeInsets.all(32),
++      decoration: BoxDecoration(
++        gradient: LinearGradient(
++          begin: Alignment.topLeft,
++          end: Alignment.bottomRight,
++          colors: [
++            Color(0xFFD2691E).withOpacity(0.1),
++            Color(0xFFD2691E).withOpacity(0.05),
++          ],
++        ),
++        borderRadius: BorderRadius.circular(20),
++        border: Border.all(
++          color: Color(0xFFD2691E).withOpacity(0.2),
++          width: 1,
++        ),
++        boxShadow: [
++          BoxShadow(
++            color: Colors.black.withOpacity(0.2),
++            blurRadius: 8,
++            offset: Offset(0, 4),
++          ),
++        ],
++      ),
++      child: Column(
++        children: [
++          Icon(
++            Icons.access_time,
++            size: 64,
++            color: Color(0xFFD2691E),
++          ),
++          SizedBox(height: 24),
++          Text(
++            'Coming Soon!',
++            style: TextStyle(
++              color: Colors.white,
++              fontSize: 28,
++              fontWeight: FontWeight.w700,
++            ),
++          ),
++          SizedBox(height: 12),
++          Text(
++            'Premium perfumes collection launching soon',
++            style: TextStyle(
++              color: Colors.grey[400],
++              fontSize: 16,
++            ),
++            textAlign: TextAlign.center,
++          ),
++          SizedBox(height: 8),
++          Text(
++            'Stay tuned for exclusive fragrances',
++            style: TextStyle(
++              color: Color(0xFFD2691E),
++              fontSize: 14,
++              fontWeight: FontWeight.w500,
++            ),
++            textAlign: TextAlign.center,
++          ),
++        ],
++      ),
++    );
++  }
++
++  Widget _buildProductCard(Map<String, dynamic> product) {
++    final isWishlisted = main_app.CartManager().isInWishlist(product['id']);
++
++    return GestureDetector(
++      onTap: () => main_app.navigateToProductDetail(context, product),
++      child: AnimatedContainer(
++        duration: Duration(milliseconds: 300),
++        decoration: BoxDecoration(
++          color: Colors.grey[900],
++          borderRadius: BorderRadius.circular(16),
++          border: Border.all(color: Colors.grey[800]!, width: 1),
++          boxShadow: [
++            BoxShadow(
++              color: Colors.black.withOpacity(0.2),
++              blurRadius: 8,
++              offset: Offset(0, 4),
++            ),
++          ],
++        ),
++        child: Column(
++          crossAxisAlignment: CrossAxisAlignment.start,
++          children: [
++            Expanded(
++              flex: 3,
++              child: Stack(
++                children: [
++                  Container(
++                    width: double.infinity,
++                    decoration: BoxDecoration(
++                      borderRadius:
++                      BorderRadius.vertical(top: Radius.circular(16)),
++                      image: DecorationImage(
++                        image: NetworkImage(product['image']),
++                        fit: BoxFit.cover,
++                      ),
++                    ),
++                  ),
++                  Positioned(
++                    top: 8,
++                    right: 8,
++                    child: Container(
++                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
++                      decoration: BoxDecoration(
++                        color: Color(0xFFD2691E),
++                        borderRadius: BorderRadius.circular(8),
++                      ),
++                      child: Text(
++                        product['discount'],
++                        style: TextStyle(
++                          color: Colors.white,
++                          fontSize: 10,
++                          fontWeight: FontWeight.w600,
++                        ),
++                      ),
++                    ),
++                  ),
++                  Positioned(
++                    bottom: 8,
++                    right: 8,
++                    child: GestureDetector(
++                      onTap: () => _toggleWishlist(product),
++                      child: Container(
++                        padding: EdgeInsets.all(6),
++                        decoration: BoxDecoration(
++                          color: Colors.black.withOpacity(0.7),
++                          borderRadius: BorderRadius.circular(20),
++                        ),
++                        child: Icon(
++                          isWishlisted
++                              ? Icons.favorite
++                              : Icons.favorite_outline,
++                          color:
++                          isWishlisted ? Color(0xFFD2691E) : Colors.white,
++                          size: 16,
++                        ),
++                      ),
++                    ),
++                  ),
++                ],
++              ),
++            ),
++            Expanded(
++              flex: 2,
++              child: Padding(
++                padding: EdgeInsets.all(12),
++                child: Column(
++                  crossAxisAlignment: CrossAxisAlignment.start,
++                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
++                  children: [
++                    Flexible(
++                      child: Text(
++                        product['name'],
++                        style: TextStyle(
++                          color: Colors.white,
++                          fontSize: 14,
++                          fontWeight: FontWeight.w600,
++                        ),
++                        maxLines: 2,
++                        overflow: TextOverflow.ellipsis,
++                      ),
++                    ),
++                    SizedBox(height: 8),
++                    Row(
++                      children: [
++                        Text(
++                          product['price'],
++                          style: TextStyle(
++                            color: Color(0xFFD2691E),
++                            fontSize: 16,
++                            fontWeight: FontWeight.w700,
++                          ),
++                        ),
++                        SizedBox(width: 8),
++                        Expanded(
++                          child: Text(
++                            product['originalPrice'],
++                            style: TextStyle(
++                              color: Colors.grey[500],
++                              fontSize: 12,
++                              decoration: TextDecoration.lineThrough,
++                            ),
++                            overflow: TextOverflow.ellipsis,
++                          ),
++                        ),
++                      ],
++                    ),
++                  ],
++                ),
++              ),
++            ),
++          ],
++        ),
++      ),
++    );
++  }
++
++  @override
++  Widget build(BuildContext context) {
++    if (_isLoading) {
++      return Scaffold(
++        backgroundColor: Colors.black,
++        body: Center(
++          child: CircularProgressIndicator(
++            color: Color(0xFFD2691E),
++          ),
++        ),
++      );
++    }
++
++    return Scaffold(
++      backgroundColor: Colors.black,
++      body: FadeTransition(
++        opacity: _fadeAnimation,
++        child: SlideTransition(
++          position: _slideAnimation,
++          child: Column(
++            children: [
++              // Fixed Header (without search bar)
++              _buildFixedHeader(),
++              // Scrollable Content
++              Expanded(
++                child: SingleChildScrollView(
++                  physics: BouncingScrollPhysics(),
++                  child: Column(
++                    crossAxisAlignment: CrossAxisAlignment.start,
++                    children: [
++                      _buildWelcomeCard(),
++                      _buildBannerSection(),
++                      _buildBannerIndicators(),
++                      _buildSectionToggle(),
++                      _buildCategoriesSection(),
++                      _buildFeaturedProducts(),
++                      SizedBox(height: 100), // Bottom padding for navigation bar
++                    ],
++                  ),
++                ),
++              ),
++            ],
++          ),
++        ),
++      ),
++    );
++  }
++
++  @override
++  void dispose() {
++    _fadeController.dispose();
++    _slideController.dispose();
++    _scaleController.dispose();
++    _bannerSlideController.dispose();
++    _sectionSwitchController.dispose();
++    _bannerTimer?.cancel();
++    _bannerController.dispose();
++    _categoriesScrollController.dispose();
++    super.dispose();
++  }
++}
+\ No newline at end of file

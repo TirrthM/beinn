@@ -12,6 +12,9 @@ class Product {
   final String details;
   final String category;
 
+  final String variantLabel;
+  final String? washCare;
+
   Product({
     required this.id,
     required this.name,
@@ -25,7 +28,12 @@ class Product {
     required this.description,
     required this.details,
     required this.category,
+    this.colorImages,
+    this.variantLabel = 'Color',
+    this.washCare,
   });
+
+  final Map<String, List<String>>? colorImages;
 
   Map<String, dynamic> toMap() {
     return {
@@ -38,9 +46,12 @@ class Product {
       'images': images,
       'sizes': sizes,
       'colors': colors,
+      'colorImages': colorImages,
       'description': description,
       'details': details,
       'category': category,
+      'variantLabel': variantLabel,
+      'washCare': washCare,
     };
   }
 
@@ -55,9 +66,21 @@ class Product {
       images: List<String>.from(map['images'] ?? []),
       sizes: List<String>.from(map['sizes'] ?? []),
       colors: List<String>.from(map['colors'] ?? []),
+      colorImages: map['colorImages'] != null
+          ? Map<String, List<String>>.from(
+              (map['colorImages'] as Map).map(
+                (key, value) => MapEntry(
+                  key,
+                  List<String>.from(value),
+                ),
+              ),
+            )
+          : null,
       description: map['description'] ?? '',
       details: map['details'] ?? '',
       category: map['category'] ?? '',
+      variantLabel: map['variantLabel'] ?? 'Color',
+      washCare: map['washCare'],
     );
   }
 }

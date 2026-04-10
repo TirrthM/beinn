@@ -12,15 +12,45 @@ import 'screens/wishlist.dart';
 import 'screens/product_detail.dart';
 import 'screens/checkout.dart';
 import 'screens/category_products.dart';
+import 'screens/profile_completion.dart';
+import 'theme_notifier.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Handling a background message: ${message.messageId}');
+}
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+const AndroidNotificationChannel highImportanceChannel =
+    AndroidNotificationChannel(
+  'high_importance_channel', // ID
+  'High Importance Notifications', // Name
+  description: 'Used for important notifications',
+  importance: Importance.max,
+);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp();
     print('Firebase initialized successfully');
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(highImportanceChannel);
+
+    await initTheme(); // Initialize theme preference
   } catch (e) {
-    print('Firebase initialization error: $e');
+    print('Initialization error: $e');
   }
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   runApp(BeinnApp());
 }
 
@@ -30,7 +60,12 @@ class BeinnApp extends StatelessWidget {
     return MaterialApp(
       title: 'Beinn - Premium Clothing',
       theme: ThemeData(
-        primarySwatch: Colors.orange,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xFFBB694A),
+          primary: Color(0xFFBB694A),
+          secondary: Color(0xFFBB694A),
+          brightness: Brightness.dark,
+        ),
         scaffoldBackgroundColor: Colors.black,
         fontFamily: 'SF Pro Display',
         pageTransitionsTheme: PageTransitionsTheme(
@@ -54,114 +89,226 @@ class AuthWrapper extends StatefulWidget {
 class _AuthWrapperState extends State<AuthWrapper> {
   bool _isLoading = true;
   bool _isLoggedIn = false;
+  bool _isProfileComplete = false;
+  String _displayedText1 = "";
+  String _displayedText2 = "";
 
   @override
   void initState() {
     super.initState();
     _checkAuthStatus();
+    _initFCM();
+  }
+
+  Future<void> _initFCM() async {
+    try {
+      String? token = await FirebaseMessaging.instance.getToken();
+      print("FCM TOKEN (CURRENT): $token");
+
+      if (token != null) {
+        _saveTokenToBackend(token);
+      }
+
+      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+        print("FCM TOKEN REFRESHED: $newToken");
+        _saveTokenToBackend(newToken);
+      });
+
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        RemoteNotification? notification = message.notification;
+        AndroidNotification? android = message.notification?.android;
+
+        if (notification != null && android != null) {
+          flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                highImportanceChannel.id,
+                highImportanceChannel.name,
+                channelDescription: highImportanceChannel.description,
+                importance: Importance.max,
+                priority: Priority.high,
+                icon: '@mipmap/ic_launcher',
+              ),
+            ),
+          );
+        }
+      });
+    } catch (e) {
+      print("Error initializing FCM: $e");
+    }
+  }
+
+  Future<void> _saveTokenToBackend(String token) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .set({'fcmToken': token}, SetOptions(merge: true));
+        print("FCM Token saved to backend");
+      }
+    } catch (e) {
+      print("Error saving FCM token: $e");
+    }
+  }
+
+  Future<void> _startAnimation() async {
+    const text1 = "BEINN";
+    const text2 = "Be Real";
+
+    // No initial pause - start immediately
+    // await Future.delayed(Duration(milliseconds: 0));
+
+    // Animate BEINN - faster (150ms per char)
+    for (int i = 0; i < text1.length; i++) {
+      await Future.delayed(Duration(milliseconds: 150));
+      if (mounted) {
+        setState(() {
+          _displayedText1 = text1.substring(0, i + 1);
+        });
+      }
+    }
+
+    // Pause between lines - reduced (100ms)
+    await Future.delayed(Duration(milliseconds: 100));
+
+    // Animate Be Real - faster (50ms per char)
+    for (int i = 0; i < text2.length; i++) {
+      await Future.delayed(Duration(milliseconds: 50));
+      if (mounted) {
+        setState(() {
+          _displayedText2 = text2.substring(0, i + 1);
+        });
+      }
+    }
+
+    // Final pause - reduced (500ms)
+    await Future.delayed(Duration(milliseconds: 500));
   }
 
   Future<void> _checkAuthStatus() async {
     try {
+      // Start animation
+      final animationFuture = _startAnimation();
+
       // Check Firebase Auth state
       final currentUser = FirebaseAuth.instance.currentUser;
-      // Check SharedPreferences for login status
+
+      bool isLoggedIn = false;
+      bool isProfileComplete = false;
+
+      if (currentUser != null) {
+        isLoggedIn = true;
+
+        // Check Firestore for profile completion status
+        try {
+          final userDoc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(currentUser.uid)
+              .get();
+
+          if (userDoc.exists) {
+            isProfileComplete = userDoc.data()?['profileComplete'] ?? false;
+          }
+        } catch (e) {
+          print('Error checking profile status: $e');
+        }
+      }
+
+      // Sync SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-      final savedUserId = prefs.getString('userId');
-
-      // User is considered logged in if:
-      // 1. Firebase user exists AND
-      // 2. SharedPreferences shows logged in AND
-      // 3. User IDs match
-      bool shouldShowHome = currentUser != null &&
-          isLoggedIn &&
-          savedUserId == currentUser.uid;
-
-      setState(() {
-        _isLoggedIn = shouldShowHome;
-        _isLoading = false;
-      });
-
-      // If user exists in Firebase but not in SharedPreferences, update it
-      if (currentUser != null && !isLoggedIn) {
+      if (isLoggedIn) {
         await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('userId', currentUser.uid);
+        await prefs.setString('userId', currentUser!.uid);
+      } else {
+        await prefs.setBool('isLoggedIn', false);
+        await prefs.remove('userId');
+      }
+
+      // Wait for animation to finish
+      await animationFuture;
+
+      if (mounted) {
         setState(() {
-          _isLoggedIn = true;
+          _isLoggedIn = isLoggedIn;
+          _isProfileComplete = isProfileComplete;
+          _isLoading = false;
         });
       }
     } catch (e) {
       print('Error checking auth status: $e');
-      setState(() {
-        _isLoggedIn = false;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoggedIn = false;
+          _isProfileComplete = false;
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Color(0xFFD2691E).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Color(0xFFD2691E).withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  'BEINN',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFD2691E),
-                    letterSpacing: 2,
-                  ),
-                ),
-              ),
-              SizedBox(height: 24),
-              CircularProgressIndicator(
-                color: Color(0xFFD2691E),
-                strokeWidth: 3,
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Loading...',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 800),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      child: _isLoading
+          ? Scaffold(
+              key: ValueKey('loading'),
+              backgroundColor: Colors.black,
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _displayedText1,
+                      style: TextStyle(
+                        fontSize: 64,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 4,
+                        fontFamily: 'SF Pro Display',
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      _displayedText2,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 2,
+                        fontFamily: 'SF Pro Display',
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return _isLoggedIn ? MainNavigationWrapper() : WelcomeScreen();
+            )
+          : (_isLoggedIn
+              ? (_isProfileComplete
+                  ? MainNavigationWrapper(key: ValueKey('home'))
+                  : ProfileCompletionScreen(
+                      user: FirebaseAuth.instance.currentUser!))
+              : WelcomeScreen(key: ValueKey('welcome'))),
+    );
   }
 }
 
 class CustomPageTransitionBuilder extends PageTransitionsBuilder {
   @override
   Widget buildTransitions<T extends Object?>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-      ) {
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(1.0, 0.0),
@@ -216,13 +363,18 @@ class CartManager {
             .doc(user.uid)
             .collection('cart');
 
-        final docId = '${item['id']}_${item['selectedSize']}_${item['selectedColor']}';
+        final docId =
+            '${item['id']}_${item['selectedSize']}_${item['selectedColor']}';
         print('Document ID: $docId');
 
         // Extract numeric values from price strings
-        final discountedPrice = double.parse(item['price'].toString().replaceAll('₹', '').replaceAll(',', ''));
+        final discountedPrice = double.parse(
+            item['price'].toString().replaceAll('₹', '').replaceAll(',', ''));
         final originalPrice = item['originalPrice'] != null
-            ? double.parse(item['originalPrice'].toString().replaceAll('₹', '').replaceAll(',', ''))
+            ? double.parse(item['originalPrice']
+                .toString()
+                .replaceAll('₹', '')
+                .replaceAll(',', ''))
             : discountedPrice;
 
         // Calculate discount percentage
@@ -233,7 +385,8 @@ class CartManager {
         final cartItemData = {
           'productId': item['id'],
           'productName': item['name'],
-          'productCategory': item['category'] ?? _getCategoryFromProductName(item['name']),
+          'productCategory':
+              item['category'] ?? _getCategoryFromProductName(item['name']),
           'productImage': item['image'],
           'productImages': item['images'] ?? [],
           'productDescription': item['description'] ?? '',
@@ -278,9 +431,13 @@ class CartManager {
         print('Wishlist Document ID: $docId');
 
         // Extract numeric values from price strings
-        final discountedPrice = double.parse(item['price'].toString().replaceAll('₹', '').replaceAll(',', ''));
+        final discountedPrice = double.parse(
+            item['price'].toString().replaceAll('₹', '').replaceAll(',', ''));
         final originalPrice = item['originalPrice'] != null
-            ? double.parse(item['originalPrice'].toString().replaceAll('₹', '').replaceAll(',', ''))
+            ? double.parse(item['originalPrice']
+                .toString()
+                .replaceAll('₹', '')
+                .replaceAll(',', ''))
             : discountedPrice;
 
         // Calculate discount percentage
@@ -291,7 +448,8 @@ class CartManager {
         final wishlistItemData = {
           'productId': item['id'],
           'productName': item['name'],
-          'productCategory': item['category'] ?? _getCategoryFromProductName(item['name']),
+          'productCategory':
+              item['category'] ?? _getCategoryFromProductName(item['name']),
           'productImage': item['image'],
           'productImages': item['images'] ?? [],
           'productDescription': item['description'] ?? '',
@@ -306,7 +464,9 @@ class CartManager {
         };
 
         print('Saving wishlist item data: ${wishlistItemData['productName']}');
-        await wishlistRef.doc(docId).set(wishlistItemData, SetOptions(merge: true));
+        await wishlistRef
+            .doc(docId)
+            .set(wishlistItemData, SetOptions(merge: true));
         print('Wishlist item saved successfully to Firestore');
       } else {
         print('No authenticated user found');
@@ -330,7 +490,8 @@ class CartManager {
             .orderBy('addedAt', descending: false)
             .get();
 
-        print('Found ${wishlistSnapshot.docs.length} wishlist items in Firestore');
+        print(
+            'Found ${wishlistSnapshot.docs.length} wishlist items in Firestore');
 
         // Clear existing wishlist items
         _wishlistItems.clear();
@@ -344,7 +505,9 @@ class CartManager {
             'id': data['productId'] ?? '',
             'name': data['productName'] ?? '',
             'price': '₹${data['discountedPrice']?.toInt() ?? 0}',
-            'originalPrice': data['originalPrice'] != null ? '₹${data['originalPrice']?.toInt()}' : null,
+            'originalPrice': data['originalPrice'] != null
+                ? '₹${data['originalPrice']?.toInt()}'
+                : null,
             'image': data['productImage'] ?? '',
             'discount': data['discountPercentage'] ?? '',
             'images': List<String>.from(data['productImages'] ?? []),
@@ -357,7 +520,8 @@ class CartManager {
           _wishlistItems.add(wishlistItem);
         }
 
-        print('Wishlist loaded successfully with ${_wishlistItems.length} items');
+        print(
+            'Wishlist loaded successfully with ${_wishlistItems.length} items');
       }
     } catch (e) {
       print('Error loading wishlist from Firestore: $e');
@@ -369,7 +533,7 @@ class CartManager {
 
     // Check if product already exists in cart with same size and color
     int existingIndex = _cartItems.indexWhere((item) =>
-    item['id'] == product['id'] &&
+        item['id'] == product['id'] &&
         item['selectedSize'] == product['selectedSize'] &&
         item['selectedColor'] == product['selectedColor']);
 
@@ -391,7 +555,7 @@ class CartManager {
 
   void removeFromCart(String productId, String size, String color) {
     _cartItems.removeWhere((item) =>
-    item['id'] == productId &&
+        item['id'] == productId &&
         item['selectedSize'] == size &&
         item['selectedColor'] == color);
 
@@ -399,7 +563,8 @@ class CartManager {
     _removeCartItemFromFirebase(productId, size, color);
   }
 
-  Future<void> _removeCartItemFromFirebase(String productId, String size, String color) async {
+  Future<void> _removeCartItemFromFirebase(
+      String productId, String size, String color) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
@@ -464,7 +629,8 @@ class CartManager {
   double getTotalAmount() {
     double total = 0;
     for (var item in _cartItems) {
-      double price = double.parse(item['price'].replaceAll('₹', '').replaceAll(',', ''));
+      double price =
+          double.parse(item['price'].replaceAll('₹', '').replaceAll(',', ''));
       int quantity = item['quantity'] ?? 1;
       total += price * quantity;
     }
@@ -472,7 +638,8 @@ class CartManager {
   }
 
   int getCartItemCount() {
-    return _cartItems.fold(0, (sum, item) => sum + (item['quantity'] as int? ?? 1));
+    return _cartItems.fold(
+        0, (sum, item) => sum + (item['quantity'] as int? ?? 1));
   }
 
   int getWishlistItemCount() {
@@ -483,7 +650,8 @@ class CartManager {
 // Main Navigation Wrapper
 class MainNavigationWrapper extends StatefulWidget {
   final int initialIndex;
-  const MainNavigationWrapper({Key? key, this.initialIndex = 0}) : super(key: key);
+  const MainNavigationWrapper({Key? key, this.initialIndex = 0})
+      : super(key: key);
 
   @override
   _MainNavigationWrapperState createState() => _MainNavigationWrapperState();
@@ -547,52 +715,59 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        children: _screens,
-      ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+    return ValueListenableBuilder<bool>(
+      valueListenable: isDarkModeNotifier,
+      builder: (context, isDark, child) {
+        return Scaffold(
+          backgroundColor: isDark
+              ? Colors.black
+              : const Color.fromARGB(255, 250, 249, 245), // #FAF9F5
+          body: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            children: _screens,
+          ),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.grey[900]
+                  : const Color.fromARGB(255, 250, 249, 245), // #FAF9F5
+              border: Border(
+                top: BorderSide(
+                    color: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                    width: 0.5),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: SizedBox(
+                height: 70,
+                child: Row(
+                  children: List.generate(_navItems.length, (index) {
+                    return Expanded(
+                      child: _buildNavItem(index, isDark),
+                    );
+                  }),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        border: Border(
-          top: BorderSide(color: Colors.grey[800]!, width: 0.5),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: SizedBox(
-          height: 70,
-          child: Row(
-            children: List.generate(_navItems.length, (index) {
-              return Expanded(
-                child: _buildNavItem(index),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index) {
+  Widget _buildNavItem(int index, bool isDark) {
     final item = _navItems[index];
     final isSelected = _selectedIndex == index;
 
@@ -600,9 +775,9 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _onItemTapped(index),
-        splashColor: Color(0xFFD2691E).withOpacity(0.2),
-        highlightColor: Color(0xFFD2691E).withOpacity(0.1),
-        child: Container(
+        splashColor: const Color(0xFFBB694A).withOpacity(0.2),
+        highlightColor: const Color(0xFFBB694A).withOpacity(0.1),
+        child: SizedBox(
           height: 70,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -610,17 +785,19 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
               Stack(
                 children: [
                   AnimatedContainer(
-                    duration: Duration(milliseconds: 200),
-                    padding: EdgeInsets.all(8),
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? Color(0xFFD2691E).withOpacity(0.15)
+                          ? const Color(0xFFBB694A).withOpacity(0.15)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       isSelected ? item.activeIcon : item.icon,
-                      color: isSelected ? Color(0xFFD2691E) : Colors.grey[500],
+                      color: isSelected
+                          ? const Color(0xFFBB694A)
+                          : (isDark ? Colors.grey[500] : Colors.grey[600]),
                       size: 24,
                     ),
                   ),
@@ -630,19 +807,21 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
                       right: 4,
                       top: 4,
                       child: Container(
-                        padding: EdgeInsets.all(2),
+                        padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
-                          color: Color(0xFFD2691E),
+                          color: const Color(0xFFBB694A),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black, width: 1),
+                          border: Border.all(
+                              color: isDark ? Colors.black : Colors.white,
+                              width: 1),
                         ),
-                        constraints: BoxConstraints(
+                        constraints: const BoxConstraints(
                           minWidth: 16,
                           minHeight: 16,
                         ),
                         child: Text(
                           '${CartManager().getCartItemCount()}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -653,11 +832,13 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
                     ),
                 ],
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 item.label,
                 style: TextStyle(
-                  color: isSelected ? Color(0xFFD2691E) : Colors.grey[500],
+                  color: isSelected
+                      ? const Color(0xFFBB694A)
+                      : (isDark ? Colors.grey[500] : Colors.grey[600]),
                   fontSize: 10,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -692,7 +873,10 @@ class NavigationItem {
 }
 
 // Navigation Helper for Wishlist
-void navigateToWishlist(BuildContext context, List<Map<String, dynamic>> wishlistItems, Function(String) onRemoveFromWishlist) {
+void navigateToWishlist(
+    BuildContext context,
+    List<Map<String, dynamic>> wishlistItems,
+    Function(String) onRemoveFromWishlist) {
   Navigator.push(
     context,
     PageRouteBuilder(
@@ -721,11 +905,13 @@ void navigateToWishlist(BuildContext context, List<Map<String, dynamic>> wishlis
 }
 
 // Navigation Helper for Product Detail
-void navigateToProductDetail(BuildContext context, Map<String, dynamic> product) {
+void navigateToProductDetail(
+    BuildContext context, Map<String, dynamic> product) {
   Navigator.push(
     context,
     PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => ProductDetailScreen(product: product),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          ProductDetailScreen(product: product),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return SlideTransition(
           position: Tween<Offset>(
@@ -751,7 +937,8 @@ void navigateToCategoryProducts(BuildContext context, String categoryName) {
   Navigator.push(
     context,
     PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => CategoryProductsScreen(categoryName: categoryName),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          CategoryProductsScreen(categoryName: categoryName),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return SlideTransition(
           position: Tween<Offset>(
@@ -773,11 +960,13 @@ void navigateToCategoryProducts(BuildContext context, String categoryName) {
 }
 
 // Navigation Helper for Checkout
-void navigateToCheckout(BuildContext context, List<Map<String, dynamic>> items) {
+void navigateToCheckout(
+    BuildContext context, List<Map<String, dynamic>> items) {
   Navigator.push(
     context,
     PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => CheckoutScreen(items: items),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          CheckoutScreen(items: items),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return SlideTransition(
           position: Tween<Offset>(

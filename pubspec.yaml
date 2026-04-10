@@ -2,7 +2,7 @@ name: beinn1
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -47,11 +47,18 @@ dependencies:
   collection: ^1.19.1
   flutter_svg: ^2.2.0
   lottie: ^3.3.1
-
+  firebase_messaging: ^15.2.10
+  flutter_local_notifications: ^19.5.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  firebase_in_app_messaging: ^0.8.1+10
+  firebase_analytics: ^11.6.0
+  url_launcher: ^6.3.2
+  font_awesome_flutter: ^10.12.0
+  flutter_markdown: ^0.7.7+1
+  video_player: ^2.10.1
 
 dev_dependencies:
   flutter_test:
@@ -63,22 +70,58 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/images/
+    - assets/images/oversized_tshirts/acid_wash/
+    - assets/images/oversized_tshirts/back/
+    - assets/images/oversized_tshirts/be_real/
+    - assets/images/oversized_tshirts/beinn_flower/
+    - assets/images/oversized_tshirts/beinn_middle/
+    - assets/images/oversized_tshirts/beinn_side/
+    - assets/images/oversized_tshirts/corporeal/
+    - assets/images/oversized_tshirts/plains/
+    - assets/images/oversized_tshirts/unorthodox/
+    - assets/images/shirts/b_shirt/
+    - assets/images/shirts/plain_t_shirt/
+    - assets/images/shirts/back/
+    - assets/images/hoodies/back/
+    - assets/images/hoodies/beinn_left/
+    - assets/images/hoodies/beinn_middle/
+    - assets/images/hoodies/plain/
+    - assets/images/hoodies/whatever/
+    - assets/images/sweatshirts/back/
+    - assets/images/sweatshirts/beinn_left/
+    - assets/images/sweatshirts/beinn_middle/
+    - assets/images/sweatshirts/offline/
+    - assets/images/sweatshirts/plain/
+    - assets/images/tank_tops/back/
+    - assets/images/tank_tops/beinn_left/
+    - assets/images/tank_tops/beinn_middle/
+    - assets/images/tank_tops/designs/
+    - assets/images/tank_tops/plain/
+    - assets/images/zipper_hoodies/black/
+    - assets/images/zipper_hoodies/white/
+    - assets/images/perfume/dark_desire/
+    - assets/images/perfume/fetish/
+    - assets/images/perfume/gorgeous/
+    - assets/images/perfume/love_story/
+    - assets/images/perfume/moonrise/
+    - assets/images/perfume/oud_Love/
+    - assets/images/perfume/sugar_sin/
+    - assets/images/perfume/wildest_dreams/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -105,3 +148,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  min_sdk_android: 21

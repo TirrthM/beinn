@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:email_validator/email_validator.dart';
@@ -78,7 +78,6 @@ class _LoginScreenState extends State<LoginScreen> {
       print('Login successful: ${userCredential.user!.uid}');
 
       _showSuccessDialog('Welcome back to Beinn!');
-
     } on FirebaseAuthException catch (e) {
       print('FirebaseAuthException: ${e.code} - ${e.message}');
       String errorMessage = 'An error occurred during login.';
@@ -97,10 +96,12 @@ class _LoginScreenState extends State<LoginScreen> {
           errorMessage = 'This user account has been disabled.';
           break;
         case 'too-many-requests':
-          errorMessage = 'Too many failed login attempts. Please try again later.';
+          errorMessage =
+              'Too many failed login attempts. Please try again later.';
           break;
         case 'network-request-failed':
-          errorMessage = 'Network error. Please check your internet connection.';
+          errorMessage =
+              'Network error. Please check your internet connection.';
           break;
         default:
           errorMessage = 'Login Error: ${e.message}';
@@ -139,7 +140,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       print('Google user signed in: ${googleUser.email}');
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       if (googleAuth.accessToken == null || googleAuth.idToken == null) {
         throw Exception('Failed to get Google authentication tokens');
@@ -150,24 +152,26 @@ class _LoginScreenState extends State<LoginScreen> {
         idToken: googleAuth.idToken,
       );
 
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
       print('Google login successful: ${userCredential.user!.uid}');
 
       _showSuccessDialog('Welcome to Beinn!');
-
     } on FirebaseAuthException catch (e) {
       print('Google FirebaseAuthException: ${e.code} - ${e.message}');
       String errorMessage = 'Google login failed.';
 
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          errorMessage = 'An account already exists with a different sign-in method.';
+          errorMessage =
+              'An account already exists with a different sign-in method.';
           break;
         case 'invalid-credential':
           errorMessage = 'Invalid Google credentials. Please try again.';
           break;
         case 'operation-not-allowed':
-          errorMessage = 'Google sign-in is not enabled. Please contact support.';
+          errorMessage =
+              'Google sign-in is not enabled. Please contact support.';
           break;
         case 'user-disabled':
           errorMessage = 'This user account has been disabled.';
@@ -193,7 +197,8 @@ class _LoginScreenState extends State<LoginScreen> {
       String errorMessage = 'Google login failed. ';
 
       if (e.toString().contains('PlatformException')) {
-        errorMessage += 'Please check your Google configuration in Firebase Console.';
+        errorMessage +=
+            'Please check your Google configuration in Firebase Console.';
       } else if (e.toString().contains('network')) {
         errorMessage += 'Please check your internet connection.';
       } else {
@@ -234,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Text(
               'OK',
               style: TextStyle(
-                color: Color(0xFFD2691E),
+                color: Color(0xFFF5F5F5),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -272,8 +277,9 @@ class _LoginScreenState extends State<LoginScreen> {
               // Navigate to home screen or dashboard
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Welcome to Beinn - Your Premium Clothing Store!'),
-                  backgroundColor: Color(0xFFD2691E),
+                  content:
+                      Text('Welcome to Beinn - Your Premium Clothing Store!'),
+                  backgroundColor: Color(0xFFF5F5F5),
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -284,7 +290,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Text(
               'Continue',
               style: TextStyle(
-                color: Color(0xFFD2691E),
+                color: Color(0xFFF5F5F5),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -318,18 +324,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFFD2691E).withOpacity(0.1),
-                        Color(0xFFD2691E).withOpacity(0.2),
+                        Color(0xFFF5F5F5).withOpacity(0.1),
+                        Color(0xFFF5F5F5).withOpacity(0.2),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(60),
                     border: Border.all(
-                      color: Color(0xFFD2691E).withOpacity(0.3),
+                      color: Color(0xFFF5F5F5).withOpacity(0.3),
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xFFD2691E).withOpacity(0.2),
+                        color: Color(0xFFF5F5F5).withOpacity(0.2),
                         blurRadius: 20,
                         offset: Offset(0, 10),
                       ),
@@ -341,7 +347,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Icon(
                         Icons.shopping_bag_outlined,
                         size: 50,
-                        color: Color(0xFFD2691E),
+                        color: Color(0xFFF5F5F5),
                       ),
                       SizedBox(height: 4),
                       Text(
@@ -349,7 +355,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFD2691E),
+                          color: Color(0xFFF5F5F5),
                           letterSpacing: 1.5,
                         ),
                       ),
@@ -404,16 +410,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(
-                          Icons.email_outlined,
-                          color: Colors.grey[500]
-                      ),
+                      prefixIcon:
+                          Icon(Icons.email_outlined, color: Colors.grey[500]),
                       suffixIcon: _emailController.text.isNotEmpty
                           ? Icon(
-                        _isEmailValid ? Icons.check_circle : Icons.error,
-                        color: _isEmailValid ? Color(0xFFD2691E) : Colors.red[400],
-                        size: 20,
-                      )
+                              _isEmailValid ? Icons.check_circle : Icons.error,
+                              color: _isEmailValid
+                                  ? Color(0xFFF5F5F5)
+                                  : Colors.red[400],
+                              size: 20,
+                            )
                           : null,
                       hintText: 'Email',
                       hintStyle: TextStyle(color: Colors.grey[500]),
@@ -423,7 +429,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     ),
                   ),
                 ),
@@ -452,22 +459,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: !_isPasswordVisible,
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(
-                          Icons.lock_outline,
-                          color: Colors.grey[500]
-                      ),
+                      prefixIcon:
+                          Icon(Icons.lock_outline, color: Colors.grey[500]),
                       suffixIcon: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (_passwordController.text.isNotEmpty)
                             Icon(
-                              _isPasswordValid ? Icons.check_circle : Icons.error,
-                              color: _isPasswordValid ? Color(0xFFD2691E) : Colors.red[400],
+                              _isPasswordValid
+                                  ? Icons.check_circle
+                                  : Icons.error,
+                              color: _isPasswordValid
+                                  ? Color(0xFFF5F5F5)
+                                  : Colors.red[400],
                               size: 20,
                             ),
                           IconButton(
                             icon: Icon(
-                              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: Colors.grey[500],
                             ),
                             onPressed: () {
@@ -486,7 +497,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     ),
                   ),
                 ),
@@ -499,67 +511,70 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 56,
                   child: _isFormValid
                       ? ElevatedButton(
-                    onPressed: _isLoading ? null : _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFD2691E),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      elevation: 4,
-                      shadowColor: Color(0xFFD2691E).withOpacity(0.3),
-                    ),
-                    child: _isLoading
-                        ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                        : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.login, color: Colors.white, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Login',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            letterSpacing: 0.5,
+                          onPressed: _isLoading ? null : _login,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFFF5F5F5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 4,
+                            shadowColor: Color(0xFFF5F5F5).withOpacity(0.3),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                          child: _isLoading
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.login,
+                                        color: Colors.white, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        )
                       : OutlinedButton(
-                    onPressed: _login,
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Color(0xFFD2691E), width: 1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      backgroundColor: Colors.transparent,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.login, color: Color(0xFFD2691E), size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Login',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFD2691E),
-                            letterSpacing: 0.5,
+                          onPressed: _login,
+                          style: OutlinedButton.styleFrom(
+                            side:
+                                BorderSide(color: Color(0xFFF5F5F5), width: 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            backgroundColor: Colors.transparent,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.login,
+                                  color: Color(0xFFF5F5F5), size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Login',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFFF5F5F5),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
                 ),
 
                 SizedBox(height: 24),
@@ -567,7 +582,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 // OR Divider
                 Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.grey[700], thickness: 1)),
+                    Expanded(
+                        child: Divider(color: Colors.grey[700], thickness: 1)),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
@@ -579,7 +595,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.grey[700], thickness: 1)),
+                    Expanded(
+                        child: Divider(color: Colors.grey[700], thickness: 1)),
                   ],
                 ),
 
@@ -645,13 +662,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => SignUpScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => SignUpScreen()),
                         );
                       },
                       child: Text(
                         'Sign Up',
                         style: TextStyle(
-                          color: Color(0xFFD2691E),
+                          color: Color(0xFFF5F5F5),
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
                         ),

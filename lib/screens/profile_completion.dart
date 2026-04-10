@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'home.dart';
+import 'welcome.dart';
+import '../main.dart';
+import 'dart:async';
 
 class ProfileCompletionScreen extends StatefulWidget {
   final User user;
@@ -10,7 +12,8 @@ class ProfileCompletionScreen extends StatefulWidget {
   ProfileCompletionScreen({required this.user});
 
   @override
-  _ProfileCompletionScreenState createState() => _ProfileCompletionScreenState();
+  _ProfileCompletionScreenState createState() =>
+      _ProfileCompletionScreenState();
 }
 
 class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
@@ -27,22 +30,14 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
   final _cityController = TextEditingController();
   final _stateController = TextEditingController();
   final _pincodeController = TextEditingController();
-  final _otpController = TextEditingController();
-
   // State variables
   String _selectedGender = '';
   bool _isLoading = false;
-  bool _isPhoneVerified = false;
-  bool _isOtpSent = false;
-  bool _isVerifyingOtp = false;
-  String _verificationId = '';
-  int _resendToken = 0;
 
   // Animation controllers
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
@@ -82,173 +77,71 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
     }
   }
 
-  Future<void> _sendOtp() async {
-    if (_phoneController.text.length != 10) {
-      _showSnackBar('Please enter a valid 10-digit phone number');
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      await _auth.verifyPhoneNumber(
-        phoneNumber: '+91${_phoneController.text}',
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // Auto-verification (rare on Android)
-          setState(() {
-            _isPhoneVerified = true;
-            _isLoading = false;
-          });
-          _showSnackBar('Phone number verified automatically!');
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          setState(() {
-            _isLoading = false;
-          });
-          _showSnackBar('Verification failed: ${e.message}');
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          setState(() {
-            _verificationId = verificationId;
-            _resendToken = resendToken ?? 0;
-            _isOtpSent = true;
-            _isLoading = false;
-          });
-          _showOtpDialog();
-        },
-        timeout: Duration(seconds: 60),
-        forceResendingToken: _resendToken > 0 ? _resendToken : null,
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Called when the timeout duration has passed
-          print('Auto-retrieval timeout for verification ID: $verificationId');
-        },
-      );
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      _showSnackBar('Error sending OTP: $e');
-    }
+  bool _isValidIndianMobile(String number) {
+    final regex = RegExp(r'^[6-9]\d{9}$');
+    return regex.hasMatch(number);
   }
 
-  // TEMPORARY: For testing without using Firebase quota
-  Future<void> _bypassPhoneVerification() async {
-    setState(() {
-      _isPhoneVerified = true;
-    });
-    _showSnackBar('Phone verification bypassed for testing!');
+  bool _isDummyNumber(String number) {
+    return RegExp(r'(.)\1{9}').hasMatch(number);
   }
 
-  Future<void> _verifyOtp() async {
-    if (_otpController.text.length != 6) {
-      _showSnackBar('Please enter a valid 6-digit OTP');
-      return;
-    }
-
-    setState(() {
-      _isVerifyingOtp = true;
-    });
-
-    try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: _verificationId,
-        smsCode: _otpController.text,
-      );
-
-      // Link phone credential to current user
-      await widget.user.linkWithCredential(credential);
-
-      setState(() {
-        _isPhoneVerified = true;
-        _isVerifyingOtp = false;
-      });
-
-      Navigator.pop(context); // Close OTP dialog
-      _showSnackBar('Phone number verified successfully!');
-
-    } catch (e) {
-      setState(() {
-        _isVerifyingOtp = false;
-      });
-      _showSnackBar('Invalid OTP. Please try again.');
-    }
-  }
-
-  void _showOtpDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Verify Phone Number',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Enter the 6-digit OTP sent to +91${_phoneController.text}',
-              style: TextStyle(color: Colors.grey[300]),
+  Future<bool> _showPhoneConfirmationDialog(String number) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.grey[900],
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(
+              'Please confirm your mobile number',
+              style: TextStyle(color: Colors.white, fontSize: 18),
             ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _otpController,
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              style: TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 2),
-              textAlign: TextAlign.center,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(
-                hintText: '000000',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                counterText: '',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFD2691E)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Order updates and delivery OTP will be sent to this number.',
+                  style: TextStyle(color: Colors.grey[400], fontSize: 14),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFD2691E), width: 2),
+                SizedBox(height: 16),
+                RichText(
+                  text: TextSpan(
+                    text: 'Mobile Number: ',
+                    style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                    children: [
+                      TextSpan(
+                        text: number,
+                        style: TextStyle(
+                          color: Color(0xFFBB694A),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('Edit', style: TextStyle(color: Colors.white)),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _isOtpSent = false;
-                _otpController.clear();
-              });
-            },
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.grey[400]),
-            ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFBB694A),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                child: Text('Confirm', style: TextStyle(color: Colors.white)),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: _isVerifyingOtp ? null : _verifyOtp,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFD2691E),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: _isVerifyingOtp
-                ? SizedBox(
-              height: 16,
-              width: 16,
-              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-            )
-                : Text('Verify', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
+        ) ??
+        false;
   }
 
   Future<void> _completeProfile() async {
@@ -257,15 +150,13 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
       return;
     }
 
-    if (!_isPhoneVerified) {
-      _showSnackBar('Please verify your phone number first');
-      return;
-    }
-
     if (_selectedGender.isEmpty) {
       _showSnackBar('Please select your gender');
       return;
     }
+
+    final confirmed = await _showPhoneConfirmationDialog(_phoneController.text);
+    if (!confirmed) return;
 
     setState(() {
       _isLoading = true;
@@ -293,7 +184,6 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
 
       print('Profile completed successfully');
       _navigateToHome();
-
     } catch (e) {
       print('Error completing profile: $e');
       _showSnackBar('Error saving profile. Please try again.');
@@ -308,7 +198,8 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => HomeScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            MainNavigationWrapper(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
@@ -330,7 +221,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Color(0xFFD2691E),
+        backgroundColor: Color(0xFFBB694A),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: EdgeInsets.all(16),
@@ -369,10 +260,11 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
         maxLines: maxLines,
         style: TextStyle(color: Colors.white),
         validator: required
-            ? (value) => value?.isEmpty ?? true ? 'This field is required' : null
+            ? (value) =>
+                value?.isEmpty ?? true ? 'This field is required' : null
             : null,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.grey[500]),
+          prefixIcon: Icon(icon, color: const Color(0xFFBB694A)),
           labelText: label,
           hintText: hint,
           labelStyle: TextStyle(color: Colors.grey[400]),
@@ -411,7 +303,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
           children: [
             Row(
               children: [
-                Icon(Icons.person_outline, color: Colors.grey[500]),
+                Icon(Icons.person_outline, color: const Color(0xFFBB694A)),
                 SizedBox(width: 12),
                 Text(
                   'Gender',
@@ -433,12 +325,12 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                       padding: EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Male'
-                            ? Color(0xFFD2691E).withOpacity(0.2)
+                            ? Color(0xFFBB694A).withOpacity(0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _selectedGender == 'Male'
-                              ? Color(0xFFD2691E)
+                              ? Color(0xFFBB694A)
                               : Colors.grey[700]!,
                         ),
                       ),
@@ -447,7 +339,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: _selectedGender == 'Male'
-                              ? Color(0xFFD2691E)
+                              ? Color(0xFFBB694A)
                               : Colors.grey[300],
                           fontWeight: FontWeight.w500,
                         ),
@@ -463,12 +355,12 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                       padding: EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Female'
-                            ? Color(0xFFD2691E).withOpacity(0.2)
+                            ? Color(0xFFBB694A).withOpacity(0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _selectedGender == 'Female'
-                              ? Color(0xFFD2691E)
+                              ? Color(0xFFBB694A)
                               : Colors.grey[700]!,
                         ),
                       ),
@@ -477,7 +369,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: _selectedGender == 'Female'
-                              ? Color(0xFFD2691E)
+                              ? Color(0xFFBB694A)
                               : Colors.grey[300],
                           fontWeight: FontWeight.w500,
                         ),
@@ -493,12 +385,12 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                       padding: EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Other'
-                            ? Color(0xFFD2691E).withOpacity(0.2)
+                            ? Color(0xFFBB694A).withOpacity(0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _selectedGender == 'Other'
-                              ? Color(0xFFD2691E)
+                              ? Color(0xFFBB694A)
                               : Colors.grey[700]!,
                         ),
                       ),
@@ -507,7 +399,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: _selectedGender == 'Other'
-                              ? Color(0xFFD2691E)
+                              ? Color(0xFFBB694A)
                               : Colors.grey[300],
                           fontWeight: FontWeight.w500,
                         ),
@@ -545,20 +437,23 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
               ],
             ),
             child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('🇮🇳', style: TextStyle(fontSize: 18)),
-                  SizedBox(width: 3),
-                  Text(
-                    '+91',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13,
-                      color: Colors.white,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('\u{1F1EE}\u{1F1F3}', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 3),
+                    Text(
+                      '+91',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -588,37 +483,15 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                 ],
                 validator: (value) {
                   if (value?.isEmpty ?? true) return 'Phone number is required';
-                  if (value!.length != 10) return 'Enter valid 10-digit number';
+                  if (!_isValidIndianMobile(value!))
+                    return 'Enter valid 10-digit number (Starts with 6-9)';
+                  if (_isDummyNumber(value))
+                    return 'Invalid number pattern (e.g. 1111111111)';
                   return null;
                 },
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone_outlined, color: Colors.grey[500]),
-                  suffixIcon: _isPhoneVerified
-                      ? Icon(Icons.check_circle, color: Colors.green[400], size: 20)
-                      : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Testing bypass button (remove in production)
-                      IconButton(
-                        icon: Icon(Icons.bug_report, color: Colors.blue[400], size: 16),
-                        onPressed: _bypassPhoneVerification,
-                        tooltip: 'Bypass for testing',
-                      ),
-                      IconButton(
-                        icon: _isLoading
-                            ? SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(
-                            color: Color(0xFFD2691E),
-                            strokeWidth: 2,
-                          ),
-                        )
-                            : Icon(Icons.send, color: Color(0xFFD2691E), size: 20),
-                        onPressed: _isLoading ? null : _sendOtp,
-                      ),
-                    ],
-                  ),
+                  prefixIcon: Icon(Icons.phone_outlined,
+                      color: const Color(0xFFBB694A)),
                   labelText: 'Mobile Number',
                   hintText: 'Enter 10-digit number',
                   labelStyle: TextStyle(color: Colors.grey[400]),
@@ -629,7 +502,8 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                   ),
                   filled: true,
                   fillColor: Colors.transparent,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                 ),
               ),
             ),
@@ -648,7 +522,10 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+          ),
         ),
         title: Text(
           'Complete Your Profile',
@@ -679,13 +556,13 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Color(0xFFD2691E).withOpacity(0.1),
-                          Color(0xFFD2691E).withOpacity(0.05),
+                          Color(0xFFBB694A).withOpacity(0.1),
+                          Color(0xFFBB694A).withOpacity(0.05),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Color(0xFFD2691E).withOpacity(0.2),
+                        color: Color(0xFFBB694A).withOpacity(0.2),
                         width: 1,
                       ),
                     ),
@@ -694,14 +571,17 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.person_add, color: Color(0xFFD2691E)),
+                            Icon(Icons.person_add, color: Color(0xFFBB694A)),
                             SizedBox(width: 8),
-                            Text(
-                              'Almost There!',
-                              style: TextStyle(
-                                color: Color(0xFFD2691E),
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
+                            Expanded(
+                              child: Text(
+                                'Almost There!',
+                                style: TextStyle(
+                                  color: Color(0xFFBB694A),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -841,38 +721,39 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _completeProfile,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFD2691E),
+                        backgroundColor: Color(0xFFBB694A),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 8,
-                        shadowColor: Color(0xFFD2691E).withOpacity(0.4),
+                        shadowColor: Color(0xFFBB694A).withOpacity(0.4),
                       ),
                       child: _isLoading
                           ? SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.5,
-                        ),
-                      )
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.5,
+                              ),
+                            )
                           : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check_circle, color: Colors.white, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Complete Profile',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              letterSpacing: 0.3,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check_circle,
+                                    color: Colors.white, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Complete Profile',
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
 
@@ -898,7 +779,6 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
     _cityController.dispose();
     _stateController.dispose();
     _pincodeController.dispose();
-    _otpController.dispose();
     super.dispose();
   }
 }

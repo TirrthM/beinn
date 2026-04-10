@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -61,8 +61,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _validatePasswordMatch() {
     setState(() {
-      _passwordsMatch = _passwordController.text == _confirmPasswordController.text &&
-          _confirmPasswordController.text.isNotEmpty;
+      _passwordsMatch =
+          _passwordController.text == _confirmPasswordController.text &&
+              _confirmPasswordController.text.isNotEmpty;
     });
   }
 
@@ -120,7 +121,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       print('Mobile: +91${_mobileController.text}');
 
       // Create user with Firebase Auth
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
@@ -146,7 +148,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       print('Verification email sent');
 
       _showSuccessDialog();
-
     } on FirebaseAuthException catch (e) {
       print('FirebaseAuthException: ${e.code} - ${e.message}');
       String errorMessage = 'An error occurred during signup.';
@@ -162,10 +163,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           errorMessage = 'The email address is not valid.';
           break;
         case 'operation-not-allowed':
-          errorMessage = 'Email/password accounts are not enabled. Please contact support.';
+          errorMessage =
+              'Email/password accounts are not enabled. Please contact support.';
           break;
         case 'network-request-failed':
-          errorMessage = 'Network error. Please check your internet connection.';
+          errorMessage =
+              'Network error. Please check your internet connection.';
           break;
         default:
           errorMessage = 'Firebase Auth Error: ${e.message}';
@@ -219,7 +222,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       print('Google user signed in: ${googleUser.email}');
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       if (googleAuth.accessToken == null || googleAuth.idToken == null) {
         throw Exception('Failed to get Google authentication tokens');
@@ -230,11 +234,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
         idToken: googleAuth.idToken,
       );
 
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
       print('Firebase authentication successful: ${userCredential.user!.uid}');
 
       // Check if user already exists in Firestore
-      final userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
 
       if (!userDoc.exists) {
         // Store new user data
@@ -255,20 +263,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
 
       _showSuccessDialog();
-
     } on FirebaseAuthException catch (e) {
       print('Google FirebaseAuthException: ${e.code} - ${e.message}');
       String errorMessage = 'Google sign-up failed.';
 
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          errorMessage = 'An account already exists with a different sign-in method.';
+          errorMessage =
+              'An account already exists with a different sign-in method.';
           break;
         case 'invalid-credential':
           errorMessage = 'Invalid Google credentials. Please try again.';
           break;
         case 'operation-not-allowed':
-          errorMessage = 'Google sign-in is not enabled. Please contact support.';
+          errorMessage =
+              'Google sign-in is not enabled. Please contact support.';
           break;
         case 'user-disabled':
           errorMessage = 'This user account has been disabled.';
@@ -294,7 +303,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       String errorMessage = 'Google sign-up failed. ';
 
       if (e.toString().contains('PlatformException')) {
-        errorMessage += 'Please check your Google configuration in Firebase Console.';
+        errorMessage +=
+            'Please check your Google configuration in Firebase Console.';
       } else if (e.toString().contains('network')) {
         errorMessage += 'Please check your internet connection.';
       } else {
@@ -335,7 +345,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Text(
               'OK',
               style: TextStyle(
-                color: Color(0xFFD2691E),
+                color: Color(0xFFF5F5F5),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -379,7 +389,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Text(
               'Continue to Login',
               style: TextStyle(
-                color: Color(0xFFD2691E),
+                color: Color(0xFFF5F5F5),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -441,18 +451,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFFD2691E).withOpacity(0.1),
-                        Color(0xFFD2691E).withOpacity(0.2),
+                        Color(0xFFF5F5F5).withOpacity(0.1),
+                        Color(0xFFF5F5F5).withOpacity(0.2),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(60),
                     border: Border.all(
-                      color: Color(0xFFD2691E).withOpacity(0.3),
+                      color: Color(0xFFF5F5F5).withOpacity(0.3),
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xFFD2691E).withOpacity(0.2),
+                        color: Color(0xFFF5F5F5).withOpacity(0.2),
                         blurRadius: 20,
                         offset: Offset(0, 10),
                       ),
@@ -464,7 +474,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Icon(
                         Icons.shopping_bag_outlined,
                         size: 50,
-                        color: Color(0xFFD2691E),
+                        color: Color(0xFFF5F5F5),
                       ),
                       SizedBox(height: 4),
                       Text(
@@ -472,7 +482,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFD2691E),
+                          color: Color(0xFFF5F5F5),
                           letterSpacing: 1.5,
                         ),
                       ),
@@ -526,16 +536,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     keyboardType: TextInputType.emailAddress,
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(
-                          Icons.email_outlined,
-                          color: Colors.grey[500]
-                      ),
+                      prefixIcon:
+                          Icon(Icons.email_outlined, color: Colors.grey[500]),
                       suffixIcon: _emailController.text.isNotEmpty
                           ? Icon(
-                        _isEmailValid ? Icons.check_circle : Icons.error,
-                        color: _isEmailValid ? Color(0xFFD2691E) : Colors.red[400],
-                        size: 20,
-                      )
+                              _isEmailValid ? Icons.check_circle : Icons.error,
+                              color: _isEmailValid
+                                  ? Color(0xFFF5F5F5)
+                                  : Colors.red[400],
+                              size: 20,
+                            )
                           : null,
                       hintText: 'Email',
                       hintStyle: TextStyle(color: Colors.grey[500]),
@@ -545,7 +555,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     ),
                   ),
                 ),
@@ -578,16 +589,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('🇮🇳', style: TextStyle(fontSize: 18)),
+                            Text('ðŸ‡®ðŸ‡³', style: TextStyle(fontSize: 18)),
                             SizedBox(width: 3),
-                            Text(
-                                '+91',
+                            Text('+91',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 13,
                                   color: Colors.white,
-                                )
-                            ),
+                                )),
                           ],
                         ),
                       ),
@@ -622,16 +631,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             LengthLimitingTextInputFormatter(10),
                           ],
                           decoration: InputDecoration(
-                            prefixIcon: Icon(
-                                Icons.phone_outlined,
-                                color: Colors.grey[500]
-                            ),
+                            prefixIcon: Icon(Icons.phone_outlined,
+                                color: Colors.grey[500]),
                             suffixIcon: _mobileController.text.isNotEmpty
                                 ? Icon(
-                              _isMobileValid ? Icons.check_circle : Icons.error,
-                              color: _isMobileValid ? Color(0xFFD2691E) : Colors.red[400],
-                              size: 20,
-                            )
+                                    _isMobileValid
+                                        ? Icons.check_circle
+                                        : Icons.error,
+                                    color: _isMobileValid
+                                        ? Color(0xFFF5F5F5)
+                                        : Colors.red[400],
+                                    size: 20,
+                                  )
                                 : null,
                             hintText: 'Mobile Number',
                             hintStyle: TextStyle(color: Colors.grey[500]),
@@ -641,7 +652,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             filled: true,
                             fillColor: Colors.transparent,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 18),
                           ),
                         ),
                       ),
@@ -673,13 +685,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     obscureText: !_isPasswordVisible,
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(
-                          Icons.lock_outline,
-                          color: Colors.grey[500]
-                      ),
+                      prefixIcon:
+                          Icon(Icons.lock_outline, color: Colors.grey[500]),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                           color: Colors.grey[500],
                         ),
                         onPressed: () {
@@ -696,7 +708,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     ),
                   ),
                 ),
@@ -725,27 +738,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     obscureText: !_isConfirmPasswordVisible,
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(
-                          Icons.lock_outline,
-                          color: Colors.grey[500]
-                      ),
+                      prefixIcon:
+                          Icon(Icons.lock_outline, color: Colors.grey[500]),
                       suffixIcon: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (_confirmPasswordController.text.isNotEmpty)
                             Icon(
-                              _passwordsMatch ? Icons.check_circle : Icons.error,
-                              color: _passwordsMatch ? Color(0xFFD2691E) : Colors.red[400],
+                              _passwordsMatch
+                                  ? Icons.check_circle
+                                  : Icons.error,
+                              color: _passwordsMatch
+                                  ? Color(0xFFF5F5F5)
+                                  : Colors.red[400],
                               size: 20,
                             ),
                           IconButton(
                             icon: Icon(
-                              _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                              _isConfirmPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: Colors.grey[500],
                             ),
                             onPressed: () {
                               setState(() {
-                                _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                _isConfirmPasswordVisible =
+                                    !_isConfirmPasswordVisible;
                               });
                             },
                           ),
@@ -759,7 +777,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     ),
                   ),
                 ),
@@ -791,11 +810,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildValidationItem('Min 8 Characters', _hasMinLength),
+                            child: _buildValidationItem(
+                                'Min 8 Characters', _hasMinLength),
                           ),
                           SizedBox(width: 8),
                           Expanded(
-                            child: _buildValidationItem('Min 1 Number', _hasNumber),
+                            child: _buildValidationItem(
+                                'Min 1 Number', _hasNumber),
                           ),
                         ],
                       ),
@@ -803,16 +824,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildValidationItem('Min 1 Uppercase', _hasUppercase),
+                            child: _buildValidationItem(
+                                'Min 1 Uppercase', _hasUppercase),
                           ),
                           SizedBox(width: 8),
                           Expanded(
-                            child: _buildValidationItem('Min 1 Special', _hasSpecialChar),
+                            child: _buildValidationItem(
+                                'Min 1 Special', _hasSpecialChar),
                           ),
                         ],
                       ),
                       SizedBox(height: 4),
-                      _buildValidationItem('Min 1 Lowercase letter', _hasLowercase),
+                      _buildValidationItem(
+                          'Min 1 Lowercase letter', _hasLowercase),
                     ],
                   ),
                 ),
@@ -825,67 +849,70 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: 56,
                   child: _isFormValid
                       ? ElevatedButton(
-                    onPressed: _isLoading ? null : _signUp,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFD2691E),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      elevation: 4,
-                      shadowColor: Color(0xFFD2691E).withOpacity(0.3),
-                    ),
-                    child: _isLoading
-                        ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                        : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.person_add, color: Colors.white, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            letterSpacing: 0.5,
+                          onPressed: _isLoading ? null : _signUp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFFF5F5F5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 4,
+                            shadowColor: Color(0xFFF5F5F5).withOpacity(0.3),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                          child: _isLoading
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.person_add,
+                                        color: Colors.white, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Sign Up',
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        )
                       : OutlinedButton(
-                    onPressed: _signUp,
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Color(0xFFD2691E), width: 1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      backgroundColor: Colors.transparent,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.person_add, color: Color(0xFFD2691E), size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFD2691E),
-                            letterSpacing: 0.5,
+                          onPressed: _signUp,
+                          style: OutlinedButton.styleFrom(
+                            side:
+                                BorderSide(color: Color(0xFFF5F5F5), width: 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            backgroundColor: Colors.transparent,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.person_add,
+                                  color: Color(0xFFF5F5F5), size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFFF5F5F5),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
                 ),
 
                 SizedBox(height: 20),
@@ -893,7 +920,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // OR Divider
                 Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.grey[700], thickness: 1)),
+                    Expanded(
+                        child: Divider(color: Colors.grey[700], thickness: 1)),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
@@ -905,7 +933,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.grey[700], thickness: 1)),
+                    Expanded(
+                        child: Divider(color: Colors.grey[700], thickness: 1)),
                   ],
                 ),
 
@@ -971,13 +1000,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()),
                         );
                       },
                       child: Text(
                         'Login',
                         style: TextStyle(
-                          color: Color(0xFFD2691E),
+                          color: Color(0xFFF5F5F5),
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
                         ),

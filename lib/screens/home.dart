@@ -6,6 +6,12 @@ import '../main.dart' as main_app;
 import 'welcome.dart';
 import 'dart:async';
 
+import '../theme_notifier.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'chatbot.dart';
+import '../data/products_data.dart';
+import 'package:video_player/video_player.dart';
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -35,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Timer? _bannerTimer;
 
   PageController _bannerController = PageController();
+  VideoPlayerController? _videoController;
   ScrollController _categoriesScrollController = ScrollController();
   bool _showSeeAll = true; // true for "See All", false for "Back"
 
@@ -44,21 +51,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'subtitle': 'Summer Collection 2025',
       'offer': 'Up to 40% off',
       'image':
-      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop',
+          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop',
     },
     {
       'title': 'NEW ARRIVALS',
       'subtitle': 'Winter Collection 2025',
       'offer': 'Up to 50% off',
       'image':
-      'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=200&fit=crop',
+          'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=200&fit=crop',
     },
     {
       'title': 'TRENDING',
       'subtitle': 'Street Style Collection',
       'offer': 'Up to 30% off',
       'image':
-      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=200&fit=crop',
+          'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=200&fit=crop',
     },
   ];
 
@@ -67,294 +74,327 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'name': 'T-Shirts',
       'type': 'image',
       'image':
-      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7Zih6I1qFheS9XELo0orL76keeJi7H.png'
+          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7Zih6I1qFheS9XELo0orL76keeJi7H.png'
+    },
+    {
+      'name': 'Shirts',
+      'type': 'image',
+      'image':'assets/images/shirtwithoutbg.png',
     },
     {
       'name': 'Hoodies',
       'type': 'image',
       'image':
-      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Hoodie_appimg.PNG-UkgfqGGPgl1p624MNH8gbsGFus8COx.png'
+          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Hoodie_appimg.PNG-UkgfqGGPgl1p624MNH8gbsGFus8COx.png'
     },
     {
       'name': 'Sweatshirts',
       'type': 'image',
       'image':
-      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Sweatshirt_appimg.PNG-stbgbQ97A0VBOYJiwv3GAzpP8JvyrA.png'
-    },
-    {
-      'name': 'Shirts',
-      'type': 'image',
-      'image':
-      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Shirt_appimg-oLQXEbn3cH36bKsWBRUCk5cHRd8EsE.png'
-    },
-    {
-      'name': 'Polo',
-      'type': 'image',
-      'image':
-      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Polo_appimg-MB1NVY0Jf1xfjqsDV10r7tvAL0dd5O.png'
+          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Sweatshirt_appimg.PNG-stbgbQ97A0VBOYJiwv3GAzpP8JvyrA.png', 
     },
     {
       'name': 'Tank Tops',
       'type': 'image',
-      'image':
-      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Tanktop_appimg-Jq79NUJOe18uWn3nknUVIQEzvTrIx8.png'
+      'image':'assets/images/tanktopfinal.png',
     },
     {
-      'name': 'Sweatpants',
+      'name': 'Zipper Hoodies',
       'type': 'image',
-      'image':
-      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Sweatpants_appimg-ITYRrT2Y0Ae5LTfoftiIxOl7eosNIU.png'
-    },
-    {
-      'name': 'Shorts',
-      'type': 'image',
-      'image':
-      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Shorts_appimg-CRUDzi32VPDQ3wFWDkgrychI9aTFzD.png'
+      'image': 'assets/images/zipperhoodie.png',
     },
   ];
 
   final List<Map<String, dynamic>> _featuredProducts = [
     {
-      'id': '1',
-      'name': 'Premium Cotton T-Shirt',
+      'id': 'tshirt_acid_wash',
+      'name': 'Acid Wash Oversized Tee',
       'price': '₹999',
       'originalPrice': '₹1499',
-      'image':
-      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop',
+      'image': 'assets/images/oversized_tshirts/acid_wash/25.webp',
       'discount': '33% OFF',
       'images': [
-        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&h=300&fit=crop',
+        'assets/images/oversized_tshirts/acid_wash/25.webp',
+        'assets/images/oversized_tshirts/acid_wash/29.webp',
       ],
       'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
-      'colors': ['Black', 'White', 'Navy', 'Gray'],
-      'description':
-      'Premium quality cotton t-shirt with comfortable fit. Perfect for casual wear and daily use.',
-      'details':
-      'Made from 100% organic cotton. Machine washable. Available in multiple sizes and colors.',
-    },
-    {
-      'id': '2',
-      'name': 'Designer Black Dress',
-      'price': '₹2499',
-      'originalPrice': '₹3999',
-      'image':
-      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=300&fit=crop',
-      'discount': '37% OFF',
-      'images': [
-        'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1566479179817-c0b5b4b4b1e5?w=300&h=300&fit=crop',
+      'variantLabel': 'Design',
+      'colors': [
+        'Beinn Left',
+        'Unorthodox',
+        'Nevermind',
+        'Go To God First',
+        'Beinn Middle'
       ],
-      'sizes': ['XS', 'S', 'M', 'L', 'XL'],
-      'colors': ['Black', 'Navy', 'Burgundy'],
+      'colorImages': {
+        'Beinn Left': [
+          'assets/images/oversized_tshirts/acid_wash/25.webp',
+          'assets/images/oversized_tshirts/acid_wash/29.webp'
+        ],
+        'Unorthodox': [
+          'assets/images/oversized_tshirts/acid_wash/24.webp',
+          'assets/images/oversized_tshirts/acid_wash/29.webp'
+        ],
+        'Nevermind': [
+          'assets/images/oversized_tshirts/acid_wash/26.webp',
+          'assets/images/oversized_tshirts/acid_wash/29.webp'
+        ],
+        'Go To God First': [
+          'assets/images/oversized_tshirts/acid_wash/27.webp',
+          'assets/images/oversized_tshirts/acid_wash/30.webp'
+        ],
+        'Beinn Middle': [
+          'assets/images/oversized_tshirts/acid_wash/28.webp',
+          'assets/images/oversized_tshirts/acid_wash/29.webp'
+        ],
+      },
       'description':
-      'Elegant designer dress perfect for formal occasions and evening events.',
-      'details':
-      'Premium fabric with elegant design. Dry clean only. Perfect fit guaranteed.',
+          'Premium acid wash oversized t-shirt with distinctive texture.',
+      'washCare':
+          '• Wash inside out in cold water.\n• Use mild detergent only.\n• Do not bleach or tumble dry.\n• Gentle machine or hand wash.\n• Iron inside out. No iron on print.',
+      'details': '100% Cotton. Oversized fit. Machine wash cold.',
+      'category': 'T-Shirts',
     },
     {
-      'id': '3',
-      'name': 'Casual Denim Jacket',
-      'price': '₹1799',
-      'originalPrice': '₹2999',
-      'image':
-      'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop',
-      'discount': '40% OFF',
+      'id': 'tshirt_beinn_flower',
+      'name': 'Beinn Flower Edition',
+      'price': '₹949',
+      'originalPrice': '₹1399',
+      'image': 'assets/images/oversized_tshirts/beinn_flower/35.webp',
+      'discount': '32% OFF',
       'images': [
-        'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop',
+        'assets/images/oversized_tshirts/beinn_flower/35.webp',
+        'assets/images/oversized_tshirts/back/40.webp',
       ],
       'sizes': ['S', 'M', 'L', 'XL'],
-      'colors': ['Blue', 'Black', 'Light Blue'],
-      'description':
-      'Classic denim jacket with modern fit. Perfect for layering and casual outfits.',
-      'details':
-      'High-quality denim fabric. Machine washable. Timeless design.',
+      'colors': ['White', 'Beige'],
+      'colorImages': {
+        'White': [
+          'assets/images/oversized_tshirts/beinn_flower/35.webp',
+          'assets/images/oversized_tshirts/back/40.webp'
+        ],
+        'Beige': [
+          'assets/images/oversized_tshirts/beinn_flower/48.webp',
+          'assets/images/oversized_tshirts/back/50.webp'
+        ],
+      },
+      'description': 'Floral inspired design from the Beinn collection.',
+      'washCare':
+          '• Wash inside out in cold water.\n• Use mild detergent only.\n• Do not bleach or tumble dry.\n• Gentle machine or hand wash.\n• Iron inside out. No iron on print.',
+      'details': 'Premium cotton blend. Modern fit.',
+      'category': 'T-Shirts',
     },
     {
-      'id': '4',
-      'name': 'Sports Hoodie',
-      'price': '₹1299',
-      'originalPrice': '₹1999',
-      'image':
-      'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300&h=300&fit=crop',
-      'discount': '35% OFF',
+      'id': 'tank_4',
+      'name': "Men's Plain Oversized Tank Top",
+      'price': '₹599',
+      'originalPrice': '₹899',
+      'image': 'assets/images/tank_tops/plain/13.webp',
+      'discount': '33% OFF',
       'images': [
-        'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&h=300&fit=crop',
+        'assets/images/tank_tops/plain/13.webp',
+        'assets/images/tank_tops/back/17.webp',
       ],
-      'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
-      'colors': ['Gray', 'Black', 'Navy', 'Red'],
-      'description':
-      'Comfortable sports hoodie perfect for workouts and casual wear.',
-      'details':
-      'Moisture-wicking fabric. Machine washable. Perfect for active lifestyle.',
+      'sizes': ['S', 'M', 'L', 'XL'],
+      'colors': ['White', 'Maroon', 'Beige', 'Pearl Blue', 'Black', 'Grey'],
+      'colorImages': {
+        'White': [
+          'assets/images/tank_tops/plain/13.webp',
+          'assets/images/tank_tops/back/17.webp',
+        ],
+        'Maroon': [
+          'assets/images/tank_tops/plain/25.webp',
+          'assets/images/tank_tops/back/26.webp',
+        ],
+        // 'Beige': [
+        // 'assets/images/tank_tops/plain/1.webp',
+        // 'assets/images/tank_tops/back/6.webp',
+        // ],
+        'Pearl Blue': [
+          'assets/images/tank_tops/plain/8.webp',
+          'assets/images/tank_tops/back/11.webp',
+        ],
+        'Black': [
+          'assets/images/tank_tops/plain/20.webp',
+          'assets/images/tank_tops/back/21.webp',
+        ],
+        'Grey': [
+          'assets/images/tank_tops/plain/29.webp',
+          'assets/images/tank_tops/back/30.webp',
+        ],
+      },
+      'description': 'Comfortable tank top perfect for gym and casual wear.',
+      'washCare':
+          '• Wash inside out in cold water.\n• Use mild detergent. No bleach.\n• Gentle machine or hand wash.\n• Do not tumble dry. Dry in shade.\n• Iron inside out. No iron on print.',
+      'details': 'Breathable cotton blend. Moisture-wicking. Athletic fit.',
+      'category': 'Tank Tops',
     },
     {
-      'id': '5',
+      'id': 'tank_3',
+      'name': "Men's Real is Rare Oversized Tank Top",
+      'price': '₹599',
+      'originalPrice': '₹899',
+      'image': 'assets/images/tank_tops/designs/42.webp',
+      'discount': '33% OFF',
+      'images': [
+        'assets/images/tank_tops/designs/42.webp',
+        'assets/images/tank_tops/back/30.webp',
+      ],
+      'sizes': ['S', 'M', 'L', 'XL'],
+      'colors': ['Grey', 'Maroon', 'Beige', 'Pearl Blue', 'White', 'Black'],
+      'colorImages': {
+        'Grey': [
+          'assets/images/tank_tops/designs/42.webp',
+          'assets/images/tank_tops/back/30.webp',
+        ],
+        'Maroon': [
+          'assets/images/tank_tops/designs/43.webp',
+          'assets/images/tank_tops/back/26.webp',
+        ],
+        'Beige': [
+          'assets/images/tank_tops/designs/4.webp',
+          'assets/images/tank_tops/back/6.webp',
+        ],
+        'Pearl Blue': [
+          'assets/images/tank_tops/designs/45.webp',
+          'assets/images/tank_tops/back/11.webp',
+        ],
+        'White': [
+          'assets/images/tank_tops/designs/46.webp',
+          'assets/images/tank_tops/back/17.webp',
+        ],
+        'Black': [
+          'assets/images/tank_tops/designs/44.webp',
+          'assets/images/tank_tops/back/21.webp',
+        ],
+      },
+      'description': 'Comfortable tank top perfect for gym and casual wear.',
+      'washCare':
+          '• Wash inside out in cold water.\n• Use mild detergent. No bleach.\n• Gentle machine or hand wash.\n• Do not tumble dry. Dry in shade.\n• Iron inside out. No iron on print.',
+      'details': 'Breathable cotton blend. Moisture-wicking. Athletic fit.',
+      'category': 'Tank Tops',
+    },
+    {
+      'id': 'shirt_1',
       'name': 'Formal White Shirt',
       'price': '₹1599',
       'originalPrice': '₹2299',
-      'image':
-      'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=300&fit=crop',
+      'image': 'assets/images/shirts/b_shirt/1.webp',
       'discount': '30% OFF',
       'images': [
-        'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop',
+        'assets/images/shirts/b_shirt/1.webp',
+        'assets/images/shirts/back/3.webp',
       ],
       'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
-      'colors': ['White', 'Light Blue', 'Light Pink'],
+      'colors': ['Beige', 'Blue', 'Charcoal Grey', 'White', 'Black'],
+      'colorImages': {
+        'Beige': [
+          'assets/images/shirts/b_shirt/1.webp',
+          'assets/images/shirts/back/3.webp'
+        ],
+        'Blue': [
+          'assets/images/shirts/b_shirt/4.webp',
+          'assets/images/shirts/back/6.webp'
+        ],
+        'Charcoal Grey': [
+          'assets/images/shirts/b_shirt/7.webp',
+          'assets/images/shirts/back/9.webp'
+        ],
+        'White': [
+          'assets/images/shirts/b_shirt/10.webp',
+          'assets/images/shirts/back/12.webp'
+        ],
+        'Black': [
+          'assets/images/shirts/b_shirt/13.webp',
+          'assets/images/shirts/back/15.webp'
+        ],
+      },
       'description':
-      'Classic formal shirt perfect for office wear and business meetings.',
+          'Classic formal shirt perfect for office wear and business meetings.',
+      'washCare':
+          '• Wash inside out in cold water.\n• Use mild detergent only.\n• Do not bleach or tumble dry.\n• Gentle machine or hand wash.\n• Iron inside out. No iron on print.',
       'details': 'Premium cotton blend. Wrinkle-resistant. Professional fit.',
+      'category': 'Shirts',
     },
     {
-      'id': '6',
-      'name': 'Cargo Pants',
-      'price': '₹1899',
-      'originalPrice': '₹2799',
-      'image':
-      'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop',
+      'id': 'shirt_2',
+      'name': 'Casual Denim Shirt',
+      'price': '₹1299',
+      'originalPrice': '₹1899',
+      'image': 'assets/images/shirts/plain_t_shirt/5.webp',
       'discount': '32% OFF',
       'images': [
-        'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=300&fit=crop',
-      ],
-      'sizes': ['28', '30', '32', '34', '36'],
-      'colors': ['Khaki', 'Black', 'Olive Green', 'Navy'],
-      'description':
-      'Stylish cargo pants with multiple pockets. Perfect for casual and outdoor activities.',
-      'details':
-      'Durable cotton fabric. Multiple utility pockets. Comfortable fit.',
-    },
-    {
-      'id': '7',
-      'name': 'Summer Shorts',
-      'price': '₹799',
-      'originalPrice': '₹1199',
-      'image':
-      'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=300&h=300&fit=crop',
-      'discount': '33% OFF',
-      'images': [
-        'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1506629905607-d405b7a30db4?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1555274175-6cbf6f3b137b?w=300&h=300&fit=crop',
+        'assets/images/shirts/plain_t_shirt/5.webp',
+        'assets/images/shirts/back/6.webp',
       ],
       'sizes': ['S', 'M', 'L', 'XL'],
-      'colors': ['Navy', 'Khaki', 'Black', 'Gray'],
-      'description':
-      'Comfortable summer shorts perfect for beach and casual outings.',
-      'details': 'Lightweight fabric. Quick-dry material. Elastic waistband.',
+      'colors': ['Blue', 'Beige', 'Charcoal Grey', 'White', 'Black'],
+      'colorImages': {
+        'Blue': [
+          'assets/images/shirts/plain_t_shirt/5.webp',
+          'assets/images/shirts/back/6.webp'
+        ],
+        'Beige': [
+          'assets/images/shirts/plain_t_shirt/2.webp',
+          'assets/images/shirts/back/3.webp'
+        ],
+        'Charcoal Grey': [
+          'assets/images/shirts/plain_t_shirt/8.webp',
+          'assets/images/shirts/back/9.webp'
+        ],
+        'White': [
+          'assets/images/shirts/plain_t_shirt/11.webp',
+          'assets/images/shirts/back/12.webp'
+        ],
+        'Black': [
+          'assets/images/shirts/plain_t_shirt/14.webp',
+          'assets/images/shirts/back/15.webp'
+        ],
+      },
+      'description': 'Casual denim shirt perfect for weekend outings.',
+      'washCare':
+          '• Wash inside out in cold water.\n• Use mild detergent only.\n• Do not bleach or tumble dry.\n• Gentle machine or hand wash.\n• Iron inside out. No iron on print.',
+      'details': 'High-quality denim fabric. Classic fit.',
+      'category': 'Shirts',
     },
-    {
-      'id': '8',
-      'name': 'Tank Top',
-      'price': '₹599',
-      'originalPrice': '₹899',
-      'image':
-      'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&h=300&fit=crop',
-      'discount': '33% OFF',
-      'images': [
-        'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=300&h=300&fit=crop',
-      ],
-      'sizes': ['S', 'M', 'L', 'XL'],
-      'colors': ['White', 'Black', 'Gray', 'Navy'],
-      'description': 'Comfortable tank top perfect for gym and casual wear.',
-      'details': 'Breathable cotton blend. Moisture-wicking. Athletic fit.',
-    },
-    {
-      'id': '9',
-      'name': 'Sweatpants',
-      'price': '₹1199',
-      'originalPrice': '₹1799',
-      'image':
-      'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=300&fit=crop',
-      'discount': '33% OFF',
-      'images': [
-        'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1506629905607-d405b7a30db4?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop',
-      ],
-      'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
-      'colors': ['Gray', 'Black', 'Navy', 'Maroon'],
-      'description':
-      'Comfortable sweatpants perfect for lounging and light workouts.',
-      'details': 'Soft fleece interior. Adjustable drawstring. Relaxed fit.',
-    },
-    {
-      'id': '10',
-      'name': 'Polo Shirt',
-      'price': '₹1399',
-      'originalPrice': '₹1999',
-      'image':
-      'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop',
-      'discount': '30% OFF',
-      'images': [
-        'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300&h=300&fit=crop',
-      ],
-      'sizes': ['S', 'M', 'L', 'XL', 'XXL'],
-      'colors': ['Navy', 'White', 'Black', 'Red'],
-      'description': 'Classic polo shirt perfect for smart casual occasions.',
-      'details': 'Premium pique cotton. Ribbed collar and cuffs. Regular fit.',
-    },
-    {
-      'id': '11',
-      'name': 'Leather Jacket',
-      'price': '₹4999',
-      'originalPrice': '₹7999',
-      'image':
-      'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=300&fit=crop',
-      'discount': '37% OFF',
-      'images': [
-        'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop',
-      ],
-      'sizes': ['S', 'M', 'L', 'XL'],
-      'colors': ['Black', 'Brown', 'Dark Brown'],
-      'description':
-      'Premium leather jacket with modern styling. Perfect for casual and semi-formal occasions.',
-      'details': 'Genuine leather. YKK zippers. Quilted lining. Biker style.',
-    },
-    {
-      'id': '12',
-      'name': 'Chinos',
-      'price': '₹1699',
-      'originalPrice': '₹2499',
-      'image':
-      'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=300&h=300&fit=crop',
-      'discount': '32% OFF',
-      'images': [
-        'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=300&fit=crop',
-      ],
-      'sizes': ['28', '30', '32', '34', '36'],
-      'colors': ['Beige', 'Navy', 'Black', 'Olive'],
-      'description':
-      'Classic chinos perfect for smart casual and formal occasions.',
-      'details': 'Premium cotton twill. Slim fit. Belt loops. Side pockets.',
-    },
+
   ];
+
+  List<Map<String, dynamic>> get _featuredPerfumes {
+    return ProductsData.getProductsByCategory('Perfumes')
+        .map((p) => p.toMap())
+        .toList();
+  }
 
   @override
   void initState() {
     super.initState();
     _initializeAnimations();
     _loadUserData();
-    _startBannerTimer();
+    // _startBannerTimer();
+    _initializeVideo();
     _checkWelcomeCardStatus();
+
     _setupScrollListener();
+    _setupFirebaseMessaging();
+  }
+
+  Future<void> _setupFirebaseMessaging() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    final token = await messaging.getToken();
+    print('FCM Token: $token');
+
+    FirebaseMessaging.onMessage.listen((message) {
+      print(message.notification?.title);
+      print(message.notification?.body);
+    });
   }
 
   void _setupScrollListener() {
@@ -461,6 +501,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
+  void _initializeVideo() {
+    _videoController = VideoPlayerController.asset('assets/images/beinnvideo.mp4')
+      ..initialize().then((_) {
+        setState(() {}); // Ensure the first frame is shown after the video is initialized
+        _videoController!.setLooping(true);
+        _videoController!.play();
+      });
+  }
+
   Future<void> _checkWelcomeCardStatus() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -499,7 +548,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _currentUser = _auth.currentUser;
       if (_currentUser != null) {
         final userDoc =
-        await _firestore.collection('users').doc(_currentUser!.uid).get();
+            await _firestore.collection('users').doc(_currentUser!.uid).get();
         if (userDoc.exists) {
           setState(() {
             _userData = userDoc.data();
@@ -586,7 +635,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               '${product['name']} is added to your wishlist!',
               style: TextStyle(color: Colors.white),
             ),
-            backgroundColor: Color(0xFFD2691E),
+            backgroundColor: Color(0xFFBB694A),
             duration: Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -639,45 +688,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  void _switchSection(String section) {
-    if (_selectedSection != section) {
-      _sectionSwitchController.reset();
-      setState(() {
-        _selectedSection = section;
-      });
-      _sectionSwitchController.forward();
-    }
-  }
-
-  Widget _buildFixedHeader() {
+  Widget _buildFixedHeader(bool isDark) {
     return Container(
-      color: Colors.black,
+      color: isDark ? Colors.black : const Color(0xFFFAF9F5),
       child: SafeArea(
         bottom: false,
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Logo
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Color(0xFFD2691E).withOpacity(0.1),
+                    color: const Color(0xFFBB694A).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: Color(0xFFD2691E).withOpacity(0.3),
+                      color: const Color(0xFFBB694A).withOpacity(0.3),
                       width: 1,
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'BEINN',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFD2691E),
+                      color: Color(0xFFBB694A),
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -685,11 +725,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 // Icons
                 Row(
                   children: [
-                    IconButton(
-                      icon: Icon(Icons.notifications_outlined,
-                          color: Colors.white, size: 24),
-                      onPressed: () {},
-                    ),
                     Stack(
                       children: [
                         IconButton(
@@ -697,9 +732,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             main_app.CartManager().wishlistItems.isNotEmpty
                                 ? Icons.favorite
                                 : Icons.favorite_outline,
-                            color: main_app.CartManager().wishlistItems.isNotEmpty
-                                ? Color(0xFFD2691E)
-                                : Colors.white,
+                            color:
+                                main_app.CartManager().wishlistItems.isNotEmpty
+                                    ? const Color(0xFFBB694A)
+                                    : (isDark ? Colors.white : Colors.black),
                             size: 24,
                           ),
                           onPressed: _navigateToWishlist,
@@ -709,19 +745,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             right: 6,
                             top: 6,
                             child: Container(
-                              padding: EdgeInsets.all(2),
+                              padding: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
-                                color: Color(0xFFD2691E),
+                                color: const Color(0xFFBB694A),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.black, width: 1),
+                                border: Border.all(
+                                    color: isDark
+                                        ? Colors.black
+                                        : const Color(0xFFFAF9F5),
+                                    width: 1),
                               ),
-                              constraints: BoxConstraints(
+                              constraints: const BoxConstraints(
                                 minWidth: 16,
                                 minHeight: 16,
                               ),
                               child: Text(
                                 '${main_app.CartManager().wishlistItems.length}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -731,10 +771,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             ),
                           ),
                       ],
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.logout, color: Colors.white, size: 24),
-                      onPressed: _signOut,
                     ),
                   ],
                 ),
@@ -746,40 +782,40 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildWelcomeCard() {
-    if (!_showWelcomeCard || _userData == null) return SizedBox.shrink();
+  Widget _buildWelcomeCard(bool isDark) {
+    if (!_showWelcomeCard || _userData == null) return const SizedBox.shrink();
 
     return SlideTransition(
       position: Tween<Offset>(
-        begin: Offset(0.0, -1.0),
+        begin: const Offset(0.0, -1.0),
         end: Offset.zero,
       ).animate(CurvedAnimation(
         parent: _slideController,
-        curve: Interval(0.1, 0.5, curve: Curves.easeOutCubic),
+        curve: const Interval(0.1, 0.5, curve: Curves.easeOutCubic),
       )),
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 400),
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        padding: EdgeInsets.all(20),
+        duration: const Duration(milliseconds: 400),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFD2691E).withOpacity(0.1),
-              Color(0xFFD2691E).withOpacity(0.05),
+              const Color(0xFFBB694A).withOpacity(0.1),
+              const Color(0xFFBB694A).withOpacity(0.05),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Color(0xFFD2691E).withOpacity(0.2),
+            color: const Color(0xFFBB694A).withOpacity(0.2),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -787,15 +823,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           children: [
             CircleAvatar(
               radius: 25,
-              backgroundColor: Color(0xFFD2691E).withOpacity(0.2),
+              backgroundColor: const Color(0xFFBB694A).withOpacity(0.2),
               backgroundImage: _currentUser?.photoURL != null
                   ? NetworkImage(_currentUser!.photoURL!)
                   : null,
               child: _currentUser?.photoURL == null
-                  ? Icon(Icons.person, color: Color(0xFFD2691E), size: 30)
+                  ? const Icon(Icons.person, color: Color(0xFFBB694A), size: 30)
                   : null,
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -803,27 +839,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Text(
                     'Welcome back!',
                     style: TextStyle(
-                      color: Colors.grey[400],
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
                       fontSize: 14,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     _userData != null
                         ? '${_userData!['firstName'] ?? ''} ${_userData!['lastName'] ?? ''}'
-                        .trim()
+                            .trim()
                         : _currentUser?.displayName ?? 'User',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: isDark ? Colors.white : Colors.black,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Text(
+                  const SizedBox(height: 4),
+                  const Text(
                     'Ready to explore premium clothing?',
                     style: TextStyle(
-                      color: Color(0xFFD2691E),
+                      color: Color(0xFFBB694A),
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -832,7 +868,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
             IconButton(
-              icon: Icon(Icons.close, color: Colors.grey[400], size: 20),
+              icon: Icon(Icons.close,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  size: 20),
               onPressed: _dismissWelcomeCard,
             ),
           ],
@@ -842,16 +880,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildBannerSection() {
+    if (_videoController == null || !_videoController!.value.isInitialized) {
+      return Container(
+        height: 180,
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey[800],
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(child: CircularProgressIndicator(color: Color(0xFFBB694A))),
+      );
+    }
+    
     return SlideTransition(
       position: Tween<Offset>(
-        begin: Offset(1.0, 0.0),
+        begin: const Offset(1.0, 0.0),
         end: Offset.zero,
       ).animate(CurvedAnimation(
         parent: _slideController,
-        curve: Interval(0.2, 0.6, curve: Curves.easeOutCubic),
+        curve: const Interval(0.2, 0.6, curve: Curves.easeOutCubic),
       )),
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 800),
+        duration: const Duration(milliseconds: 800),
         curve: Curves.easeOutCubic,
         margin: EdgeInsets.symmetric(
           horizontal: 20,
@@ -865,77 +915,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               BoxShadow(
                 color: Colors.black.withOpacity(0.3),
                 blurRadius: 10,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: PageView.builder(
-            controller: _bannerController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentBannerIndex = index;
-              });
-            },
-            itemCount: _bannerData.length,
-            itemBuilder: (context, index) {
-              final banner = _bannerData[index];
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  image: DecorationImage(
-                    image: NetworkImage(banner['image']),
-                    fit: BoxFit.cover,
-                  ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              width: double.infinity,
+              height: 180,
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: _videoController!.value.size.width,
+                  height: _videoController!.value.size.height,
+                  child: VideoPlayer(_videoController!),
                 ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Colors.black.withOpacity(0.7),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        banner['title'],
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        banner['subtitle'],
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        banner['offer'],
-                        style: TextStyle(
-                          color: Color(0xFFD2691E),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),
@@ -943,48 +940,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildBannerIndicators() {
-    return Container(
-      margin: EdgeInsets.only(top: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: _bannerData.asMap().entries.map((entry) {
-          return AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            width: _currentBannerIndex == entry.key ? 20 : 8,
-            height: 8,
-            margin: EdgeInsets.symmetric(horizontal: 4),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4),
-              color: _currentBannerIndex == entry.key
-                  ? Color(0xFFD2691E)
-                  : Colors.grey[600],
-            ),
-          );
-        }).toList(),
-      ),
-    );
+    return const SizedBox.shrink();
   }
 
-  Widget _buildSectionToggle() {
+  void _switchSection(String section) {
+    if (_selectedSection != section) {
+      _sectionSwitchController.reset();
+      setState(() {
+        _selectedSection = section;
+      });
+      _sectionSwitchController.forward();
+    }
+  }
+
+  Widget _buildSectionToggle(bool isDark) {
     return SlideTransition(
       position: Tween<Offset>(
-        begin: Offset(0.0, 1.0),
+        begin: const Offset(0.0, 1.0),
         end: Offset.zero,
       ).animate(CurvedAnimation(
         parent: _slideController,
-        curve: Interval(0.4, 0.8, curve: Curves.easeOutCubic),
+        curve: const Interval(0.4, 0.8, curve: Curves.easeOutCubic),
       )),
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: Colors.grey[800]!, width: 1),
+          border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -994,20 +982,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: GestureDetector(
                 onTap: () => _switchSection('Clothing'),
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOutCubic,
-                  padding: EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     color: _selectedSection == 'Clothing'
-                        ? Color(0xFFD2691E)
+                        ? const Color(0xFFBB694A)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: _selectedSection == 'Clothing'
                         ? [
                       BoxShadow(
-                        color: Color(0xFFD2691E).withOpacity(0.3),
+                        color: const Color(0xFFBB694A).withOpacity(0.3),
                         blurRadius: 8,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ]
                         : null,
@@ -1017,7 +1005,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     style: TextStyle(
                       color: _selectedSection == 'Clothing'
                           ? Colors.white
-                          : Colors.grey[400],
+                          : (isDark ? Colors.grey[400] : Colors.grey[600]),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1030,20 +1018,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: GestureDetector(
                 onTap: () => _switchSection('Perfumes'),
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOutCubic,
-                  padding: EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     color: _selectedSection == 'Perfumes'
-                        ? Color(0xFFD2691E)
+                        ? const Color(0xFFBB694A)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: _selectedSection == 'Perfumes'
                         ? [
                       BoxShadow(
-                        color: Color(0xFFD2691E).withOpacity(0.3),
+                        color: const Color(0xFFBB694A).withOpacity(0.3),
                         blurRadius: 8,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ]
                         : null,
@@ -1053,7 +1041,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     style: TextStyle(
                       color: _selectedSection == 'Perfumes'
                           ? Colors.white
-                          : Colors.grey[400],
+                          : (isDark ? Colors.grey[400] : Colors.grey[600]),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1068,32 +1056,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildCategoriesSection() {
-    // Only show categories when Clothing is selected
-    if (_selectedSection != 'Clothing') return SizedBox.shrink();
+  Widget _buildCategoriesSection(bool isDark) {
+    if (_selectedSection != 'Clothing') return const SizedBox.shrink();
 
     return SlideTransition(
       position: Tween<Offset>(
-        begin: Offset(-1.0, 0.0),
+        begin: const Offset(-1.0, 0.0),
         end: Offset.zero,
       ).animate(CurvedAnimation(
         parent: _slideController,
-        curve: Interval(0.3, 0.7, curve: Curves.easeOutCubic),
+        curve: const Interval(0.3, 0.7, curve: Curves.easeOutCubic),
       )),
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 16),
+        margin: const EdgeInsets.symmetric(vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Categories',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: isDark ? Colors.white : Colors.black,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1102,8 +1089,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     onTap: _handleCategoryScroll,
                     child: Text(
                       _showSeeAll ? 'See All' : 'Back',
-                      style: TextStyle(
-                        color: Color(0xFFD2691E),
+                      style: const TextStyle(
+                        color: Color(0xFFBB694A),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1112,13 +1099,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            SizedBox(height: 16),
-            Container(
+            const SizedBox(height: 16),
+            SizedBox(
               height: 100,
               child: ListView.builder(
                 controller: _categoriesScrollController,
                 scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: _categories.length,
                 itemBuilder: (context, index) {
                   final category = _categories[index];
@@ -1127,66 +1114,84 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         context, category['name']),
                     child: Container(
                       width: 80,
-                      margin: EdgeInsets.symmetric(horizontal: 4),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
                       child: Column(
                         children: [
                           Container(
                             width: 60,
                             height: 60,
                             decoration: BoxDecoration(
-                              color: Color(0xFFD2691E).withOpacity(0.1),
+                              color: const Color(0xFFBB694A).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: Color(0xFFD2691E).withOpacity(0.3),
+                                color: const Color(0xFFBB694A).withOpacity(0.3),
                                 width: 1,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black
+                                      .withOpacity(isDark ? 0.2 : 0.05),
                                   blurRadius: 4,
-                                  offset: Offset(0, 2),
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(14),
                               child: Container(
-                                padding: EdgeInsets.all(8),
-                                child: Image.network(
-                                  category['image'],
-                                  width: 44,
-                                  height: 44,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.checkroom,
-                                      color: Color(0xFFD2691E),
-                                      size: 28,
-                                    );
-                                  },
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          color: Color(0xFFD2691E),
-                                          strokeWidth: 2,
-                                        ),
+                                padding: const EdgeInsets.all(8),
+                                child: category['image'].startsWith('assets/')
+                                    ? Image.asset(
+                                        category['image'],
+                                        width: 44,
+                                        height: 44,
+                                        fit: BoxFit.contain,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return const Icon(
+                                            Icons.checkroom,
+                                            color: Color(0xFFBB694A),
+                                            size: 28,
+                                          );
+                                        },
+                                      )
+                                    : Image.network(
+                                        category['image'],
+                                        width: 44,
+                                        height: 44,
+                                        fit: BoxFit.contain,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return const Icon(
+                                            Icons.checkroom,
+                                            color: Color(0xFFBB694A),
+                                            size: 28,
+                                          );
+                                        },
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null)
+                                            return child;
+                                          return const Center(
+                                            child: SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                color: Color(0xFFBB694A),
+                                                strokeWidth: 2,
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       ),
-                                    );
-                                  },
-                                ),
                               ),
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
                             category['name'],
                             style: TextStyle(
-                              color: Colors.white,
+                              color: isDark ? Colors.white : Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -1207,44 +1212,67 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildFeaturedProducts() {
+  Widget _buildFeaturedProducts(bool isDark) {
     return SlideTransition(
       position: _sectionSlideAnimation,
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 _selectedSection == 'Clothing'
                     ? 'Featured Products'
                     : 'Premium Perfumes',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _selectedSection == 'Clothing'
-                ? _buildClothingGrid()
-                : _buildPerfumesComingSoon(),
+                ? _buildClothingGrid(isDark)
+                : _buildPerfumesGrid(isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildClothingGrid() {
+  Widget _buildPerfumesGrid(bool isDark) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: GridView.builder(
+        padding: EdgeInsets.zero,
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.75,
+        ),
+        itemCount: _featuredPerfumes.length,
+        itemBuilder: (context, index) {
+          final product = _featuredPerfumes[index];
+          return _buildProductCard(product, isDark);
+        },
+      ),
+    );
+  }
+
+  Widget _buildClothingGrid(bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GridView.builder(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
@@ -1253,94 +1281,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         itemCount: _featuredProducts.length,
         itemBuilder: (context, index) {
           final product = _featuredProducts[index];
-          return _buildProductCard(product);
+          return _buildProductCard(product, isDark);
         },
       ),
     );
   }
 
-  Widget _buildPerfumesComingSoon() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20),
-      padding: EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFD2691E).withOpacity(0.1),
-            Color(0xFFD2691E).withOpacity(0.05),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Color(0xFFD2691E).withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.access_time,
-            size: 64,
-            color: Color(0xFFD2691E),
-          ),
-          SizedBox(height: 24),
-          Text(
-            'Coming Soon!',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          SizedBox(height: 12),
-          Text(
-            'Premium perfumes collection launching soon',
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Stay tuned for exclusive fragrances',
-            style: TextStyle(
-              color: Color(0xFFD2691E),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductCard(Map<String, dynamic> product) {
+  Widget _buildProductCard(Map<String, dynamic> product, bool isDark) {
     final isWishlisted = main_app.CartManager().isInWishlist(product['id']);
 
     return GestureDetector(
       onTap: () => main_app.navigateToProductDetail(context, product),
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[800]!, width: 1),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -1355,9 +1318,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16)),
+                          const BorderRadius.vertical(top: Radius.circular(16)),
                       image: DecorationImage(
-                        image: NetworkImage(product['image']),
+                        image: product['image'].startsWith('assets/')
+                            ? AssetImage(product['image']) as ImageProvider
+                            : NetworkImage(product['image']),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -1366,14 +1331,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Color(0xFFD2691E),
+                        color: const Color(0xFFBB694A),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         product['discount'],
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -1387,7 +1353,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     child: GestureDetector(
                       onTap: () => _toggleWishlist(product),
                       child: Container(
-                        padding: EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(20),
@@ -1396,8 +1362,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           isWishlisted
                               ? Icons.favorite
                               : Icons.favorite_outline,
-                          color:
-                          isWishlisted ? Color(0xFFD2691E) : Colors.white,
+                          color: isWishlisted
+                              ? const Color(0xFFBB694A)
+                              : Colors.white,
                           size: 16,
                         ),
                       ),
@@ -1409,7 +1376,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Expanded(
               flex: 2,
               child: Padding(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1418,7 +1385,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       child: Text(
                         product['name'],
                         style: TextStyle(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1426,23 +1393,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         Text(
                           product['price'],
-                          style: TextStyle(
-                            color: Color(0xFFD2691E),
+                          style: const TextStyle(
+                            color: Color(0xFFBB694A),
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             product['originalPrice'],
                             style: TextStyle(
-                              color: Colors.grey[500],
+                              color:
+                                  isDark ? Colors.grey[500] : Colors.grey[500],
                               fontSize: 12,
                               decoration: TextDecoration.lineThrough,
                             ),
@@ -1463,49 +1431,67 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: CircularProgressIndicator(
-            color: Color(0xFFD2691E),
-          ),
-        ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: Column(
-            children: [
-              // Fixed Header (without search bar)
-              _buildFixedHeader(),
-              // Scrollable Content
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildWelcomeCard(),
-                      _buildBannerSection(),
-                      _buildBannerIndicators(),
-                      _buildSectionToggle(),
-                      _buildCategoriesSection(),
-                      _buildFeaturedProducts(),
-                      SizedBox(height: 100), // Bottom padding for navigation bar
-                    ],
-                  ),
-                ),
+    return ValueListenableBuilder<bool>(
+      valueListenable: isDarkModeNotifier,
+      builder: (context, isDark, child) {
+        if (_isLoading) {
+          return Scaffold(
+            backgroundColor: isDark ? Colors.black : const Color(0xFFFAF9F5),
+            body: const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFBB694A),
               ),
-            ],
+            ),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: isDark ? Colors.black : const Color(0xFFFAF9F5),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ChatbotScreen()),
+              );
+            },
+            backgroundColor: const Color(0xFFBB694A),
+            child: const Icon(Icons.mark_chat_unread_rounded,
+                color: Colors.white), // Use a chat icon
+            tooltip: 'Chat with Assistant',
           ),
-        ),
-      ),
+          body: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: Column(
+                children: [
+                  // Fixed Header (without search bar)
+                  _buildFixedHeader(isDark),
+                  // Scrollable Content
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildWelcomeCard(isDark),
+                          _buildBannerSection(),
+                          _buildBannerIndicators(),
+                          _buildSectionToggle(isDark),
+                          _buildCategoriesSection(isDark),
+                          _buildFeaturedProducts(isDark),
+                          const SizedBox(
+                              height: 100), // Bottom padding for navigation bar
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1516,8 +1502,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _scaleController.dispose();
     _bannerSlideController.dispose();
     _sectionSwitchController.dispose();
+
     _bannerTimer?.cancel();
     _bannerController.dispose();
+    _videoController?.dispose();
     _categoriesScrollController.dispose();
     super.dispose();
   }

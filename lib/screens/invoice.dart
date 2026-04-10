@@ -10,14 +10,17 @@ class InvoiceService {
   Future<void> generateInvoice(Map<String, dynamic> orderData) async {
     try {
       print('Starting invoice generation...');
-      
+
       // Create PDF document
       final pdf = pw.Document();
 
       // Extract order data with null safety
-      final customerInfo = orderData['customerInfo'] as Map<String, dynamic>? ?? {};
-      final deliveryAddress = orderData['deliveryAddress'] as Map<String, dynamic>? ?? {};
-      final addressData = (deliveryAddress['address'] as Map<String, dynamic>?) ?? {};
+      final customerInfo =
+          orderData['customerInfo'] as Map<String, dynamic>? ?? {};
+      final deliveryAddress =
+          orderData['deliveryAddress'] as Map<String, dynamic>? ?? {};
+      final addressData =
+          (deliveryAddress['address'] as Map<String, dynamic>?) ?? {};
       final items = (orderData['items'] as List<dynamic>?) ?? [];
       final pricing = orderData['pricing'] as Map<String, dynamic>? ?? {};
       final payment = orderData['payment'] as Map<String, dynamic>? ?? {};
@@ -72,7 +75,6 @@ class InvoiceService {
       // Save PDF to device
       await _savePdfToDevice(pdf, orderNumber);
       print('Invoice generation completed successfully');
-      
     } catch (e) {
       print('Error in generateInvoice: $e');
       throw Exception('Failed to generate invoice: $e');
@@ -81,7 +83,7 @@ class InvoiceService {
 
   String _buildAddress(Map<String, dynamic> addressData) {
     final parts = <String>[];
-    
+
     if (addressData['building']?.toString().isNotEmpty == true) {
       parts.add(addressData['building'].toString());
     }
@@ -100,7 +102,7 @@ class InvoiceService {
     if (addressData['pincode']?.toString().isNotEmpty == true) {
       parts.add(addressData['pincode'].toString());
     }
-    
+
     return parts.join(', ');
   }
 
@@ -116,7 +118,7 @@ class InvoiceService {
               style: pw.TextStyle(
                 fontSize: 32,
                 fontWeight: pw.FontWeight.bold,
-                color: PdfColor.fromHex('#D2691E'),
+                color: PdfColor.fromHex('#BB694A'),
               ),
             ),
             pw.SizedBox(height: 8),
@@ -142,7 +144,7 @@ class InvoiceService {
           width: 80,
           height: 80,
           decoration: pw.BoxDecoration(
-            color: PdfColor.fromHex('#D2691E'),
+            color: PdfColor.fromHex('#BB694A'),
             borderRadius: pw.BorderRadius.circular(40),
           ),
           child: pw.Center(
@@ -181,7 +183,7 @@ class InvoiceService {
               style: pw.TextStyle(
                 fontSize: 16,
                 fontWeight: pw.FontWeight.bold,
-                color: PdfColor.fromHex('#D2691E'),
+                color: PdfColor.fromHex('#BB694A'),
               ),
             ),
           ],
@@ -203,7 +205,8 @@ class InvoiceService {
     );
   }
 
-  pw.Widget _buildCustomerInfo(Map<String, dynamic> customerInfo, Map<String, dynamic> deliveryAddress, String fullAddress) {
+  pw.Widget _buildCustomerInfo(Map<String, dynamic> customerInfo,
+      Map<String, dynamic> deliveryAddress, String fullAddress) {
     return pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -304,7 +307,7 @@ class InvoiceService {
             // Header row
             pw.TableRow(
               decoration: pw.BoxDecoration(
-                color: PdfColor.fromHex('#D2691E'),
+                color: PdfColor.fromHex('#BB694A'),
               ),
               children: [
                 _buildTableCell('Product Name', isHeader: true),
@@ -318,11 +321,13 @@ class InvoiceService {
             // Data rows
             ...items.map((item) {
               final priceStr = item['price']?.toString() ?? '0';
-              final cleanPrice = priceStr.replaceAll('₹', '').replaceAll(',', '');
+              final cleanPrice =
+                  priceStr.replaceAll('₹', '').replaceAll(',', '');
               double itemPrice = double.tryParse(cleanPrice) ?? 0.0;
-              int quantity = int.tryParse(item['quantity']?.toString() ?? '1') ?? 1;
+              int quantity =
+                  int.tryParse(item['quantity']?.toString() ?? '1') ?? 1;
               double totalItemPrice = itemPrice * quantity;
-              
+
               return pw.TableRow(
                 children: [
                   _buildTableCell(item['name']?.toString() ?? 'N/A'),
@@ -363,11 +368,18 @@ class InvoiceService {
           width: 250,
           child: pw.Column(
             children: [
-              _buildPriceRow('Subtotal (${pricing['totalItems'] ?? 0} items)', 'Rs. ${(pricing['subtotal'] ?? 0).toStringAsFixed(0)}'),
-              _buildPriceRow('Tax (GST 18%)', 'Rs. ${(pricing['tax'] ?? 0).toStringAsFixed(0)}'),
-              _buildPriceRow('Shipping', (pricing['shipping'] ?? 0) == 0 ? 'FREE' : 'Rs. ${(pricing['shipping'] ?? 0).toStringAsFixed(0)}'),
+              _buildPriceRow('Subtotal (${pricing['totalItems'] ?? 0} items)',
+                  'Rs. ${(pricing['subtotal'] ?? 0).toStringAsFixed(0)}'),
+
+              _buildPriceRow(
+                  'Shipping',
+                  (pricing['shipping'] ?? 0) == 0
+                      ? 'FREE'
+                      : 'Rs. ${(pricing['shipping'] ?? 0).toStringAsFixed(0)}'),
               pw.Divider(color: PdfColors.grey400, thickness: 1),
-              _buildPriceRow('TOTAL AMOUNT', 'Rs. ${(pricing['grandTotal'] ?? 0).toStringAsFixed(0)}', isTotal: true),
+              _buildPriceRow('TOTAL AMOUNT',
+                  'Rs. ${(pricing['grandTotal'] ?? 0).toStringAsFixed(0)}',
+                  isTotal: true),
             ],
           ),
         ),
@@ -394,7 +406,7 @@ class InvoiceService {
             style: pw.TextStyle(
               fontSize: isTotal ? 14 : 12,
               fontWeight: isTotal ? pw.FontWeight.bold : pw.FontWeight.normal,
-              color: isTotal ? PdfColor.fromHex('#D2691E') : PdfColors.black,
+              color: isTotal ? PdfColor.fromHex('#BB694A') : PdfColors.black,
             ),
           ),
         ],
@@ -403,6 +415,11 @@ class InvoiceService {
   }
 
   pw.Widget _buildPaymentInfo(Map<String, dynamic> payment) {
+    final method = payment['method'] ?? 'Unknown';
+    final isCOD = method == 'Cash on Delivery';
+    final status = payment['status']?.toString().toUpperCase() ?? 'COMPLETED';
+    final paymentId = payment['paymentId']?.toString() ?? 'N/A';
+
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -426,33 +443,50 @@ class InvoiceService {
             children: [
               pw.Row(
                 children: [
-                  pw.Text('Payment Method: ', style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
-                  pw.Text('Razorpay', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
+                  pw.Text('Payment Method: ',
+                      style:
+                          pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
+                  pw.Text(isCOD ? 'Cash on Delivery' : 'Razorpay',
+                      style: pw.TextStyle(
+                          fontSize: 12, fontWeight: pw.FontWeight.bold)),
                 ],
               ),
               pw.SizedBox(height: 4),
+              if (!isCOD) ...[
+                pw.Row(
+                  children: [
+                    pw.Text('Payment ID: ',
+                        style: pw.TextStyle(
+                            fontSize: 12, color: PdfColors.grey600)),
+                    pw.Text(paymentId,
+                        style: pw.TextStyle(
+                            fontSize: 12, fontWeight: pw.FontWeight.bold)),
+                  ],
+                ),
+                pw.SizedBox(height: 4),
+              ],
               pw.Row(
                 children: [
-                  pw.Text('Payment ID: ', style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
-                  pw.Text(payment['paymentId']?.toString() ?? 'N/A', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-                ],
-              ),
-              pw.SizedBox(height: 4),
-              pw.Row(
-                children: [
-                  pw.Text('Status: ', style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
+                  pw.Text('Status: ',
+                      style:
+                          pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
                   pw.Container(
-                    padding: pw.EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        pw.EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: pw.BoxDecoration(
-                      color: PdfColors.green100,
+                      color: status == 'COMPLETED'
+                          ? PdfColors.green100
+                          : PdfColor.fromHex('#F4E0D9'),
                       borderRadius: pw.BorderRadius.circular(4),
                     ),
                     child: pw.Text(
-                      'COMPLETED',
+                      status,
                       style: pw.TextStyle(
                         fontSize: 10,
                         fontWeight: pw.FontWeight.bold,
-                        color: PdfColors.green800,
+                        color: status == 'COMPLETED'
+                            ? PdfColors.green800
+                            : PdfColor.fromHex('#BB694A'),
                       ),
                     ),
                   ),
@@ -475,7 +509,7 @@ class InvoiceService {
           style: pw.TextStyle(
             fontSize: 18,
             fontWeight: pw.FontWeight.bold,
-            color: PdfColor.fromHex('#D2691E'),
+            color: PdfColor.fromHex('#BB694A'),
           ),
           textAlign: pw.TextAlign.center,
         ),
@@ -510,14 +544,14 @@ class InvoiceService {
       print('Starting PDF save process...');
       final Uint8List bytes = await pdf.save();
       print('PDF bytes generated: ${bytes.length}');
-      
+
       Directory? directory;
-      
+
       if (Platform.isAndroid) {
         // Try to get external storage directory
         directory = await getExternalStorageDirectory();
         print('External storage directory: ${directory?.path}');
-        
+
         // Try to use Downloads folder
         if (directory != null) {
           final downloadsPath = '/storage/emulated/0/Download';
@@ -537,10 +571,11 @@ class InvoiceService {
         final File file = File('${directory.path}/$fileName');
         await file.writeAsBytes(bytes);
         print('Invoice saved successfully to: ${file.path}');
-        
+
         // Verify file was created
         if (await file.exists()) {
-          print('File verification successful. Size: ${await file.length()} bytes');
+          print(
+              'File verification successful. Size: ${await file.length()} bytes');
         } else {
           throw Exception('File was not created successfully');
         }

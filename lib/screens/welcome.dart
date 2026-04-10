@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -7,6 +7,8 @@ import 'profile_completion.dart';
 import '../main.dart';
 
 class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({Key? key}) : super(key: key);
+
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
@@ -52,7 +54,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
       print('Google user signed in: ${googleUser.email}');
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       if (googleAuth.accessToken == null || googleAuth.idToken == null) {
         throw Exception('Failed to get Google authentication tokens');
@@ -63,7 +66,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         idToken: googleAuth.idToken,
       );
 
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
       print('Firebase authentication successful: ${userCredential.user!.uid}');
 
       // Set login status
@@ -98,10 +102,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       } else {
         // New user - create basic record and complete profile
         print('New user - creating profile');
-        await _firestore
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .set({
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
           'uid': userCredential.user!.uid,
           'email': userCredential.user!.email,
           'name': userCredential.user!.displayName,
@@ -149,7 +150,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => MainNavigationWrapper(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            MainNavigationWrapper(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
@@ -171,7 +173,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => ProfileCompletionScreen(user: user),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            ProfileCompletionScreen(user: user),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
@@ -215,7 +218,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             child: Text(
               'OK',
               style: TextStyle(
-                color: Color(0xFFD2691E),
+                color: Color(0xFFF5F5F5),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -398,50 +401,50 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _continueWithGoogle,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFD2691E),
+                          backgroundColor: Color(0xFFBB694A),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 8,
-                          shadowColor: Color(0xFFD2691E).withOpacity(0.4),
+                          shadowColor: Color(0xFFBB694A).withOpacity(0.4),
                         ),
                         child: _isLoading
                             ? SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5,
-                          ),
-                        )
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
                             : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Icon(
+                                      Icons.g_mobiledata,
+                                      color: Color(0xFFBB694A),
+                                      size: 20,
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'Continue with Google',
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              child: Icon(
-                                Icons.g_mobiledata,
-                                color: Color(0xFFD2691E),
-                                size: 20,
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Text(
-                              'Continue with Google',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                                letterSpacing: 0.3,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                     SizedBox(height: 16),

@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
+import '../theme_notifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'order_details.dart';
+import '../main.dart' as main_app;
 
 class OrdersScreen extends StatefulWidget {
   @override
   _OrdersScreenState createState() => _OrdersScreenState();
 }
 
-class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMixin {
+class _OrdersScreenState extends State<OrdersScreen>
+    with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late AnimationController _scaleController;
-  late AnimationController _staggerController;
+  late AnimationController _bounceController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _staggerAnimation;
+  late Animation<double> _bounceAnimation;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -30,84 +33,70 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    print('🚀 OrdersScreen initState called');
+    print('ðŸš€ OrdersScreen initState called');
     _initializeAnimations();
     _loadOrdersFromFirestore();
   }
 
   void _initializeAnimations() {
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 900),
       vsync: this,
     );
 
     _slideController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 700),
       vsync: this,
     );
 
     _scaleController = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
 
-    _staggerController = AnimationController(
-      duration: Duration(milliseconds: 1200),
+    _bounceController = AnimationController(
+      duration: const Duration(milliseconds: 900),
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.35), end: Offset.zero).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.elasticOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeOut),
+    );
 
-    _staggerAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _staggerController,
-      curve: Curves.easeOutCubic,
-    ));
+    _bounceAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack),
+    );
 
+    // Start animations with staggered timing
     _fadeController.forward();
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 120), () {
       if (mounted) _slideController.forward();
     });
-    Future.delayed(Duration(milliseconds: 400), () {
+    Future.delayed(const Duration(milliseconds: 240), () {
       if (mounted) _scaleController.forward();
     });
-    Future.delayed(Duration(milliseconds: 600), () {
-      if (mounted) _staggerController.forward();
+    Future.delayed(const Duration(milliseconds: 360), () {
+      if (mounted) _bounceController.forward();
     });
   }
 
   // ROBUST order loading with extensive debugging
   Future<void> _loadOrdersFromFirestore() async {
     try {
-      print('🔍 === STARTING ORDER FETCH ===');
+      print('ðŸ” === STARTING ORDER FETCH ===');
 
       final user = _auth.currentUser;
       if (user == null) {
-        print('❌ No authenticated user found');
+        print('âŒ No authenticated user found');
         setState(() {
           _isLoading = false;
           _hasError = true;
@@ -116,28 +105,32 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
         return;
       }
 
-      print('✅ User authenticated: ${user.uid}');
-      print('📧 User email: ${user.email}');
+      print('âœ… User authenticated: ${user.uid}');
+      print('ðŸ“§ User email: ${user.email}');
 
-      final orderPlacedRef =
-      _firestore.collection('users').doc(user.uid).collection('order_placed');
+      final orderPlacedRef = _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('order_placed');
 
-      print('🔍 Querying collection: users/${user.uid}/order_placed');
+      print('ðŸ” Querying collection: users/${user.uid}/order_placed');
 
       final snapshot = await orderPlacedRef.get();
 
-      print('📊 Raw query result: ${snapshot.docs.length} documents found');
-      print('📊 Snapshot metadata: ${snapshot.metadata}');
-      print('📊 Is from cache: ${snapshot.metadata.isFromCache}');
+      print('ðŸ“Š Raw query result: ${snapshot.docs.length} documents found');
+      print('ðŸ“Š Snapshot metadata: ${snapshot.metadata}');
+      print('ðŸ“Š Is from cache: ${snapshot.metadata.isFromCache}');
 
       if (snapshot.docs.isEmpty) {
-        print('⚠️ No documents found in order_placed collection');
+        print('âš ï¸ No documents found in order_placed collection');
 
-        final userDoc = await _firestore.collection('users').doc(user.uid).get();
-        print('👤 User document exists: ${userDoc.exists}');
+        final userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        print('ðŸ‘¤ User document exists: ${userDoc.exists}');
 
         if (userDoc.exists) {
-          print('👤 User document data keys: ${userDoc.data()?.keys.toList()}');
+          print(
+              'ðŸ‘¤ User document data keys: ${userDoc.data()?.keys.toList()}');
         }
 
         setState(() {
@@ -152,11 +145,11 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
 
       for (var doc in snapshot.docs) {
         try {
-          print('📄 Processing document: ${doc.id}');
+          print('ðŸ“„ Processing document: ${doc.id}');
           final data = doc.data();
 
-          print('📄 Raw document data: $data');
-          print('📄 Document keys: ${data.keys.toList()}');
+          print('ðŸ“„ Raw document data: $data');
+          print('ðŸ“„ Document keys: ${data.keys.toList()}');
 
           Map<String, dynamic> orderData = {
             'id': doc.id,
@@ -172,12 +165,14 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
 
           if (data['orderDate'] != null) {
             if (data['orderDate'] is Timestamp) {
-              orderData['orderDate'] = (data['orderDate'] as Timestamp).toDate();
+              orderData['orderDate'] =
+                  (data['orderDate'] as Timestamp).toDate();
             } else if (data['orderDate'] is String) {
               orderData['orderDate'] =
                   DateTime.tryParse(data['orderDate']) ?? DateTime.now();
             }
-          } else if (data['createdAt'] != null && data['createdAt'] is Timestamp) {
+          } else if (data['createdAt'] != null &&
+              data['createdAt'] is Timestamp) {
             orderData['orderDate'] = (data['createdAt'] as Timestamp).toDate();
           } else {
             orderData['orderDate'] = DateTime.now();
@@ -198,28 +193,29 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
           }
 
           orderData['customerInfo'] = data['customerInfo'] ?? {};
-          print('👤 Customer info: ${orderData['customerInfo']}');
+          print('ðŸ‘¤ Customer info: ${orderData['customerInfo']}');
 
           orderData['deliveryAddress'] = data['deliveryAddress'] ?? {};
-          print('📍 Delivery address: ${orderData['deliveryAddress']}');
+          print('ðŸ“ Delivery address: ${orderData['deliveryAddress']}');
 
           orderData['items'] = data['items'] ?? [];
-          print('🛍️ Items count: ${(orderData['items'] as List).length}');
+          print('ðŸ›ï¸ Items count: ${(orderData['items'] as List).length}');
           if ((orderData['items'] as List).isNotEmpty) {
-            print('🛍️ First item: ${(orderData['items'] as List)[0]}');
+            print('ðŸ›ï¸ First item: ${(orderData['items'] as List)[0]}');
           }
 
           orderData['pricing'] = data['pricing'] ?? {};
-          print('💰 Pricing: ${orderData['pricing']}');
+          print('ðŸ’° Pricing: ${orderData['pricing']}');
 
           orderData['payment'] = data['payment'] ?? {};
-          print('💳 Payment: ${orderData['payment']}');
+          print('ðŸ’³ Payment: ${orderData['payment']}');
 
           orders.add(orderData);
-          print('✅ Successfully processed order: ${orderData['orderNumber']}');
+          print(
+              'âœ… Successfully processed order: ${orderData['orderNumber']}');
         } catch (e) {
-          print('❌ Error processing document ${doc.id}: $e');
-          print('❌ Error stack trace: ${StackTrace.current}');
+          print('âŒ Error processing document ${doc.id}: $e');
+          print('âŒ Error stack trace: ${StackTrace.current}');
           continue;
         }
       }
@@ -230,8 +226,8 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
         return dateB.compareTo(dateA);
       });
 
-      print('🎉 === ORDER FETCH COMPLETE ===');
-      print('🎉 Total orders processed: ${orders.length}');
+      print('ðŸŽ‰ === ORDER FETCH COMPLETE ===');
+      print('ðŸŽ‰ Total orders processed: ${orders.length}');
 
       setState(() {
         _orders = orders;
@@ -242,11 +238,11 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
       for (int i = 0; i < _orders.length; i++) {
         final order = _orders[i];
         print(
-            '📋 Order ${i + 1}: ${order['orderNumber']} - ${order['orderDate']} - Items: ${(order['items'] as List).length}');
+            'ðŸ“‹ Order ${i + 1}: ${order['orderNumber']} - ${order['orderDate']} - Items: ${(order['items'] as List).length}');
       }
     } catch (e, stackTrace) {
-      print('💥 CRITICAL ERROR in _loadOrdersFromFirestore: $e');
-      print('💥 Stack trace: $stackTrace');
+      print('ðŸ’¥ CRITICAL ERROR in _loadOrdersFromFirestore: $e');
+      print('ðŸ’¥ Stack trace: $stackTrace');
 
       setState(() {
         _isLoading = false;
@@ -257,7 +253,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
   }
 
   Future<void> _refreshOrders() async {
-    print('🔄 Refreshing orders...');
+    print('ðŸ”„ Refreshing orders...');
     setState(() {
       _isLoading = true;
       _hasError = false;
@@ -283,126 +279,145 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.grey[900],
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[600],
-                  borderRadius: BorderRadius.circular(2),
-                ),
+        builder: (context, setModalState) => ValueListenableBuilder<bool>(
+          valueListenable: isDarkModeNotifier,
+          builder: (context, isDark, child) {
+            return Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[900] : Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
-              SizedBox(height: 16),
-              Text(
-                'Rate Your Order',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'How was your shopping experience?',
-                style: TextStyle(
-                  color: Colors.grey[300],
-                  fontSize: 14,
-                ),
-              ),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  5,
-                      (index) => GestureDetector(
-                    onTap: () {
-                      setModalState(() {
-                        selectedRating = index + 1;
-                      });
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: Icon(
-                        selectedRating > index ? Icons.star : Icons.star_border,
-                        color: Color(0xFFD2691E),
-                        size: 32,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 16),
-              TextField(
-                controller: reviewController,
-                style: TextStyle(color: Colors.white, fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'Write your review (optional)',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  filled: true,
-                  fillColor: Colors.grey[850],
-                  contentPadding: EdgeInsets.all(12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                maxLines: 3,
-              ),
-              SizedBox(height: 16),
-              Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.grey[600]!),
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey[600] : Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Rate Your Order',
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'How was your shopping experience?',
+                    style: TextStyle(
+                      color: isDark ? Colors.grey[300] : Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      5,
+                      (index) => GestureDetector(
+                        onTap: () {
+                          setModalState(() {
+                            selectedRating = index + 1;
+                          });
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          child: Icon(
+                            selectedRating > index
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: Color(0xFFBB694A),
+                            size: 32,
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(color: Colors.grey[300], fontSize: 14),
                       ),
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: selectedRating > 0
-                          ? () async {
-                        await _saveRatingToFirestore(
-                            order, selectedRating, reviewController.text.trim());
-                        Navigator.pop(context);
-                      }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFD2691E),
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        'Submit Rating',
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: reviewController,
+                    style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: 'Write your review (optional)',
+                      hintStyle: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[500]),
+                      filled: true,
+                      fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                      contentPadding: EdgeInsets.all(12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
                       ),
                     ),
+                    maxLines: 3,
                   ),
+                  SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                                color: isDark
+                                    ? Colors.grey[600]!
+                                    : Colors.grey[400]!),
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                                color: isDark
+                                    ? Colors.grey[300]
+                                    : Colors.grey[600],
+                                fontSize: 14),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: selectedRating > 0
+                              ? () async {
+                                  await _saveRatingToFirestore(
+                                      order,
+                                      selectedRating,
+                                      reviewController.text.trim());
+                                  Navigator.pop(context);
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFFBB694A),
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            'Submit Rating',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                 ],
               ),
-              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -413,7 +428,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        print('💾 Saving rating for order: ${order['orderNumber']}');
+        print('ðŸ’¾ Saving rating for order: ${order['orderNumber']}');
 
         await _firestore
             .collection('users')
@@ -428,7 +443,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
           'updatedAt': FieldValue.serverTimestamp(),
         });
 
-        print('✅ Rating saved successfully');
+        print('âœ… Rating saved successfully');
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -440,16 +455,17 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                   Text('Thank you for rating us $rating stars!'),
                 ],
               ),
-              backgroundColor: Color(0xFFD2691E),
+              backgroundColor: Color(0xFFBB694A),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
           );
         }
 
         setState(() {
-          final orderIndex =
-          _orders.indexWhere((o) => o['orderNumber'] == order['orderNumber']);
+          final orderIndex = _orders
+              .indexWhere((o) => o['orderNumber'] == order['orderNumber']);
           if (orderIndex != -1) {
             _orders[orderIndex]['isRated'] = true;
             _orders[orderIndex]['rating'] = rating;
@@ -458,14 +474,15 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
         });
       }
     } catch (e) {
-      print('❌ Error saving rating: $e');
+      print('âŒ Error saving rating: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to save rating. Please try again.'),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         );
       }
@@ -473,7 +490,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
   }
 
   void _navigateToOrderDetails(Map<String, dynamic> order) {
-    print('🔄 Navigating to order details: ${order['orderNumber']}');
+    print('ðŸ”„ Navigating to order details: ${order['orderNumber']}');
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -484,7 +501,8 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
           const end = Offset.zero;
           const curve = Curves.easeInOutCubic;
 
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
           var offsetAnimation = animation.drive(tween);
 
           return SlideTransition(position: offsetAnimation, child: child);
@@ -494,12 +512,34 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
     );
   }
 
+  void _navigateToHome() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            main_app.MainNavigationWrapper(initialIndex: 0),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(-1.0, 0.0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+                parent: animation, curve: Curves.easeInOutCubic)),
+            child: FadeTransition(opacity: animation, child: child),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 380),
+      ),
+      (route) => false,
+    );
+  }
+
   // Helper functions for safe data conversion
   double _safeToDouble(dynamic value) {
     if (value == null) return 0.0;
     if (value is num) return value.toDouble();
     if (value is String) {
-      String cleanValue = value.replaceAll(RegExp(r'[₹,\s]'), '');
+      String cleanValue = value.replaceAll(RegExp(r'[\u20B9,\s]'), '');
       return double.tryParse(cleanValue) ?? 0.0;
     }
     return 0.0;
@@ -514,89 +554,96 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header - compact
-                ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      children: [
-                        Text(
-                          'My Orders',
-                          style: TextStyle(
-                            color: Color(0xFFD2691E),
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
+    return ValueListenableBuilder<bool>(
+        valueListenable: isDarkModeNotifier,
+        builder: (context, isDark, child) {
+          return Scaffold(
+            backgroundColor: isDark ? Colors.black : const Color(0xFFFAF9F5),
+            body: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: SafeArea(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header - compact
+                      ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: [
+                              Text(
+                                'My Orders',
+                                style: TextStyle(
+                                  color: Color(0xFFBB694A),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Spacer(),
+                              if (_orders.isNotEmpty)
+                                ScaleTransition(
+                                  scale: _bounceAnimation,
+                                  child: AnimatedContainer(
+                                    duration: Duration(milliseconds: 300),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Color(0xFFBB694A).withOpacity(0.08),
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color:
+                                            Color(0xFFBB694A).withOpacity(0.25),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${_orders.length} ${_orders.length == 1 ? 'order' : 'orders'}',
+                                      style: TextStyle(
+                                        color: Color(0xFFBB694A),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                        Spacer(),
-                        if (_orders.isNotEmpty)
-                          ScaleTransition(
-                            scale: _staggerAnimation,
-                            child: AnimatedContainer(
-                              duration: Duration(milliseconds: 300),
-                              padding:
-                              EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Color(0xFFD2691E).withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: Color(0xFFD2691E).withOpacity(0.25),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Text(
-                                '${_orders.length} ${_orders.length == 1 ? 'order' : 'orders'}',
-                                style: TextStyle(
-                                  color: Color(0xFFD2691E),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                      ),
+
+                      // Content
+                      Expanded(
+                        child: _buildContent(isDark),
+                      ),
+                    ],
                   ),
                 ),
-
-                // Content
-                Expanded(
-                  child: _buildContent(),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        });
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(bool isDark) {
     if (_isLoading) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              color: Color(0xFFD2691E),
+              color: Color(0xFFBB694A),
               strokeWidth: 2,
             ),
             SizedBox(height: 12),
             Text(
               'Loading your orders...',
               style: TextStyle(
-                color: Colors.white,
+                color: isDark ? Colors.white : Colors.black,
                 fontSize: 14,
               ),
             ),
@@ -604,7 +651,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
             Text(
               'Fetching from order_placed collection',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
                 fontSize: 12,
               ),
             ),
@@ -629,7 +676,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
               Text(
                 'Failed to load orders',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
@@ -639,7 +686,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
               Text(
                 _errorMessage,
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
                   fontSize: 13,
                   height: 1.4,
                 ),
@@ -649,7 +696,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
               ElevatedButton(
                 onPressed: _refreshOrders,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFD2691E),
+                  backgroundColor: Color(0xFFBB694A),
                   padding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -671,56 +718,35 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
     }
 
     if (_orders.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(isDark);
     }
 
     return RefreshIndicator(
       onRefresh: _refreshOrders,
-      color: Color(0xFFD2691E),
-      backgroundColor: Colors.grey[900],
+      color: Color(0xFFBB694A),
+      backgroundColor: isDark ? Colors.grey[900] : Colors.white,
       child: ListView.builder(
         physics: BouncingScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: 16),
         itemCount: _orders.length,
         itemBuilder: (context, index) {
           return SlideTransition(
-            position: Tween<Offset>(
-              begin: Offset(1.0, 0.0),
-              end: Offset.zero,
-            ).animate(CurvedAnimation(
-              parent: _staggerController,
-              curve: Interval(
-                index * 0.1,
-                1.0,
-                curve: Curves.easeOutCubic,
-              ),
-            )),
+            position:
+                Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                    .animate(
+              CurvedAnimation(
+                  parent: _slideController,
+                  curve:
+                      Interval(index * 0.08, 1.0, curve: Curves.easeOutCubic)),
+            ),
             child: FadeTransition(
-              opacity: Tween<double>(
-                begin: 0.0,
-                end: 1.0,
-              ).animate(CurvedAnimation(
-                parent: _staggerController,
-                curve: Interval(
-                  index * 0.1,
-                  1.0,
-                  curve: Curves.easeInOut,
-                ),
-              )),
-              child: ScaleTransition(
-                scale: Tween<double>(
-                  begin: 0.9,
-                  end: 1.0,
-                ).animate(CurvedAnimation(
-                  parent: _staggerController,
-                  curve: Interval(
-                    index * 0.1,
-                    1.0,
-                    curve: Curves.easeOutBack,
-                  ),
-                )),
-                child: _buildOrderCard(_orders[index], index),
+              opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+                CurvedAnimation(
+                    parent: _fadeController,
+                    curve:
+                        Interval(index * 0.08, 1.0, curve: Curves.easeInOut)),
               ),
+              child: _buildOrderCard(_orders[index], index, isDark),
             ),
           );
         },
@@ -728,7 +754,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDark) {
     return ScaleTransition(
       scale: _scaleAnimation,
       child: FadeTransition(
@@ -738,17 +764,19 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ScaleTransition(
-                scale: _staggerAnimation,
+                scale: _bounceAnimation,
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 500),
                   padding: EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: Colors.grey[900],
+                    color: isDark ? Colors.grey[900] : Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey[800]!, width: 1),
+                    border: Border.all(
+                        color: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                        width: 1),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
                         blurRadius: 8,
                         offset: Offset(0, 3),
                       ),
@@ -757,7 +785,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                   child: Icon(
                     Icons.receipt_long_outlined,
                     size: 48,
-                    color: Colors.grey[600],
+                    color: isDark ? Colors.grey[600] : Colors.grey[400],
                   ),
                 ),
               ),
@@ -773,7 +801,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                 child: Text(
                   'No orders found',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                   ),
@@ -791,7 +819,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                 child: Text(
                   'Your order history will appear here\nonce you place your first order',
                   style: TextStyle(
-                    color: Colors.grey[400],
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontSize: 13,
                     height: 1.4,
                   ),
@@ -800,19 +828,17 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
               ),
               SizedBox(height: 20),
               ScaleTransition(
-                scale: _staggerAnimation,
+                scale: _bounceAnimation,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
+                  onPressed: _navigateToHome,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFD2691E),
+                    backgroundColor: Color(0xFFBB694A),
                     padding: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    elevation: 0,
-                    shadowColor: Colors.transparent,
+                    elevation: 2,
+                    shadowColor: Color(0xFFBB694A).withOpacity(0.2),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -842,7 +868,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
     );
   }
 
-  Widget _buildOrderCard(Map<String, dynamic> order, int index) {
+  Widget _buildOrderCard(Map<String, dynamic> order, int index, bool isDark) {
     final orderDate = order['orderDate'] as DateTime;
     final pricing = order['pricing'] as Map<String, dynamic>? ?? {};
     final items = order['items'] as List<dynamic>? ?? [];
@@ -858,12 +884,13 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
         curve: Curves.easeOutCubic,
         margin: EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[800]!, width: 1),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.18),
+              color: Colors.black.withOpacity(isDark ? 0.18 : 0.05),
               blurRadius: 8,
               offset: Offset(0, 3),
             ),
@@ -884,7 +911,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                       Text(
                         'Placed at ${_formatDate(orderDate)}, ${_formatTime(orderDate)}',
                         style: TextStyle(
-                          color: Colors.grey[400],
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -892,11 +919,11 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                       SizedBox(height: 6),
                       Text(
                         totalAmount > 0
-                            ? '₹${totalAmount.toStringAsFixed(0)}'
+                            ? '\u20B9${totalAmount.toStringAsFixed(0)}'
                             : 'Amount not available',
                         style: TextStyle(
                           color: totalAmount > 0
-                              ? Color(0xFFD2691E)
+                              ? Color(0xFFBB694A)
                               : Colors.grey[500],
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -909,7 +936,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                             child: Text(
                               'Order #${order['orderNumber']}',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: isDark ? Colors.white : Colors.black,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -918,7 +945,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                           ),
                           Icon(
                             Icons.arrow_forward_ios,
-                            color: Colors.grey[600],
+                            color: isDark ? Colors.grey[600] : Colors.grey[400],
                             size: 14,
                           ),
                         ],
@@ -932,9 +959,12 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                     Container(
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.grey[850],
+                        color: isDark ? Colors.grey[850] : Colors.grey[100],
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey[800]!, width: 1),
+                        border: Border.all(
+                            color:
+                                isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                            width: 1),
                       ),
                       child: Row(
                         children: [
@@ -946,17 +976,21 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                               borderRadius: BorderRadius.circular(8),
                               image: items[0]['image'] != null
                                   ? DecorationImage(
-                                image: NetworkImage(items[0]['image']),
-                                fit: BoxFit.cover,
-                              )
+                                      image: items[0]['image'].toString().startsWith('assets/')
+                                          ? AssetImage(items[0]['image']) as ImageProvider
+                                          : NetworkImage(items[0]['image']),
+                                      fit: BoxFit.cover,
+                                    )
                                   : null,
                               color: items[0]['image'] == null
-                                  ? Colors.grey[700]
+                                  ? (isDark
+                                      ? Colors.grey[700]
+                                      : Colors.grey[300])
                                   : null,
                             ),
                             child: items[0]['image'] == null
                                 ? Icon(Icons.image,
-                                color: Colors.grey[500], size: 18)
+                                    color: Colors.grey[500], size: 18)
                                 : null,
                           ),
                           SizedBox(width: 10),
@@ -969,7 +1003,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                                       ? (items[0]['name'] ?? 'Product')
                                       : '${items[0]['name'] ?? 'Product'} and ${items.length - 1} more',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: isDark ? Colors.white : Colors.black,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -980,7 +1014,9 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                                 Text(
                                   '$totalItems items',
                                   style: TextStyle(
-                                    color: Colors.grey[400],
+                                    color: isDark
+                                        ? Colors.grey[400]
+                                        : Colors.grey[600],
                                     fontSize: 11,
                                   ),
                                 ),
@@ -1026,20 +1062,27 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                     Container(
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.grey[850],
+                        color: isDark ? Colors.grey[850] : Colors.grey[100],
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey[800]!, width: 1),
+                        border: Border.all(
+                            color:
+                                isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                            width: 1),
                       ),
                       child: Row(
                         children: [
                           Icon(Icons.shopping_bag_outlined,
-                              color: Colors.grey[500], size: 32),
+                              color:
+                                  isDark ? Colors.grey[500] : Colors.grey[400],
+                              size: 32),
                           SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               'Order items not available',
                               style: TextStyle(
-                                color: Colors.grey[400],
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
                                 fontSize: 13,
                               ),
                             ),
@@ -1064,7 +1107,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                       side: BorderSide(
-                        color: Color(0xFFD2691E),
+                        color: Color(0xFFBB694A),
                         width: 1,
                       ),
                     ),
@@ -1076,14 +1119,14 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
                     children: [
                       Icon(
                         Icons.star_rate,
-                        color: Color(0xFFD2691E),
+                        color: Color(0xFFBB694A),
                         size: 16,
                       ),
                       SizedBox(width: 6),
                       Text(
                         'Rate Order',
                         style: TextStyle(
-                          color: Color(0xFFD2691E),
+                          color: Color(0xFFBB694A),
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1103,7 +1146,7 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
     _fadeController.dispose();
     _slideController.dispose();
     _scaleController.dispose();
-    _staggerController.dispose();
+    _bounceController.dispose();
     super.dispose();
   }
 }

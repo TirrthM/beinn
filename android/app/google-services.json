@@ -14,21 +14,49 @@
       },
       "oauth_client": [
         {
-          "client_id": "392208399642-1qh0504acd505i6c2j042k3gjn9u80eq.apps.googleusercontent.com",
+          "client_id": "392208399642-26kth590rc36dvv8qdc9pv15rmpk6nc5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.beinn1",
-            "certificate_hash": "18e0c6bea25cb63fa1b0f10069381768e4ab2d02"
+            "certificate_hash": "4796a29dff4da28ae5b846dcb31099e2dd2bc0ce"
           }
         },
         {
-          "client_id": "392208399642-qd9rnui9vrevd0hqbkekme3cf2t7s4q6.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.beinn1",
-            "certificate_hash": "7017ee398493058655e1ef9d76db5b6b7a817d80"
-          }
-        },
+          "client_id": "392208399642-7v7530pmr7javopvij52akuurhcr2ao0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDysMXJZTdrUQkhxOfc7OimhOwbYiEOyiM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "392208399642-7v7530pmr7javopvij52akuurhcr2ao0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "392208399642-o24m9scfdtolvh3misd3njrp2pclqaq2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.beinn1"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392208399642:android:79f410b14e0f2a1ac8c0a3",
+        "android_client_info": {
+          "package_name": "com.example.coupon_code"
+        }
+      },
+      "oauth_client": [
         {
           "client_id": "392208399642-7v7530pmr7javopvij52akuurhcr2ao0.apps.googleusercontent.com",
           "client_type": 3

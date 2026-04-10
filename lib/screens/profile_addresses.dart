@@ -1,4 +1,6 @@
-import 'dart:async';
+﻿import 'dart:async';
+import '../theme_notifier.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,18 +38,20 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
   }
 
   void _setupAnimations() {
-    _fadeController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
-    _slideController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 450));
-    _scaleController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _fadeController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
+    _slideController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 450));
+    _scaleController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 400));
 
     _fade = CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
-    _slide = Tween<Offset>(begin: const Offset(0, .06), end: Offset.zero).animate(
+    _slide =
+        Tween<Offset>(begin: const Offset(0, .06), end: Offset.zero).animate(
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
     );
-    _scale = CurvedAnimation(parent: _scaleController, curve: Curves.easeOutBack);
+    _scale =
+        CurvedAnimation(parent: _scaleController, curve: Curves.easeOutBack);
 
     _fadeController.forward();
     _slideController.forward();
@@ -60,7 +64,8 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
       setState(() => _loadingMain = false);
       return;
     }
-    _userDocSub = _firestore.collection('users').doc(user.uid).snapshots().listen((doc) {
+    _userDocSub =
+        _firestore.collection('users').doc(user.uid).snapshots().listen((doc) {
       final data = doc.data();
       if (data != null && data['address'] != null) {
         final addressData = data['address'];
@@ -74,7 +79,9 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
         setState(() {
           _mainProfileAddress = {
             'id': 'main_profile',
-            'fullName': '${(data['firstName'] ?? '').toString()} ${(data['lastName'] ?? '').toString()}'.trim(),
+            'fullName':
+                '${(data['firstName'] ?? '').toString()} ${(data['lastName'] ?? '').toString()}'
+                    .trim(),
             'email': (data['email'] ?? '').toString(),
             'mobile': (data['phone'] ?? '').toString().replaceFirst('+91', ''),
             'address': addr,
@@ -113,20 +120,26 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
     final city = (address['city'] ?? '').toString();
     final state = (address['state'] ?? '').toString();
     final pincode = (address['pincode'] ?? '').toString();
-    return '$building, $area, $landmark$city, $state - $pincode'.replaceAll(RegExp(r', ,'), ',').trim();
+    return '$building, $area, $landmark$city, $state - $pincode'
+        .replaceAll(RegExp(r', ,'), ',')
+        .trim();
   }
 
   void _openNewAddress() async {
     final result = await Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const NewAddressScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const NewAddressScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          final curved = CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic);
+          final curved =
+              CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic);
           return FadeTransition(
             opacity: curved,
             child: SlideTransition(
-              position: Tween<Offset>(begin: const Offset(0.06, 0), end: Offset.zero).animate(curved),
+              position:
+                  Tween<Offset>(begin: const Offset(0.06, 0), end: Offset.zero)
+                      .animate(curved),
               child: child,
             ),
           );
@@ -138,7 +151,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Address added successfully'),
-          backgroundColor: Color(0xFFD2691E),
+          backgroundColor: Color(0xFFBB694A),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -158,7 +171,8 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
     final editAddressData = {
       'id': address['id'],
       'firstName': address['fullName']?.toString().split(' ').first ?? '',
-      'lastName': address['fullName']?.toString().split(' ').skip(1).join(' ') ?? '',
+      'lastName':
+          address['fullName']?.toString().split(' ').skip(1).join(' ') ?? '',
       'email': address['email']?.toString() ?? '',
       'mobile': address['mobile']?.toString() ?? '',
       'building': addr['building']?.toString() ?? '',
@@ -175,16 +189,20 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
     final result = await Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => NewAddressScreen(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            NewAddressScreen(
           existingAddress: editAddressData,
           isEditing: true,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          final curved = CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic);
+          final curved =
+              CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic);
           return FadeTransition(
             opacity: curved,
             child: SlideTransition(
-              position: Tween<Offset>(begin: const Offset(0.06, 0), end: Offset.zero).animate(curved),
+              position:
+                  Tween<Offset>(begin: const Offset(0.06, 0), end: Offset.zero)
+                      .animate(curved),
               child: child,
             ),
           );
@@ -196,7 +214,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Address updated successfully'),
-          backgroundColor: Color(0xFFD2691E),
+          backgroundColor: Color(0xFFBB694A),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -229,7 +247,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Address deleted'),
-          backgroundColor: Color(0xFFD2691E),
+          backgroundColor: Color(0xFFBB694A),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -257,7 +275,8 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
         return const SizedBox.shrink();
       },
       transitionBuilder: (context, anim1, anim2, child) {
-        final curved = CurvedAnimation(parent: anim1, curve: Curves.easeOutCubic);
+        final curved =
+            CurvedAnimation(parent: anim1, curve: Curves.easeOutCubic);
         return Transform.scale(
           scale: 0.96 + 0.04 * curved.value,
           child: Opacity(
@@ -280,229 +299,302 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
 
   @override
   Widget build(BuildContext context) {
-    const orange = Color(0xFFD2691E);
+    const orange = Color(0xFFBB694A);
     final user = _auth.currentUser;
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: FadeTransition(
-        opacity: _fade,
-        child: SlideTransition(
-          position: _slide,
-          child: SafeArea(
-            child: Column(
-              children: [
-                // Header
-                ScaleTransition(
-                  scale: _scale,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[800],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Center(
-                              child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'Saved Addresses',
-                          style: TextStyle(
-                            color: orange,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Content
-                Expanded(
-                  child: user == null
-                      ? const Center(
-                    child: Text(
-                      'Please sign in to view addresses',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  )
-                      : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    stream: _firestore
-                        .collection('users')
-                        .doc(user.uid)
-                        .collection('saved_addresses')
-                        .orderBy('createdAt', descending: false)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      final isLoading = snapshot.connectionState == ConnectionState.waiting || _loadingMain;
-                      if (isLoading) {
-                        return const Center(
-                          child: SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              color: orange,
-                              strokeWidth: 2,
-                            ),
-                          ),
-                        );
-                      }
-
-                      final docs = snapshot.data?.docs ?? [];
-                      final addresses = <Map<String, dynamic>>[];
-                      if (_mainProfileAddress != null) {
-                        addresses.add(_mainProfileAddress!);
-                      }
-
-                      for (final d in docs) {
-                        final data = d.data();
-                        Map<String, dynamic> addressData = {};
-
-                        // Handle address field type casting
-                        if (data['address'] is Map) {
-                          addressData = Map<String, dynamic>.from(data['address']);
-                        }
-
-                        addresses.add({
-                          'id': d.id,
-                          'fullName': data['fullName']?.toString() ?? '',
-                          'email': data['email']?.toString() ?? '',
-                          'mobile': data['mobile']?.toString() ?? '',
-                          'address': addressData,
-                          'addressType': data['addressType']?.toString() ?? 'HOME',
-                          'isDefault': data['isDefault'] ?? false,
-                          'isMainProfile': false,
-                        });
-                      }
-
-                      if (addresses.isEmpty) {
-                        return SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                          child: Column(
+    return ValueListenableBuilder<bool>(
+        valueListenable: isDarkModeNotifier,
+        builder: (context, isDark, child) {
+          return Scaffold(
+            backgroundColor: isDark
+                ? Colors.black
+                : const Color.fromARGB(255, 250, 249, 245), // #FAF9F5
+            body: FadeTransition(
+              opacity: _fade,
+              child: SlideTransition(
+                position: _slide,
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      // Header
+                      ScaleTransition(
+                        scale: _scale,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          child: Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[900],
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.grey[800]!, width: 1),
+                              GestureDetector(
+                                onTap: () => Navigator.pop(context),
+                                child: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.grey[800]
+                                        : Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: Icon(Icons.arrow_back_ios_new,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                        size: 18),
+                                  ),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 36,
-                                      height: 36,
-                                      decoration: BoxDecoration(
-                                        color: orange.withOpacity(0.12),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(Icons.location_off, color: orange, size: 18),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    const Expanded(
-                                      child: Text(
-                                        'No saved addresses yet',
-                                        style: TextStyle(color: Colors.white70, fontSize: 13),
-                                      ),
-                                    ),
-                                  ],
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Saved Addresses',
+                                style: TextStyle(
+                                  color: orange,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
                           ),
-                        );
-                      }
-
-                      return ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: addresses.length,
-                        itemBuilder: (context, index) {
-                          final address = addresses[index];
-                          final addr = address['address'] as Map<String, dynamic>? ?? {};
-                          final fullAddress = _formatFullAddress(addr);
-                          final isMain = address['isMainProfile'] == true;
-
-                          return _AddressCard(
-                            index: index,
-                            fullName: (address['fullName'] ?? '').toString(),
-                            addressType: (address['addressType'] ?? 'HOME').toString(),
-                            fullAddress: fullAddress,
-                            mobile: (address['mobile'] ?? '').toString(),
-                            email: (address['email'] ?? '').toString(),
-                            showMenu: !isMain,
-                            onMenuTap: () => _openOptionsDialog(address),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-
-                // Bottom Add New button
-                Container(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[900],
-                    border: Border(top: BorderSide(color: Colors.grey[800]!, width: 1)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.25),
-                        blurRadius: 8,
-                        offset: const Offset(0, -3),
-                      ),
-                    ],
-                  ),
-                  child: SafeArea(
-                    top: false,
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _openNewAddress,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: orange,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-                          elevation: 3,
-                          shadowColor: orange.withOpacity(0.25),
                         ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.add, color: Colors.white, size: 18),
-                            SizedBox(width: 6),
-                            Text(
-                              'Add New',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
+                      ),
+
+                      // Content
+                      Expanded(
+                        child: user == null
+                            ? Center(
+                                child: Text(
+                                  'Please sign in to view addresses',
+                                  style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white70
+                                          : Colors.grey[600]),
+                                ),
+                              )
+                            : StreamBuilder<
+                                QuerySnapshot<Map<String, dynamic>>>(
+                                stream: _firestore
+                                    .collection('users')
+                                    .doc(user.uid)
+                                    .collection('saved_addresses')
+                                    .orderBy('createdAt', descending: false)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  final isLoading = snapshot.connectionState ==
+                                          ConnectionState.waiting ||
+                                      _loadingMain;
+                                  if (isLoading) {
+                                    return const Center(
+                                      child: SizedBox(
+                                        width: 22,
+                                        height: 22,
+                                        child: CircularProgressIndicator(
+                                          color: orange,
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  final docs = snapshot.data?.docs ?? [];
+                                  final addresses = <Map<String, dynamic>>[];
+                                  if (_mainProfileAddress != null) {
+                                    addresses.add(_mainProfileAddress!);
+                                  }
+
+                                  for (final d in docs) {
+                                    final data = d.data();
+                                    Map<String, dynamic> addressData = {};
+
+                                    // Handle address field type casting
+                                    if (data['address'] is Map) {
+                                      addressData = Map<String, dynamic>.from(
+                                          data['address']);
+                                    }
+
+                                    addresses.add({
+                                      'id': d.id,
+                                      'fullName':
+                                          data['fullName']?.toString() ?? '',
+                                      'email': data['email']?.toString() ?? '',
+                                      'mobile':
+                                          data['mobile']?.toString() ?? '',
+                                      'address': addressData,
+                                      'addressType':
+                                          data['addressType']?.toString() ??
+                                              'HOME',
+                                      'isDefault': data['isDefault'] ?? false,
+                                      'isMainProfile': false,
+                                    });
+                                  }
+
+                                  if (addresses.isEmpty) {
+                                    return SingleChildScrollView(
+                                      physics: const BouncingScrollPhysics(),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 20),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(16),
+                                            decoration: BoxDecoration(
+                                              color: isDark
+                                                  ? Colors.grey[900]
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              border: Border.all(
+                                                  color: isDark
+                                                      ? Colors.grey[800]!
+                                                      : Colors.grey[300]!,
+                                                  width: 1),
+                                              boxShadow: isDark
+                                                  ? null
+                                                  : [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.05),
+                                                        blurRadius: 4,
+                                                        offset:
+                                                            const Offset(0, 2),
+                                                      ),
+                                                    ],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 36,
+                                                  height: 36,
+                                                  decoration: BoxDecoration(
+                                                    color: orange
+                                                        .withOpacity(0.12),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: const Icon(
+                                                      Icons.location_off,
+                                                      color: orange,
+                                                      size: 18),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Expanded(
+                                                  child: Text(
+                                                    'No saved addresses yet',
+                                                    style: TextStyle(
+                                                        color: isDark
+                                                            ? Colors.white70
+                                                            : Colors.grey[600],
+                                                        fontSize: 13),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  return ListView.builder(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 8),
+                                    physics: const BouncingScrollPhysics(),
+                                    itemCount: addresses.length,
+                                    itemBuilder: (context, index) {
+                                      final address = addresses[index];
+                                      final addr = address['address']
+                                              as Map<String, dynamic>? ??
+                                          {};
+                                      final fullAddress =
+                                          _formatFullAddress(addr);
+                                      final isMain =
+                                          address['isMainProfile'] == true;
+
+                                      return _AddressCard(
+                                        index: index,
+                                        fullName: (address['fullName'] ?? '')
+                                            .toString(),
+                                        addressType:
+                                            (address['addressType'] ?? 'HOME')
+                                                .toString(),
+                                        fullAddress: fullAddress,
+                                        mobile: (address['mobile'] ?? '')
+                                            .toString(),
+                                        email:
+                                            (address['email'] ?? '').toString(),
+                                        showMenu: !isMain,
+                                        onMenuTap: () =>
+                                            _openOptionsDialog(address),
+                                        isDark: isDark,
+                                      );
+                                    },
+                                  );
+                                },
                               ),
+                      ),
+
+                      // Bottom Add New button
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[900] : Colors.white,
+                          border: Border(
+                              top: BorderSide(
+                                  color: isDark
+                                      ? Colors.grey[800]!
+                                      : Colors.grey[300]!,
+                                  width: 1)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, -3),
                             ),
                           ],
                         ),
+                        child: SafeArea(
+                          top: false,
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _openNewAddress,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: orange,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(22)),
+                                elevation: 3,
+                                shadowColor: orange.withOpacity(0.25),
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.add,
+                                      color: Colors.white, size: 18),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Add New',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        });
   }
 }
 
@@ -515,6 +607,7 @@ class _AddressCard extends StatelessWidget {
   final String email;
   final bool showMenu;
   final VoidCallback onMenuTap;
+  final bool isDark;
 
   const _AddressCard({
     Key? key,
@@ -526,11 +619,12 @@ class _AddressCard extends StatelessWidget {
     required this.email,
     required this.showMenu,
     required this.onMenuTap,
+    required this.isDark,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const orange = Color(0xFFD2691E);
+    const orange = Color(0xFFBB694A);
 
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 300),
@@ -546,12 +640,13 @@ class _AddressCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[800]!, width: 1),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -579,8 +674,8 @@ class _AddressCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           fullName.isNotEmpty ? fullName : 'Not set',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
@@ -589,11 +684,13 @@ class _AddressCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: orange.withOpacity(0.18),
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: orange.withOpacity(0.5), width: 1),
+                          border: Border.all(
+                              color: orange.withOpacity(0.5), width: 1),
                         ),
                         child: Text(
                           addressType,
@@ -610,7 +707,7 @@ class _AddressCard extends StatelessWidget {
                   Text(
                     fullAddress,
                     style: TextStyle(
-                      color: Colors.grey[300],
+                      color: isDark ? Colors.grey[300] : Colors.grey[600],
                       fontSize: 13,
                       height: 1.3,
                     ),
@@ -621,11 +718,15 @@ class _AddressCard extends StatelessWidget {
                   if (mobile.isNotEmpty)
                     Row(
                       children: [
-                        const Icon(Icons.phone_outlined, color: orange, size: 14),
+                        const Icon(Icons.phone_outlined,
+                            color: orange, size: 14),
                         const SizedBox(width: 6),
                         Text(
                           '+91 $mobile',
-                          style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -633,12 +734,16 @@ class _AddressCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.email_outlined, color: orange, size: 14),
+                        const Icon(Icons.email_outlined,
+                            color: orange, size: 14),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             email,
-                            style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -655,10 +760,12 @@ class _AddressCard extends StatelessWidget {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: Colors.grey[800],
+                    color: isDark ? Colors.grey[800] : Colors.grey[100],
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(Icons.more_vert, color: Colors.grey[400], size: 16),
+                  child: Icon(Icons.more_vert,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      size: 16),
                 ),
               ),
           ],
@@ -682,93 +789,104 @@ class _OptionsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const orange = Color(0xFFD2691E);
+    const orange = Color(0xFFBB694A);
 
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF101012),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[850]!, width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.35),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.tune, color: orange, size: 18),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Address options',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Divider(color: Colors.grey[850], height: 1, thickness: 1),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _DialogActionButton(
-                        icon: Icons.edit_outlined,
-                        label: 'Edit',
-                        color: orange,
-                        bg: orange.withOpacity(0.12),
-                        onTap: onEdit,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _DialogActionButton(
-                        icon: Icons.delete_outline,
-                        label: 'Delete',
-                        color: Colors.red,
-                        bg: Colors.red.withOpacity(0.12),
-                        onTap: onDelete,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Positioned(
-              right: 0,
-              top: 0,
-              child: GestureDetector(
-                onTap: onClose,
-                child: Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(8),
+    return ValueListenableBuilder<bool>(
+        valueListenable: isDarkModeNotifier,
+        builder: (context, isDark, child) {
+          return Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF101012) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                    color: isDark ? Colors.grey[850]! : Colors.grey[300]!,
+                    width: 1),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
                   ),
-                  child: const Icon(Icons.close, color: Colors.white, size: 16),
-                ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.tune, color: orange, size: 18),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Address options',
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black,
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const Spacer(),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Divider(
+                          color: isDark ? Colors.grey[850] : Colors.grey[300],
+                          height: 1,
+                          thickness: 1),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _DialogActionButton(
+                              icon: Icons.edit_outlined,
+                              label: 'Edit',
+                              color: orange,
+                              bg: orange.withOpacity(0.12),
+                              onTap: onEdit,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _DialogActionButton(
+                              icon: Icons.delete_outline,
+                              label: 'Delete',
+                              color: Colors.red,
+                              bg: Colors.red.withOpacity(0.12),
+                              onTap: onDelete,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: GestureDetector(
+                      onTap: onClose,
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[800] : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(Icons.close,
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            size: 16),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 }
 

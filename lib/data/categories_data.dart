@@ -50,6 +50,12 @@ class CategoriesData {
       image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Shorts_appimg-CRUDzi32VPDQ3wFWDkgrychI9aTFzD.png',
       description: 'Stylish shorts for summer and casual wear',
     ),
+    Category( 
+      name: 'Zipper Hoodies',
+      type: 'image',
+      image: 'assets/images/zipper_hoodies/black/2.webp',
+      description: 'Premium quality zipper hoodies for everyday comfort',
+    ),
   ];
 
   static Category? getCategoryByName(String name) {

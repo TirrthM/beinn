@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
+import '../main.dart' as main_app;
 import 'package:intl/intl.dart';
+import '../theme_notifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
+import 'package:url_launcher/url_launcher.dart';
 import 'invoice.dart';
 
 class OrderPlacedScreen extends StatefulWidget {
   final Map<String, dynamic> orderData;
 
-  const OrderPlacedScreen({Key? key, required this.orderData}) : super(key: key);
+  const OrderPlacedScreen({Key? key, required this.orderData})
+      : super(key: key);
 
   @override
   _OrderPlacedScreenState createState() => _OrderPlacedScreenState();
 }
 
-class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProviderStateMixin {
+class _OrderPlacedScreenState extends State<OrderPlacedScreen>
+    with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late AnimationController _scaleController;
@@ -36,22 +41,22 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     "Style is calling, and you answered perfectly! 🎯",
     "Your wardrobe is about to get a major upgrade! 🔥",
     "Thank you for choosing quality and style! 💎",
-    "Your fashion sense is impeccable! 👑",
+    "Your fashion sense is impeccable! 👗",
     "Style meets comfort - the perfect combination! 🌈",
     "You're about to look absolutely stunning! ✨",
     "Fashion forward thinking - we love it! 🚀",
     "Your style story continues with us! 📖",
     "Elegance is on its way to you! 🌸",
-    "You've unlocked premium fashion! 🔓",
-    "Style delivered with love and care! 💝",
+    "You've unlocked premium fashion! 🏆",
+    "Style delivered with love and care! 💖",
     "Your confidence boost is being packaged! 💪",
     "Fashion magic is heading your way! 🎭",
     "You deserve nothing but the best! 👌",
     "Style that speaks your language! 🗣️",
     "Your fashion adventure starts here! 🗺️",
-    "Trendsetter alert - that's you! 📢",
+    "Trendsetter alert - that's you! 📣",
     "Elevating your wardrobe game to the next level! 🎮",
-    "Premium quality meets unbeatable style! 🏆",
+    "Premium quality meets unbeatable style! 🏅",
     "Your personal fashion revolution starts today! 🌟",
     "Crafted with passion, delivered with pride! 🎨",
     "Welcome to the world of limitless style possibilities! 🌍"
@@ -62,6 +67,77 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     super.initState();
     _initializeAnimations();
     _saveOrderToFirestore();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.orderData['payment']?['method'] == 'cash_on_delivery') {
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          if (mounted) {
+            _showCODSuccessDialog();
+          }
+        });
+      }
+    });
+  }
+
+  void _showCODSuccessDialog() {
+    final totalAmount = widget.orderData['payment']?['amount']?.toString() ?? '';
+    
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Dismiss',
+      transitionDuration: const Duration(milliseconds: 600),
+      transitionBuilder: (context, anim1, anim2, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(parent: anim1, curve: Curves.elasticOut),
+          child: FadeTransition(opacity: anim1, child: child),
+        );
+      },
+      pageBuilder: (context, anim1, anim2) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          backgroundColor: isDark ? Colors.grey[900] : Colors.white,
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                 padding: const EdgeInsets.all(20),
+                 decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), shape: BoxShape.circle),
+                 child: const Icon(Icons.check_circle, color: Colors.green, size: 56),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Order placed successfully!',
+                style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Kindly pay ₹$totalAmount at the time of delivery.',
+                style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[700], fontSize: 16, height: 1.4, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFBB694A),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: const Text('Got it', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _initializeAnimations() {
@@ -137,7 +213,8 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           // Order Basic Information
           'orderNumber': widget.orderData['orderNumber'],
           'orderDate': widget.orderData['orderDate'],
-          'estimatedDelivery': updatedEstimatedDelivery, // Updated delivery date (9 days)
+          'estimatedDelivery':
+              updatedEstimatedDelivery, // Updated delivery date (9 days)
           'status': 'order_placed', // Initial status
 
           // Customer Information
@@ -155,15 +232,17 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           },
 
           // Order Items
-          'items': widget.orderData['items'].map((item) => {
-            'id': item['id'],
-            'name': item['name'],
-            'image': item['image'],
-            'price': item['price'],
-            'quantity': item['quantity'] ?? 1,
-            'selectedSize': item['selectedSize'],
-            'selectedColor': item['selectedColor'],
-          }).toList(),
+          'items': widget.orderData['items']
+              .map((item) => {
+                    'id': item['id'],
+                    'name': item['name'],
+                    'image': item['image'],
+                    'price': item['price'],
+                    'quantity': item['quantity'] ?? 1,
+                    'selectedSize': item['selectedSize'],
+                    'selectedColor': item['selectedColor'],
+                  })
+              .toList(),
 
           // Pricing Details
           'pricing': {
@@ -200,7 +279,21 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
             .doc(widget.orderData['orderNumber'])
             .set(orderToSave);
 
-        print('Order saved to Firestore successfully: ${widget.orderData['orderNumber']}');
+        // Clear cart items
+        try {
+          final itemsList = widget.orderData['items'] as List<dynamic>? ?? [];
+          for (var item in itemsList) {
+            final productId = item['id'];
+            final size = item['selectedSize'] ?? '';
+            final color = item['selectedColor'] ?? '';
+            main_app.CartManager().removeFromCart(productId, size, color);
+          }
+        } catch (clearErr) {
+          print('Error clearing cart: $clearErr');
+        }
+
+        print(
+            'Order saved to Firestore successfully: ${widget.orderData['orderNumber']}');
       }
     } catch (e) {
       print('Error saving order to Firestore: $e');
@@ -212,7 +305,8 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
               Icon(Icons.error, color: Colors.white),
               SizedBox(width: 8),
               Expanded(
-                child: Text('Failed to save order. Please contact support if this persists.'),
+                child: Text(
+                    'Failed to save order. Please contact support if this persists.'),
               ),
             ],
           ),
@@ -246,18 +340,23 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        content: Row(
-          children: [
-            CircularProgressIndicator(color: Color(0xFFD2691E)),
-            SizedBox(width: 16),
-            Text(
-              'Generating invoice...',
-              style: TextStyle(color: Colors.white),
+      builder: (context) => ValueListenableBuilder<bool>(
+        valueListenable: isDarkModeNotifier,
+        builder: (context, isDark, child) {
+          return AlertDialog(
+            backgroundColor: isDark ? Colors.grey[900] : Colors.white,
+            content: Row(
+              children: [
+                CircularProgressIndicator(color: Color(0xFFBB694A)),
+                SizedBox(width: 16),
+                Text(
+                  'Generating invoice...',
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
 
@@ -274,7 +373,8 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
               Icon(Icons.check_circle, color: Colors.white),
               SizedBox(width: 8),
               Expanded(
-                child: Text('Invoice downloaded successfully to Downloads folder!'),
+                child: Text(
+                    'Invoice downloaded successfully to Downloads folder!'),
               ),
             ],
           ),
@@ -317,122 +417,141 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          padding: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.grey[900],
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
+        builder: (context, setModalState) => ValueListenableBuilder<bool>(
+            valueListenable: isDarkModeNotifier,
+            builder: (context, isDark, child) {
+              return Container(
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.grey[600],
-                  borderRadius: BorderRadius.circular(2),
+                  color: isDark ? Colors.grey[900] : Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Rate Your Order',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'How was your shopping experience?',
-                style: TextStyle(
-                  color: Colors.grey[300],
-                  fontSize: 16,
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) =>
-                    GestureDetector(
-                      onTap: () {
-                        setModalState(() {
-                          selectedRating = index + 1;
-                        });
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        child: Icon(
-                          selectedRating > index ? Icons.star : Icons.star_border,
-                          color: Color(0xFFD2691E),
-                          size: 40,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey[600] : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Rate Your Order',
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'How was your shopping experience?',
+                      style: TextStyle(
+                        color: isDark ? Colors.grey[300] : Colors.grey[600],
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        5,
+                        (index) => GestureDetector(
+                          onTap: () {
+                            setModalState(() {
+                              selectedRating = index + 1;
+                            });
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4),
+                            child: Icon(
+                              selectedRating > index
+                                  ? Icons.star
+                                  : Icons.star_border,
+                              color: Color(0xFFBB694A),
+                              size: 40,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: reviewController,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'Write your review (optional)',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  filled: true,
-                  fillColor: Colors.grey[800],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                maxLines: 3,
-              ),
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.grey[600]!),
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    SizedBox(height: 20),
+                    TextField(
+                      controller: reviewController,
+                      style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black),
+                      decoration: InputDecoration(
+                        hintText: 'Write your review (optional)',
+                        hintStyle: TextStyle(
+                            color:
+                                isDark ? Colors.grey[400] : Colors.grey[500]),
+                        filled: true,
+                        fillColor: isDark ? Colors.grey[800] : Colors.grey[100],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
                         ),
                       ),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(color: Colors.grey[300]),
-                      ),
+                      maxLines: 3,
                     ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: selectedRating > 0 ? () async {
-                        await _saveRatingToFirestore(selectedRating, reviewController.text.trim());
-                        Navigator.pop(context);
-                      } : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFD2691E),
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                  color: isDark
+                                      ? Colors.grey[600]!
+                                      : Colors.grey[400]!),
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                  color: isDark
+                                      ? Colors.grey[300]
+                                      : Colors.grey[600]),
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        'Submit Rating',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: selectedRating > 0
+                                ? () async {
+                                    await _saveRatingToFirestore(selectedRating,
+                                        reviewController.text.trim());
+                                    Navigator.pop(context);
+                                  }
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFFBB694A),
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Submit Rating',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
-            ],
-          ),
-        ),
+                    SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+                  ],
+                ),
+              );
+            }),
       ),
     );
   }
@@ -463,9 +582,10 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                 Text('Thank you for rating us $rating stars!'),
               ],
             ),
-            backgroundColor: Color(0xFFD2691E),
+            backgroundColor: Color(0xFFBB694A),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         );
       }
@@ -484,8 +604,10 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final customerInfo = widget.orderData['customerInfo'] as Map<String, dynamic>;
-    final deliveryAddress = widget.orderData['deliveryAddress'] as Map<String, dynamic>;
+    final customerInfo =
+        widget.orderData['customerInfo'] as Map<String, dynamic>;
+    final deliveryAddress =
+        widget.orderData['deliveryAddress'] as Map<String, dynamic>;
     final addressData = deliveryAddress['address'] as Map<String, dynamic>;
     final items = widget.orderData['items'] as List<Map<String, dynamic>>;
     final pricing = widget.orderData['pricing'] as Map<String, dynamic>;
@@ -494,316 +616,347 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     // Updated estimated delivery to 9 days from order date
     final estimatedDelivery = orderDate.add(Duration(days: 9));
 
-    final fullAddress = '${addressData['building'] ?? ''}, ${addressData['area'] ?? ''}, ${addressData['landmark'] != null && addressData['landmark'].isNotEmpty ? '${addressData['landmark']}, ' : ''}${addressData['city'] ?? ''}, ${addressData['state'] ?? ''} - ${addressData['pincode'] ?? ''}';
+    final fullAddress =
+        '${addressData['building'] ?? ''}, ${addressData['area'] ?? ''}, ${addressData['landmark'] != null && addressData['landmark'].isNotEmpty ? '${addressData['landmark']}, ' : ''}${addressData['city'] ?? ''}, ${addressData['state'] ?? ''} - ${addressData['pincode'] ?? ''}';
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: SafeArea(
-            child: Column(
-              children: [
-                // Header with Invoice Button
-                ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).popUntil((route) => route.isFirst);
-                          },
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[800],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.arrow_back_ios_new,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        Text(
-                          'Order Placed',
-                          style: TextStyle(
-                            color: Color(0xFFD2691E),
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Spacer(),
-                        // Invoice Button
-                        GestureDetector(
-                          onTap: _generateInvoice,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Color(0xFFD2691E).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: Color(0xFFD2691E).withOpacity(0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.receipt_long,
-                                  color: Color(0xFFD2691E),
-                                  size: 16,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Invoice',
-                                  style: TextStyle(
-                                    color: Color(0xFFD2691E),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Content
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: BouncingScrollPhysics(),
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Success Message
-                        ScaleTransition(
-                          scale: _bounceAnimation,
-                          child: Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.green.withOpacity(0.3), width: 1),
-                            ),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 80,
-                                  height: 80,
+    return ValueListenableBuilder<bool>(
+        valueListenable: isDarkModeNotifier,
+        builder: (context, isDark, child) {
+          return Scaffold(
+            backgroundColor: isDark ? Colors.black : const Color(0xFFFAF9F5),
+            body: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      // Header with Invoice Button
+                      ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context)
+                                      .popUntil((route) => route.isFirst);
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
                                   decoration: BoxDecoration(
-                                    color: Colors.green.withOpacity(0.2),
-                                    shape: BoxShape.circle,
+                                    color: isDark
+                                        ? Colors.grey[800]
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: isDark
+                                        ? null
+                                        : Border.all(
+                                            color: Colors.grey[300]!, width: 1),
                                   ),
-                                  child: Icon(
-                                    Icons.check_circle,
-                                    color: Colors.green,
-                                    size: 40,
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.arrow_back_ios_new,
+                                      color:
+                                          isDark ? Colors.white : Colors.black,
+                                      size: 20,
+                                    ),
                                   ),
                                 ),
-                                SizedBox(height: 16),
-                                Text(
-                                  'Order Placed Successfully!',
+                              ),
+                              SizedBox(width: 16),
+                              Text(
+                                'Order Placed',
+                                style: TextStyle(
+                                  color: Color(0xFFBB694A),
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Spacer(),
+                              // Invoice Button
+                              GestureDetector(
+                                onTap: _generateInvoice,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFFBB694A).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: Color(0xFFBB694A).withOpacity(0.3),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.receipt_long,
+                                        color: Color(0xFFBB694A),
+                                        size: 16,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Invoice',
+                                        style: TextStyle(
+                                          color: Color(0xFFBB694A),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Content
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Success Message
+                              ScaleTransition(
+                                scale: _bounceAnimation,
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                        color: Colors.green.withOpacity(0.3),
+                                        width: 1),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: 80,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.withOpacity(0.2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                          size: 40,
+                                        ),
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'Order Placed Successfully!',
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Order #${widget.orderData['orderNumber']}',
+                                        style: TextStyle(
+                                          color: Color(0xFFBB694A),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Thank you for your purchase! Your order has been confirmed and will be delivered soon.',
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.grey[300]
+                                              : Colors.grey[600],
+                                          fontSize: 14,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 24),
+
+                              // Unique Thank You Message
+                              SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(-1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(CurvedAnimation(
+                                  parent: _slideController,
+                                  curve: Interval(0.1, 0.5,
+                                      curve: Curves.easeOutCubic),
+                                )),
+                                child: _buildUniqueThankYouMessage(isDark),
+                              ),
+                              SizedBox(height: 24),
+
+                              // Order Information - Updated with Order ID
+                              SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(CurvedAnimation(
+                                  parent: _slideController,
+                                  curve: Interval(0.15, 0.55,
+                                      curve: Curves.easeOutCubic),
+                                )),
+                                child: _buildOrderInformation(
+                                    orderDate, estimatedDelivery, isDark),
+                              ),
+                              SizedBox(height: 24),
+
+                              // Delivery Address
+                              SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(-1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(CurvedAnimation(
+                                  parent: _slideController,
+                                  curve: Interval(0.2, 0.6,
+                                      curve: Curves.easeOutCubic),
+                                )),
+                                child: _buildDeliveryAddress(customerInfo,
+                                    deliveryAddress, fullAddress, isDark),
+                              ),
+                              SizedBox(height: 24),
+
+                              // Order Summary
+                              SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(CurvedAnimation(
+                                  parent: _slideController,
+                                  curve: Interval(0.3, 0.7,
+                                      curve: Curves.easeOutCubic),
+                                )),
+                                child: Text(
+                                  'Order Summary',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: isDark ? Colors.white : Colors.black,
                                     fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Order #${widget.orderData['orderNumber']}',
-                                  style: TextStyle(
-                                    color: Color(0xFFD2691E),
-                                    fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Thank you for your purchase! Your order has been confirmed and will be delivered soon.',
-                                  style: TextStyle(
-                                    color: Colors.grey[300],
-                                    fontSize: 14,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 24),
-
-                        // Unique Thank You Message
-                        SlideTransition(
-                          position: Tween<Offset>(
-                            begin: Offset(-1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: _slideController,
-                            curve: Interval(0.1, 0.5, curve: Curves.easeOutCubic),
-                          )),
-                          child: _buildUniqueThankYouMessage(),
-                        ),
-                        SizedBox(height: 24),
-
-                        // Order Information - Updated with Order ID
-                        SlideTransition(
-                          position: Tween<Offset>(
-                            begin: Offset(1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: _slideController,
-                            curve: Interval(0.15, 0.55, curve: Curves.easeOutCubic),
-                          )),
-                          child: _buildOrderInformation(orderDate, estimatedDelivery),
-                        ),
-                        SizedBox(height: 24),
-
-                        // Delivery Address
-                        SlideTransition(
-                          position: Tween<Offset>(
-                            begin: Offset(-1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: _slideController,
-                            curve: Interval(0.2, 0.6, curve: Curves.easeOutCubic),
-                          )),
-                          child: _buildDeliveryAddress(customerInfo, deliveryAddress, fullAddress),
-                        ),
-                        SizedBox(height: 24),
-
-                        // Order Summary
-                        SlideTransition(
-                          position: Tween<Offset>(
-                            begin: Offset(1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: _slideController,
-                            curve: Interval(0.3, 0.7, curve: Curves.easeOutCubic),
-                          )),
-                          child: Text(
-                            'Order Summary',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-
-                        // Order Items
-                        ...items.asMap().entries.map((entry) {
-                          int index = entry.key;
-                          Map<String, dynamic> item = entry.value;
-                          return SlideTransition(
-                            position: Tween<Offset>(
-                              begin: Offset(1.0, 0.0),
-                              end: Offset.zero,
-                            ).animate(CurvedAnimation(
-                              parent: _slideController,
-                              curve: Interval(
-                                0.4 + (index * 0.1),
-                                0.8,
-                                curve: Curves.easeOutCubic,
                               ),
-                            )),
-                            child: _buildOrderItem(item),
-                          );
-                        }).toList(),
-                        SizedBox(height: 24),
+                              SizedBox(height: 16),
 
-                        // Price Breakdown
-                        SlideTransition(
-                          position: Tween<Offset>(
-                            begin: Offset(0.0, 1.0),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: _slideController,
-                            curve: Interval(0.5, 0.9, curve: Curves.easeOutCubic),
-                          )),
-                          child: _buildPriceBreakdown(pricing),
-                        ),
-                        SizedBox(height: 24),
+                              // Order Items
+                              ...items.asMap().entries.map((entry) {
+                                int index = entry.key;
+                                Map<String, dynamic> item = entry.value;
+                                return SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: Offset(1.0, 0.0),
+                                    end: Offset.zero,
+                                  ).animate(CurvedAnimation(
+                                    parent: _slideController,
+                                    curve: Interval(
+                                      0.4 + (index * 0.1),
+                                      0.8,
+                                      curve: Curves.easeOutCubic,
+                                    ),
+                                  )),
+                                  child: _buildOrderItem(item, isDark),
+                                );
+                              }).toList(),
+                              SizedBox(height: 24),
 
-                        // Payment Information
-                        SlideTransition(
-                          position: Tween<Offset>(
-                            begin: Offset(0.0, 1.0),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: _slideController,
-                            curve: Interval(0.6, 1.0, curve: Curves.easeOutCubic),
-                          )),
-                          child: _buildPaymentInfo(payment),
-                        ),
-                        SizedBox(height: 24),
+                              // Price Breakdown
+                              SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(0.0, 1.0),
+                                  end: Offset.zero,
+                                ).animate(CurvedAnimation(
+                                  parent: _slideController,
+                                  curve: Interval(0.5, 0.9,
+                                      curve: Curves.easeOutCubic),
+                                )),
+                                child: _buildPriceBreakdown(pricing, isDark),
+                              ),
+                              SizedBox(height: 24),
 
-                        // Need Help? Widget
-                        SlideTransition(
-                          position: Tween<Offset>(
-                            begin: Offset(0.0, 1.0),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: _slideController,
-                            curve: Interval(0.7, 1.0, curve: Curves.easeOutCubic),
-                          )),
-                          child: _buildCustomerSupport(),
+                              // Payment Information
+                              SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(0.0, 1.0),
+                                  end: Offset.zero,
+                                ).animate(CurvedAnimation(
+                                  parent: _slideController,
+                                  curve: Interval(0.6, 1.0,
+                                      curve: Curves.easeOutCubic),
+                                )),
+                                child: _buildPaymentInfo(payment, isDark),
+                              ),
+                              SizedBox(height: 24),
+
+                              // Need Help? Widget
+                              SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(0.0, 1.0),
+                                  end: Offset.zero,
+                                ).animate(CurvedAnimation(
+                                  parent: _slideController,
+                                  curve: Interval(0.7, 1.0,
+                                      curve: Curves.easeOutCubic),
+                                )),
+                                child: _buildCustomerSupport(isDark),
+                              ),
+                              SizedBox(height: 100),
+                            ],
+                          ),
                         ),
-                        SizedBox(height: 100),
-                      ],
-                    ),
+                      ),
+
+                      // Bottom Section with Two Buttons
+                      _buildBottomSection(isDark),
+                    ],
                   ),
                 ),
-
-                // Bottom Section with Two Buttons
-                _buildBottomSection(),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        });
   }
 
-  Widget _buildUniqueThankYouMessage() {
+  Widget _buildUniqueThankYouMessage(bool isDark) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 600),
       width: double.infinity,
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
+        color: isDark ? Colors.transparent : Colors.white,
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFD2691E).withOpacity(0.15),
-            Color(0xFFD2691E).withOpacity(0.05),
+            Color(0xFFBB694A).withOpacity(0.15),
+            Color(0xFFBB694A).withOpacity(0.05),
             Colors.purple.withOpacity(0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Color(0xFFD2691E).withOpacity(0.3),
+          color: Color(0xFFBB694A).withOpacity(0.3),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFD2691E).withOpacity(0.1),
+            color: Color(0xFFBB694A).withOpacity(0.1),
             blurRadius: 20,
             offset: Offset(0, 8),
           ),
@@ -819,7 +972,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: Color(0xFFD2691E),
+                  color: Color(0xFFBB694A),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -828,7 +981,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: Color(0xFFD2691E).withOpacity(0.7),
+                  color: Color(0xFFBB694A).withOpacity(0.7),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -837,7 +990,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: Color(0xFFD2691E),
+                  color: Color(0xFFBB694A),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -849,7 +1002,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           Text(
             _getUniqueThankYouMessage(),
             style: TextStyle(
-              color: Colors.white,
+              color: isDark ? Colors.white : Colors.black,
               fontSize: 18,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.5,
@@ -863,7 +1016,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           Text(
             'We\'re thrilled to be part of your style journey!',
             style: TextStyle(
-              color: Color(0xFFD2691E).withOpacity(0.9),
+              color: Color(0xFFBB694A).withOpacity(0.9),
               fontSize: 14,
               fontWeight: FontWeight.w500,
               fontStyle: FontStyle.italic,
@@ -880,7 +1033,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  Color(0xFFD2691E),
+                  Color(0xFFBB694A),
                   Colors.transparent,
                 ],
               ),
@@ -892,14 +1045,16 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     );
   }
 
-  Widget _buildOrderInformation(DateTime orderDate, DateTime estimatedDelivery) {
+  Widget _buildOrderInformation(
+      DateTime orderDate, DateTime estimatedDelivery, bool isDark) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 400),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(
+            color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -915,14 +1070,14 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
             children: [
               Icon(
                 Icons.info_outline,
-                color: Color(0xFFD2691E),
+                color: Color(0xFFBB694A),
                 size: 20,
               ),
               SizedBox(width: 8),
               Text(
                 'Order Information',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -935,9 +1090,10 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color(0xFFD2691E).withOpacity(0.1),
+              color: Color(0xFFBB694A).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Color(0xFFD2691E).withOpacity(0.3), width: 1),
+              border: Border.all(
+                  color: Color(0xFFBB694A).withOpacity(0.3), width: 1),
             ),
             child: Row(
               children: [
@@ -945,12 +1101,12 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Color(0xFFD2691E).withOpacity(0.2),
+                    color: Color(0xFFBB694A).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.receipt_outlined,
-                    color: Color(0xFFD2691E),
+                    color: Color(0xFFBB694A),
                     size: 20,
                   ),
                 ),
@@ -962,7 +1118,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                       Text(
                         'Order ID',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -971,7 +1127,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                       Text(
                         '#${widget.orderData['orderNumber']}',
                         style: TextStyle(
-                          color: Color(0xFFD2691E),
+                          color: Color(0xFFBB694A),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -989,9 +1145,13 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[800]?.withOpacity(0.5),
+              color: isDark
+                  ? Colors.grey[800]?.withOpacity(0.5)
+                  : Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[700]!, width: 1),
+              border: Border.all(
+                  color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                  width: 1),
             ),
             child: Row(
               children: [
@@ -1016,7 +1176,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                       Text(
                         'Order Confirmed',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1025,7 +1185,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                       Text(
                         '${_formatDate(orderDate)} at ${_formatTime(orderDate)}',
                         style: TextStyle(
-                          color: Colors.grey[400],
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
                           fontSize: 14,
                         ),
                       ),
@@ -1042,9 +1202,10 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color(0xFFD2691E).withOpacity(0.1),
+              color: Color(0xFFBB694A).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Color(0xFFD2691E).withOpacity(0.3), width: 1),
+              border: Border.all(
+                  color: Color(0xFFBB694A).withOpacity(0.3), width: 1),
             ),
             child: Row(
               children: [
@@ -1052,12 +1213,12 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Color(0xFFD2691E).withOpacity(0.2),
+                    color: Color(0xFFBB694A).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.local_shipping_outlined,
-                    color: Color(0xFFD2691E),
+                    color: Color(0xFFBB694A),
                     size: 20,
                   ),
                 ),
@@ -1069,7 +1230,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                       Text(
                         'Estimated Delivery',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1078,7 +1239,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                       Text(
                         _formatDate(estimatedDelivery),
                         style: TextStyle(
-                          color: Color(0xFFD2691E),
+                          color: Color(0xFFBB694A),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -1087,7 +1248,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                       Text(
                         'Delivery time may vary based on location and weather conditions.',
                         style: TextStyle(
-                          color: Colors.grey[400],
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
                           fontSize: 12,
                         ),
                       ),
@@ -1102,14 +1263,16 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     );
   }
 
-  Widget _buildDeliveryAddress(Map<String, dynamic> customerInfo, Map<String, dynamic> deliveryAddress, String fullAddress) {
+  Widget _buildDeliveryAddress(Map<String, dynamic> customerInfo,
+      Map<String, dynamic> deliveryAddress, String fullAddress, bool isDark) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 400),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(
+            color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -1125,14 +1288,14 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
             children: [
               Icon(
                 Icons.location_on,
-                color: Color(0xFFD2691E),
+                color: Color(0xFFBB694A),
                 size: 20,
               ),
               SizedBox(width: 8),
               Text(
                 'Delivery Address',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1145,7 +1308,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
               Text(
                 deliveryAddress['fullName'],
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -1154,17 +1317,17 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Color(0xFFD2691E).withOpacity(0.2),
+                  color: Color(0xFFBB694A).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color: Color(0xFFD2691E).withOpacity(0.5),
+                    color: Color(0xFFBB694A).withOpacity(0.5),
                     width: 1,
                   ),
                 ),
                 child: Text(
                   deliveryAddress['addressType'] ?? 'HOME',
                   style: TextStyle(
-                    color: Color(0xFFD2691E),
+                    color: Color(0xFFBB694A),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1176,7 +1339,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           Text(
             fullAddress,
             style: TextStyle(
-              color: Colors.grey[300],
+              color: isDark ? Colors.grey[300] : Colors.grey[700],
               fontSize: 16,
               height: 1.4,
             ),
@@ -1187,14 +1350,14 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
             children: [
               Icon(
                 Icons.phone_outlined,
-                color: Color(0xFFD2691E),
+                color: Color(0xFFBB694A),
                 size: 16,
               ),
               SizedBox(width: 8),
               Text(
                 'Mobile: ',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1202,7 +1365,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
               Text(
                 customerInfo['mobile'],
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1214,14 +1377,14 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
             children: [
               Icon(
                 Icons.email_outlined,
-                color: Color(0xFFD2691E),
+                color: Color(0xFFBB694A),
                 size: 16,
               ),
               SizedBox(width: 8),
               Text(
                 'Email: ',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1230,7 +1393,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                 child: Text(
                   customerInfo['email'],
                   style: TextStyle(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1243,8 +1406,9 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     );
   }
 
-  Widget _buildOrderItem(Map<String, dynamic> item) {
-    double itemPrice = double.parse(item['price'].replaceAll('₹', '').replaceAll(',', ''));
+  Widget _buildOrderItem(Map<String, dynamic> item, bool isDark) {
+    double itemPrice = double.parse(
+        item['price'].replaceAll('\u20B9', '').replaceAll(',', ''));
     int quantity = item['quantity'] ?? 1;
     double totalItemPrice = itemPrice * quantity;
 
@@ -1253,9 +1417,10 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(
+            color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -1274,7 +1439,9 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: NetworkImage(item['image']),
+                  image: item['image'].toString().startsWith('assets/')
+                      ? AssetImage(item['image']) as ImageProvider
+                      : NetworkImage(item['image']),
                   fit: BoxFit.cover,
                 ),
                 boxShadow: [
@@ -1295,7 +1462,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                 Text(
                   item['name'],
                   style: TextStyle(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1303,17 +1470,20 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 4),
-                if (item['selectedSize'] != null && item['selectedColor'] != null)
+                if (item['selectedSize'] != null &&
+                    item['selectedColor'] != null)
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.grey[800],
+                      color: isDark ? Colors.grey[800] : Colors.grey[100],
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      'Size: ${item['selectedSize']} | Color: ${item['selectedColor']}',
+                      item['category'] == 'Perfumes'
+                          ? 'Type: ${item['selectedColor']}'
+                          : 'Size: ${item['selectedSize']} | Color: ${item['selectedColor']}',
                       style: TextStyle(
-                        color: Colors.grey[300],
+                        color: isDark ? Colors.grey[300] : Colors.grey[700],
                         fontSize: 10,
                       ),
                     ),
@@ -1322,9 +1492,9 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                 Row(
                   children: [
                     Text(
-                      '₹${totalItemPrice.toStringAsFixed(0)}',
+                      '\u20B9${totalItemPrice.toStringAsFixed(0)}',
                       style: TextStyle(
-                        color: Color(0xFFD2691E),
+                        color: Color(0xFFBB694A),
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1333,17 +1503,17 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Color(0xFFD2691E).withOpacity(0.1),
+                        color: Color(0xFFBB694A).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Color(0xFFD2691E).withOpacity(0.3),
+                          color: Color(0xFFBB694A).withOpacity(0.3),
                           width: 1,
                         ),
                       ),
                       child: Text(
                         'Qty: $quantity',
                         style: TextStyle(
-                          color: Color(0xFFD2691E),
+                          color: Color(0xFFBB694A),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1359,14 +1529,15 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     );
   }
 
-  Widget _buildPriceBreakdown(Map<String, dynamic> pricing) {
+  Widget _buildPriceBreakdown(Map<String, dynamic> pricing, bool isDark) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 400),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(
+            color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -1382,14 +1553,14 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
             children: [
               Icon(
                 Icons.receipt_long,
-                color: Color(0xFFD2691E),
+                color: Color(0xFFBB694A),
                 size: 20,
               ),
               SizedBox(width: 8),
               Text(
                 'Price Details',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1397,17 +1568,25 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
             ],
           ),
           SizedBox(height: 16),
-          _buildPriceRow('Subtotal (${pricing['totalItems']} items)', '₹${pricing['subtotal'].toStringAsFixed(0)}'),
-          _buildPriceRow('Tax (GST 18%)', '₹${pricing['tax'].toStringAsFixed(0)}'),
+          _buildPriceRow('Subtotal (${pricing['totalItems']} items)',
+              '\u20B9${pricing['subtotal'].toStringAsFixed(0)}', isDark),
+
           _buildPriceRow(
             'Shipping',
-            pricing['shipping'] == 0 ? 'FREE' : '₹${pricing['shipping'].toStringAsFixed(0)}',
+            pricing['shipping'] == 0
+                ? 'FREE'
+                : '\u20B9${pricing['shipping'].toStringAsFixed(0)}',
+            isDark,
             isShipping: true,
           ),
-          Divider(color: Colors.grey[700], height: 24, thickness: 1),
+          Divider(
+              color: isDark ? Colors.grey[700] : Colors.grey[300],
+              height: 24,
+              thickness: 1),
           _buildPriceRow(
             'Total Amount',
-            '₹${pricing['grandTotal'].toStringAsFixed(0)}',
+            '\u20B9${pricing['grandTotal'].toStringAsFixed(0)}',
+            isDark,
             isTotal: true,
           ),
         ],
@@ -1415,7 +1594,8 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     );
   }
 
-  Widget _buildPriceRow(String label, String value, {bool isTotal = false, bool isShipping = false}) {
+  Widget _buildPriceRow(String label, String value, bool isDark,
+      {bool isTotal = false, bool isShipping = false}) {
     return Padding(
       padding: EdgeInsets.only(bottom: isTotal ? 0 : 8),
       child: Row(
@@ -1424,7 +1604,9 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           Text(
             label,
             style: TextStyle(
-              color: isTotal ? Colors.white : Colors.grey[400],
+              color: isTotal
+                  ? (isDark ? Colors.white : Colors.black)
+                  : (isDark ? Colors.grey[400] : Colors.grey[600]),
               fontSize: isTotal ? 16 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
             ),
@@ -1451,7 +1633,9 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                 Text(
                   value,
                   style: TextStyle(
-                    color: isTotal ? Color(0xFFD2691E) : Colors.white,
+                    color: isTotal
+                        ? Color(0xFFBB694A)
+                        : (isDark ? Colors.white : Colors.black),
                     fontSize: isTotal ? 16 : 14,
                     fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
                   ),
@@ -1463,14 +1647,19 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     );
   }
 
-  Widget _buildPaymentInfo(Map<String, dynamic> payment) {
+  Widget _buildPaymentInfo(Map<String, dynamic> payment, bool isDark) {
+    final method = payment['method'] ?? 'Unknown';
+    final isCOD = method == 'Cash on Delivery';
+    final status = payment['status'] ?? 'completed';
+
     return AnimatedContainer(
       duration: Duration(milliseconds: 400),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(
+            color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -1485,15 +1674,15 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           Row(
             children: [
               Icon(
-                Icons.payment,
-                color: Color(0xFFD2691E),
+                isCOD ? Icons.local_atm : Icons.payment,
+                color: Color(0xFFBB694A),
                 size: 20,
               ),
               SizedBox(width: 8),
               Text(
                 'Payment Information',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1506,14 +1695,14 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
               Text(
                 'Payment Method: ',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
                   fontSize: 14,
                 ),
               ),
               Text(
-                'Razorpay',
+                isCOD ? 'Cash on Delivery' : 'Razorpay',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1521,49 +1710,56 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
             ],
           ),
           SizedBox(height: 8),
-          Row(
-            children: [
-              Text(
-                'Payment ID: ',
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 14,
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  payment['paymentId'],
+          if (!isCOD) ...[
+            Row(
+              children: [
+                Text(
+                  'Payment ID: ',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
+                Expanded(
+                  child: Text(
+                    payment['paymentId'] ?? 'N/A',
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+          ],
           Row(
             children: [
               Text(
                 'Status: ',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
                   fontSize: 14,
                 ),
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
+                  color: (status.toLowerCase() == 'completed'
+                          ? Colors.green
+                          : Color(0xFFBB694A))
+                      .withOpacity(0.2),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  'Completed',
+                  status.toUpperCase(),
                   style: TextStyle(
-                    color: Colors.green,
+                    color: status.toLowerCase() == 'completed'
+                        ? Colors.green
+                        : Color(0xFFBB694A),
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -1574,14 +1770,15 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
     );
   }
 
-  Widget _buildCustomerSupport() {
+  Widget _buildCustomerSupport(bool isDark) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 400),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(
+            color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -1597,14 +1794,14 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
             children: [
               Icon(
                 Icons.support_agent,
-                color: Color(0xFFD2691E),
+                color: Color(0xFFBB694A),
                 size: 20,
               ),
               SizedBox(width: 8),
               Text(
                 'Need Help?',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1615,103 +1812,80 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
           Text(
             'Our customer support team is here to help you with any questions about your order.',
             style: TextStyle(
-              color: Colors.grey[300],
+              color: isDark ? Colors.grey[300] : Colors.grey[700],
               fontSize: 14,
               height: 1.4,
             ),
           ),
           SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800]?.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey[700]!, width: 1),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.email_outlined,
-                        color: Color(0xFFD2691E),
-                        size: 24,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Email Support',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'support@beinn.com',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          GestureDetector(
+            onTap: () async {
+              final Uri emailLaunchUri = Uri(
+                scheme: 'mailto',
+                path: 'beinnlifestyle@gmail.com',
+                query: 'subject=Support Request for Order ${widget.orderData['orderNumber'] ?? ''}',
+              );
+              try {
+                await launchUrl(emailLaunchUri);
+              } catch (e) {
+                print('Could not launch email: $e');
+              }
+            },
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.grey[800]?.withOpacity(0.5)
+                    : Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                    color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                    width: 1),
               ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800]?.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey[700]!, width: 1),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.email_outlined,
+                    color: Color(0xFFBB694A),
+                    size: 28,
                   ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.phone_outlined,
-                        color: Color(0xFFD2691E),
-                        size: 24,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Phone Support',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        '+91 9876543210',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
+                  SizedBox(height: 12),
+                  Text(
+                    'Email Support',
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
+                  SizedBox(height: 6),
+                  Text(
+                    'beinnlifestyle@gmail.com',
+                    style: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBottomSection() {
+  Widget _buildBottomSection(bool isDark) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 500),
       curve: Curves.easeOutCubic,
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: isDark ? Colors.grey[900] : Colors.white,
         border: Border(
-          top: BorderSide(color: Colors.grey[800]!, width: 1),
+          top: BorderSide(
+              color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         ),
         boxShadow: [
           BoxShadow(
@@ -1732,7 +1906,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Color(0xFFD2691E), width: 2),
+                  side: BorderSide(color: Color(0xFFBB694A), width: 2),
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
@@ -1744,7 +1918,7 @@ class _OrderPlacedScreenState extends State<OrderPlacedScreen> with TickerProvid
                   children: [
                     Icon(
                       Icons.shopping_bag_outlined,
-                      color: Color(0xFFD2691E),
+                      color: Color(0xFFBB694A),
                       size: 18,
                     ),
                     SizedBox(width: 6),

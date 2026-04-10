@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../main.dart' as main_app;
 
@@ -6,12 +6,14 @@ class ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback? onTap;
   final Function(Product)? onWishlistToggle;
+  final bool isDark;
 
   const ProductCard({
     Key? key,
     required this.product,
     this.onTap,
     this.onWishlistToggle,
+    this.isDark = true,
   }) : super(key: key);
 
   @override
@@ -19,12 +21,21 @@ class ProductCard extends StatelessWidget {
     final isWishlisted = main_app.CartManager().isInWishlist(product.id);
 
     return GestureDetector(
-      onTap: onTap ?? () => main_app.navigateToProductDetail(context, product.toMap()),
+      onTap: onTap ??
+          () => main_app.navigateToProductDetail(context, product.toMap()),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[800]!, width: 1),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDark ? 0.0 : 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,10 +47,17 @@ class ProductCard extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16)),
                       image: DecorationImage(
-                        image: NetworkImage(product.image),
+                        image: product.image.startsWith('assets/')
+                            ? AssetImage(product.image) as ImageProvider
+                            : NetworkImage(product.image),
                         fit: BoxFit.cover,
+                        onError: (exception, stackTrace) {
+                          print('Error loading image for product ${product.name}: ${product.image}');
+                          print('Exception: $exception');
+                        },
                       ),
                     ),
                   ),
@@ -49,7 +67,7 @@ class ProductCard extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Color(0xFFD2691E),
+                        color: Color(0xFFBB694A),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -78,10 +96,22 @@ class ProductCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFFF5F5F5).withOpacity(0.5)
+                                : Colors.white.withOpacity(0.5),
+                            width: 1,
+                          ),
                         ),
                         child: Icon(
-                          isWishlisted ? Icons.favorite : Icons.favorite_outline,
-                          color: isWishlisted ? Color(0xFFD2691E) : Colors.white,
+                          isWishlisted
+                              ? Icons.favorite
+                              : Icons.favorite_outline,
+                          color: isWishlisted
+                              ? const Color(0xFFBB694A)
+                              : (isDark
+                                  ? const Color(0xFFF5F5F5)
+                                  : const Color(0xFFBB694A)),
                           size: 16,
                         ),
                       ),
@@ -102,7 +132,7 @@ class ProductCard extends StatelessWidget {
                       child: Text(
                         product.name,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -116,7 +146,7 @@ class ProductCard extends StatelessWidget {
                         Text(
                           product.price,
                           style: TextStyle(
-                            color: Color(0xFFD2691E),
+                            color: Color(0xFFBB694A),
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
@@ -126,7 +156,8 @@ class ProductCard extends StatelessWidget {
                           child: Text(
                             product.originalPrice,
                             style: TextStyle(
-                              color: Colors.grey[500],
+                              color:
+                                  isDark ? Colors.grey[500] : Colors.grey[400],
                               fontSize: 10,
                               decoration: TextDecoration.lineThrough,
                             ),
@@ -170,7 +201,7 @@ class ProductCard extends StatelessWidget {
             '${product.name} added to wishlist!',
             style: TextStyle(color: Colors.white),
           ),
-          backgroundColor: Color(0xFFD2691E),
+          backgroundColor: Color(0xFFBB694A),
           duration: Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(

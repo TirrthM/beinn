@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../main.dart' as main_app;
+import '../theme_notifier.dart';
 
 class WishlistScreen extends StatefulWidget {
   final List<Map<String, dynamic>> wishlistItems;
@@ -17,17 +18,16 @@ class WishlistScreen extends StatefulWidget {
   _WishlistScreenState createState() => _WishlistScreenState();
 }
 
-class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStateMixin {
+class _WishlistScreenState extends State<WishlistScreen>
+    with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late AnimationController _scaleController;
   late AnimationController _bounceController;
-  late AnimationController _staggerController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _bounceAnimation;
-  late Animation<double> _staggerAnimation;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -42,83 +42,52 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
 
   void _initializeAnimations() {
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 900),
       vsync: this,
     );
 
     _slideController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 700),
       vsync: this,
     );
 
     _scaleController = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
 
     _bounceController = AnimationController(
-      duration: Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 900),
       vsync: this,
     );
 
-    _staggerController = AnimationController(
-      duration: Duration(milliseconds: 1500),
-      vsync: this,
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.35), end: Offset.zero).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeOut),
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.elasticOut,
-    ));
-
-    _bounceAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _bounceController,
-      curve: Curves.bounceOut,
-    ));
-
-    _staggerAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _staggerController,
-      curve: Curves.easeOutCubic,
-    ));
+    _bounceAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack),
+    );
 
     // Start animations with staggered timing
     _fadeController.forward();
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 120), () {
       if (mounted) _slideController.forward();
     });
-    Future.delayed(Duration(milliseconds: 400), () {
+    Future.delayed(const Duration(milliseconds: 240), () {
       if (mounted) _scaleController.forward();
     });
-    Future.delayed(Duration(milliseconds: 600), () {
+    Future.delayed(const Duration(milliseconds: 360), () {
       if (mounted) _bounceController.forward();
-    });
-    Future.delayed(Duration(milliseconds: 800), () {
-      if (mounted) _staggerController.forward();
     });
   }
 
@@ -138,135 +107,126 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(
-                color: Color(0xFFD2691E),
+    return ValueListenableBuilder<bool>(
+      valueListenable: isDarkModeNotifier,
+      builder: (context, isDark, child) {
+        if (_isLoading) {
+          return Scaffold(
+            backgroundColor: isDark ? Colors.black : const Color(0xFFFAF9F5),
+            body: const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFBB694A),
               ),
-              SizedBox(height: 16),
-              Text(
-                'Loading your wishlist...',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+            ),
+          );
+        }
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with box-style back button and title
-                ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    child: Row(
-                      children: [
-                        // Box-style Back Button
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[800],
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.3),
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
+        return Scaffold(
+          backgroundColor: isDark ? Colors.black : const Color(0xFFFAF9F5),
+          body: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header with box-style back button and title
+                    ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 16),
+                        child: Row(
+                          children: [
+                            // Box-style Back Button
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color:
+                                      isDark ? Colors.grey[800] : Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black
+                                          .withOpacity(isDark ? 0.3 : 0.05),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.arrow_back_ios_new,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        // Title
-                        Expanded(
-                          child: Text(
-                            'My Wishlist',
-                            style: TextStyle(
-                              color: Color(0xFFD2691E),
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        // Item count with animation
-                        ScaleTransition(
-                          scale: _bounceAnimation,
-                          child: AnimatedContainer(
-                            duration: Duration(milliseconds: 300),
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Color(0xFFD2691E).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Color(0xFFD2691E).withOpacity(0.3),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xFFD2691E).withOpacity(0.2),
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.arrow_back_ios_new,
+                                    color: isDark ? Colors.white : Colors.black,
+                                    size: 20,
+                                  ),
                                 ),
-                              ],
-                            ),
-                            child: Text(
-                              '${main_app.CartManager().wishlistItems.length} items',
-                              style: TextStyle(
-                                color: Color(0xFFD2691E),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
+                            const SizedBox(width: 16),
+                            // Title
+                            Expanded(
+                              child: Text(
+                                'My Wishlist',
+                                style: TextStyle(
+                                  color: const Color(0xFFBB694A),
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            // Item count with animation
+                            ScaleTransition(
+                              scale: _bounceAnimation,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xFFBB694A).withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: const Color(0xFFBB694A)
+                                        .withOpacity(0.28),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Text(
+                                  '${main_app.CartManager().wishlistItems.length} items',
+                                  style: const TextStyle(
+                                    color: Color(0xFFBB694A),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    // Wishlist Content
+                    Expanded(
+                      child: main_app.CartManager().wishlistItems.isEmpty
+                          ? _buildEmptyWishlist(isDark)
+                          : _buildWishlistGrid(isDark),
+                    ),
+                  ],
                 ),
-                // Wishlist Content
-                Expanded(
-                  child: main_app.CartManager().wishlistItems.isEmpty
-                      ? _buildEmptyWishlist()
-                      : _buildWishlistGrid(),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildEmptyWishlist() {
+  Widget _buildEmptyWishlist(bool isDark) {
     return ScaleTransition(
       scale: _scaleAnimation,
       child: FadeTransition(
@@ -278,92 +238,89 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
               ScaleTransition(
                 scale: _bounceAnimation,
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 600),
-                  padding: EdgeInsets.all(24),
+                  duration: const Duration(milliseconds: 500),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: Colors.grey[900],
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.grey[800]!, width: 1),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
+                    color: isDark ? Colors.grey[900] : Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                        color: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                        width: 1),
                   ),
                   child: Icon(
                     Icons.favorite_outline,
-                    size: 60,
-                    color: Colors.grey[600],
+                    size: 46,
+                    color: isDark ? Colors.grey[600] : Colors.grey[400],
                   ),
                 ),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 16),
               SlideTransition(
-                position: Tween<Offset>(
-                  begin: Offset(0, 0.5),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(
-                  parent: _slideController,
-                  curve: Interval(0.3, 1.0, curve: Curves.easeOutCubic),
-                )),
+                position:
+                    Tween<Offset>(begin: const Offset(0, 0.4), end: Offset.zero)
+                        .animate(
+                  CurvedAnimation(
+                      parent: _slideController,
+                      curve:
+                          const Interval(0.3, 1.0, curve: Curves.easeOutCubic)),
+                ),
                 child: Text(
                   'Your wishlist is empty',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
+                    color: isDark ? Colors.white : Colors.black,
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 6),
               SlideTransition(
                 position: Tween<Offset>(
-                  begin: Offset(0, 0.3),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(
-                  parent: _slideController,
-                  curve: Interval(0.5, 1.0, curve: Curves.easeOutCubic),
-                )),
+                        begin: const Offset(0, 0.25), end: Offset.zero)
+                    .animate(
+                  CurvedAnimation(
+                      parent: _slideController,
+                      curve:
+                          const Interval(0.5, 1.0, curve: Curves.easeOutCubic)),
+                ),
                 child: Text(
-                  'Add items you love to your wishlist.\nReview them anytime and easily move them to bag.',
+                  'Save items you like to see them here',
                   style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 16,
-                    height: 1.4,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 22),
               ScaleTransition(
                 scale: _bounceAnimation,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: _navigateToHome,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFD2691E),
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    backgroundColor: const Color(0xFFBB694A),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 22, vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    elevation: 4,
-                    shadowColor: Color(0xFFD2691E).withOpacity(0.3),
+                    elevation: 2,
+                    shadowColor: const Color(0xFFBB694A).withOpacity(0.2),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.shopping_bag,
+                        Icons.home,
                         color: Colors.white,
-                        size: 20,
+                        size: 18,
                       ),
-                      SizedBox(width: 8),
+                      SizedBox(width: 6),
                       Text(
                         'Continue Shopping',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -378,12 +335,12 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
     );
   }
 
-  Widget _buildWishlistGrid() {
+  Widget _buildWishlistGrid(bool isDark) {
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: GridView.builder(
-        physics: BouncingScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        physics: const BouncingScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
@@ -392,43 +349,23 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
         itemCount: main_app.CartManager().wishlistItems.length,
         itemBuilder: (context, index) {
           return SlideTransition(
-            position: Tween<Offset>(
-              begin: Offset(1.0, 0.0),
-              end: Offset.zero,
-            ).animate(CurvedAnimation(
-              parent: _staggerController,
-              curve: Interval(
-                index * 0.1,
-                1.0,
-                curve: Curves.easeOutCubic,
-              ),
-            )),
+            position:
+                Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                    .animate(
+              CurvedAnimation(
+                  parent: _slideController,
+                  curve:
+                      Interval(index * 0.08, 1.0, curve: Curves.easeOutCubic)),
+            ),
             child: FadeTransition(
-              opacity: Tween<double>(
-                begin: 0.0,
-                end: 1.0,
-              ).animate(CurvedAnimation(
-                parent: _staggerController,
-                curve: Interval(
-                  index * 0.1,
-                  1.0,
-                  curve: Curves.easeInOut,
-                ),
-              )),
-              child: ScaleTransition(
-                scale: Tween<double>(
-                  begin: 0.8,
-                  end: 1.0,
-                ).animate(CurvedAnimation(
-                  parent: _staggerController,
-                  curve: Interval(
-                    index * 0.1,
-                    1.0,
-                    curve: Curves.elasticOut,
-                  ),
-                )),
-                child: _buildWishlistItem(main_app.CartManager().wishlistItems[index], index),
+              opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+                CurvedAnimation(
+                    parent: _fadeController,
+                    curve:
+                        Interval(index * 0.08, 1.0, curve: Curves.easeInOut)),
               ),
+              child: _buildWishlistItem(
+                  main_app.CartManager().wishlistItems[index], index, isDark),
             ),
           );
         },
@@ -436,21 +373,23 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
     );
   }
 
-  Widget _buildWishlistItem(Map<String, dynamic> product, int index) {
+  Widget _buildWishlistItem(
+      Map<String, dynamic> product, int index, bool isDark) {
     return GestureDetector(
       onTap: () => main_app.navigateToProductDetail(context, product),
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300 + (index * 100)),
         curve: Curves.easeOutCubic,
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[800]!, width: 1),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -465,37 +404,53 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
                     tag: 'wishlist_item_${product['id']}_$index',
                     child: Container(
                       width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                        image: DecorationImage(
-                          image: NetworkImage(product['image']),
+                      decoration: const BoxDecoration(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16)),
+                        child: Image.network(
+                          product['image'],
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            color: isDark ? Colors.grey[800] : Colors.grey[200],
+                            child: Icon(Icons.error,
+                                color: isDark
+                                    ? Colors.grey[600]
+                                    : Colors.grey[400]),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  if (product['discount'] != null && product['discount'].isNotEmpty && product['discount'] != '0% OFF')
+                  if (product['discount'] != null &&
+                      product['discount'].isNotEmpty &&
+                      product['discount'] != '0% OFF')
                     Positioned(
                       top: 8,
                       right: 8,
                       child: ScaleTransition(
                         scale: _bounceAnimation,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Color(0xFFD2691E),
+                            color: const Color(0xFFBB694A),
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: Color(0xFFD2691E).withOpacity(0.3),
+                                color: const Color(0xFFBB694A).withOpacity(0.3),
                                 blurRadius: 4,
-                                offset: Offset(0, 2),
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
                           child: Text(
                             product['discount'],
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -514,19 +469,23 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
                       child: ScaleTransition(
                         scale: _scaleAnimation,
                         child: AnimatedContainer(
-                          duration: Duration(milliseconds: 200),
-                          padding: EdgeInsets.all(6),
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.7),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: Color(0xFFD2691E).withOpacity(0.5),
+                              color: isDark
+                                  ? const Color(0xFFF5F5F5).withOpacity(0.5)
+                                  : Colors.white.withOpacity(0.5),
                               width: 1,
                             ),
                           ),
                           child: Icon(
                             Icons.favorite,
-                            color: Color(0xFFD2691E),
+                            color: isDark
+                                ? const Color(0xFFF5F5F5)
+                                : const Color(0xFFBB694A),
                             size: 16,
                           ),
                         ),
@@ -539,7 +498,7 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
             Expanded(
               flex: 2,
               child: Padding(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -548,7 +507,7 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
                       child: Text(
                         product['name'],
                         style: TextStyle(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -556,24 +515,26 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         Text(
                           product['price'],
-                          style: TextStyle(
-                            color: Color(0xFFD2691E),
+                          style: const TextStyle(
+                            color: Color(0xFFBB694A),
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         if (product['originalPrice'] != null)
                           Expanded(
                             child: Text(
                               product['originalPrice'],
                               style: TextStyle(
-                                color: Colors.grey[500],
+                                color: isDark
+                                    ? Colors.grey[500]
+                                    : Colors.grey[400],
                                 fontSize: 10,
                                 decoration: TextDecoration.lineThrough,
                               ),
@@ -628,7 +589,28 @@ class _WishlistScreenState extends State<WishlistScreen> with TickerProviderStat
     _slideController.dispose();
     _scaleController.dispose();
     _bounceController.dispose();
-    _staggerController.dispose();
     super.dispose();
+  }
+
+  void _navigateToHome() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            main_app.MainNavigationWrapper(initialIndex: 0),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(-1.0, 0.0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+                parent: animation, curve: Curves.easeInOutCubic)),
+            child: FadeTransition(opacity: animation, child: child),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 380),
+      ),
+      (route) => false,
+    );
   }
 }

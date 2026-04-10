@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../main.dart' as main_app;
+import '../theme_notifier.dart';
 
 class CartScreen extends StatefulWidget {
   @override
@@ -58,7 +59,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
 
-    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.35), end: Offset.zero).animate(
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.35), end: Offset.zero).animate(
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
     );
 
@@ -88,7 +90,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     try {
       await main_app.CartManager().loadWishlistFromFirestore();
       setState(() {
-        _wishlistItemIds = main_app.CartManager().wishlistItems
+        _wishlistItemIds = main_app.CartManager()
+            .wishlistItems
             .map((item) => item['id'].toString())
             .toSet();
       });
@@ -129,7 +132,9 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
             'id': data['productId'] ?? '',
             'name': data['productName'] ?? '',
             'price': '₹${data['discountedPrice']?.toInt() ?? 0}',
-            'originalPrice': data['originalPrice'] != null ? '₹${data['originalPrice']?.toInt()}' : null,
+            'originalPrice': data['originalPrice'] != null
+                ? '₹${data['originalPrice']?.toInt()}'
+                : null,
             'image': data['productImage'] ?? '',
             'discount': data['discountPercentage'] ?? '',
             'selectedSize': data['selectedSize'] ?? '',
@@ -170,7 +175,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
           children: const [
             Icon(Icons.check_circle, color: Colors.white, size: 18),
             SizedBox(width: 8),
-            Text('Item removed from cart', style: TextStyle(color: Colors.white)),
+            Text('Item removed from cart',
+                style: TextStyle(color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.grey[850],
@@ -182,7 +188,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
   }
 
   // Remove cart item from Firestore
-  Future<void> _removeCartItemFromFirestore(String productId, String size, String color) async {
+  Future<void> _removeCartItemFromFirestore(
+      String productId, String size, String color) async {
     try {
       final user = _auth.currentUser;
       if (user != null) {
@@ -233,7 +240,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
           backgroundColor: Colors.grey[850],
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     } else {
@@ -254,10 +262,11 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-          backgroundColor: const Color(0xFFD2691E),
+          backgroundColor: const Color(0xFFBB694A),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -281,7 +290,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
           backgroundColor: Colors.red[600],
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
       return;
@@ -298,118 +308,137 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     Navigator.pushAndRemoveUntil(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => main_app.MainNavigationWrapper(initialIndex: 0),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            main_app.MainNavigationWrapper(initialIndex: 0),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
               begin: const Offset(-1.0, 0.0),
               end: Offset.zero,
-            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic)),
+            ).animate(CurvedAnimation(
+                parent: animation, curve: Curves.easeInOutCubic)),
             child: FadeTransition(opacity: animation, child: child),
           );
         },
         transitionDuration: const Duration(milliseconds: 380),
       ),
-          (route) => false,
+      (route) => false,
     );
   }
 
   double _calculateItemTotal(Map<String, dynamic> item) {
-    double price = double.parse(item['price'].replaceAll('₹', '').replaceAll(',', ''));
+    double price =
+        double.parse(item['price'].replaceAll('₹', '').replaceAll(',', ''));
     int quantity = item['quantity'] ?? 1;
     return price * quantity;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              CircularProgressIndicator(color: Color(0xFFD2691E), strokeWidth: 2.5),
-              SizedBox(height: 12),
-              Text('Loading your cart...', style: TextStyle(color: Colors.white, fontSize: 15)),
-            ],
-          ),
-        ),
-      );
-    }
+    return ValueListenableBuilder<bool>(
+      valueListenable: isDarkModeNotifier,
+      builder: (context, isDark, child) {
+        if (_isLoading) {
+          return Scaffold(
+            backgroundColor: isDark ? Colors.black : const Color(0xFFFAF9F5),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                      color: Color(0xFFBB694A), strokeWidth: 2.5),
+                  const SizedBox(height: 12),
+                  Text('Loading your cart...',
+                      style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontSize: 15)),
+                ],
+              ),
+            ),
+          );
+        }
 
-    final cartItems = main_app.CartManager().cartItems;
-    final totalAmount = main_app.CartManager().getTotalAmount();
+        final cartItems = main_app.CartManager().cartItems;
+        final totalAmount = main_app.CartManager().getTotalAmount();
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Cart',
-                          style: TextStyle(
-                            color: Color(0xFFD2691E),
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        if (cartItems.isNotEmpty)
-                          ScaleTransition(
-                            scale: _bounceAnimation,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 250),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFD2691E).withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: const Color(0xFFD2691E).withOpacity(0.28),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Text(
-                                '${cartItems.length} ${cartItems.length == 1 ? 'item' : 'items'}',
-                                style: const TextStyle(
-                                  color: Color(0xFFD2691E),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
+        return Scaffold(
+          backgroundColor: isDark ? Colors.black : const Color(0xFFFAF9F5),
+          body: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 14),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Cart',
+                              style: TextStyle(
+                                color: Color(0xFFBB694A),
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                      ],
+                            if (cartItems.isNotEmpty)
+                              ScaleTransition(
+                                scale: _bounceAnimation,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFBB694A)
+                                        .withOpacity(0.08),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: const Color(0xFFBB694A)
+                                          .withOpacity(0.28),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '${cartItems.length} ${cartItems.length == 1 ? 'item' : 'items'}',
+                                    style: const TextStyle(
+                                      color: Color(0xFFBB694A),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                    // Cart Content
+                    Expanded(
+                      child: cartItems.isEmpty
+                          ? _buildEmptyCart(isDark)
+                          : _buildCartList(cartItems, isDark),
+                    ),
+                    // Bottom Section with Total and Checkout
+                    if (cartItems.isNotEmpty)
+                      _buildBottomSection(totalAmount, isDark),
+                  ],
                 ),
-                // Cart Content
-                Expanded(
-                  child: cartItems.isEmpty ? _buildEmptyCart() : _buildCartList(cartItems),
-                ),
-                // Bottom Section with Total and Checkout
-                if (cartItems.isNotEmpty) _buildBottomSection(totalAmount),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildEmptyCart() {
+  Widget _buildEmptyCart(bool isDark) {
     return ScaleTransition(
       scale: _scaleAnimation,
       child: FadeTransition(
@@ -424,31 +453,50 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                   duration: const Duration(milliseconds: 500),
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: Colors.grey[900],
+                    color: isDark ? Colors.grey[900] : Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.grey[800]!, width: 1),
+                    border: Border.all(
+                        color: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                        width: 1),
                   ),
-                  child: Icon(Icons.shopping_cart_outlined, size: 46, color: Colors.grey[600]),
+                  child: Icon(Icons.shopping_cart_outlined,
+                      size: 46,
+                      color: isDark ? Colors.grey[600] : Colors.grey[400]),
                 ),
               ),
               const SizedBox(height: 16),
               SlideTransition(
-                position: Tween<Offset>(begin: const Offset(0, 0.4), end: Offset.zero).animate(
-                  CurvedAnimation(parent: _slideController, curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic)),
+                position:
+                    Tween<Offset>(begin: const Offset(0, 0.4), end: Offset.zero)
+                        .animate(
+                  CurvedAnimation(
+                      parent: _slideController,
+                      curve:
+                          const Interval(0.3, 1.0, curve: Curves.easeOutCubic)),
                 ),
-                child: const Text(
+                child: Text(
                   'Your cart is empty',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600),
                 ),
               ),
               const SizedBox(height: 6),
               SlideTransition(
-                position: Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero).animate(
-                  CurvedAnimation(parent: _slideController, curve: const Interval(0.5, 1.0, curve: Curves.easeOutCubic)),
+                position: Tween<Offset>(
+                        begin: const Offset(0, 0.25), end: Offset.zero)
+                    .animate(
+                  CurvedAnimation(
+                      parent: _slideController,
+                      curve:
+                          const Interval(0.5, 1.0, curve: Curves.easeOutCubic)),
                 ),
                 child: Text(
                   'Add items to your cart to see them here',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                  style: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -458,18 +506,24 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                 child: ElevatedButton(
                   onPressed: _navigateToHome,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD2691E),
-                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    backgroundColor: const Color(0xFFBB694A),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 22, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
                     elevation: 2,
-                    shadowColor: const Color(0xFFD2691E).withOpacity(0.2),
+                    shadowColor: const Color(0xFFBB694A).withOpacity(0.2),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: const [
                       Icon(Icons.home, color: Colors.white, size: 18),
                       SizedBox(width: 6),
-                      Text('Continue Shopping', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text('Continue Shopping',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
@@ -481,28 +535,34 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildCartList(List<Map<String, dynamic>> cartItems) {
+  Widget _buildCartList(List<Map<String, dynamic>> cartItems, bool isDark) {
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 20),
       itemCount: cartItems.length,
       itemBuilder: (context, index) {
         return SlideTransition(
-          position: Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero).animate(
-            CurvedAnimation(parent: _slideController, curve: Interval(index * 0.08, 1.0, curve: Curves.easeOutCubic)),
+          position:
+              Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                  .animate(
+            CurvedAnimation(
+                parent: _slideController,
+                curve: Interval(index * 0.08, 1.0, curve: Curves.easeOutCubic)),
           ),
           child: FadeTransition(
             opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
-              CurvedAnimation(parent: _fadeController, curve: Interval(index * 0.08, 1.0, curve: Curves.easeInOut)),
+              CurvedAnimation(
+                  parent: _fadeController,
+                  curve: Interval(index * 0.08, 1.0, curve: Curves.easeInOut)),
             ),
-            child: _buildCartItem(cartItems[index], index),
+            child: _buildCartItem(cartItems[index], index, isDark),
           ),
         );
       },
     );
   }
 
-  Widget _buildCartItem(Map<String, dynamic> item, int index) {
+  Widget _buildCartItem(Map<String, dynamic> item, int index, bool isDark) {
     final itemTotal = _calculateItemTotal(item);
     final isInWishlist = _isInWishlist(item['id'].toString());
     final String imageUrl = (item['image'] ?? '').toString();
@@ -515,9 +575,10 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[800]!, width: 1),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         ),
         child: Column(
           children: [
@@ -532,12 +593,20 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       image: imageUrl.isNotEmpty
-                          ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover)
+                          ? DecorationImage(
+                              image: imageUrl.startsWith('assets/')
+                                  ? AssetImage(imageUrl) as ImageProvider
+                                  : NetworkImage(imageUrl),
+                              fit: BoxFit.cover)
                           : null,
-                      color: imageUrl.isEmpty ? Colors.grey[800] : null,
+                      color: imageUrl.isEmpty
+                          ? (isDark ? Colors.grey[800] : Colors.grey[200])
+                          : null,
                     ),
                     child: imageUrl.isEmpty
-                        ? Icon(Icons.image_outlined, color: Colors.grey[500], size: 22)
+                        ? Icon(Icons.image_outlined,
+                            color: isDark ? Colors.grey[500] : Colors.grey[400],
+                            size: 22)
                         : null,
                   ),
                 ),
@@ -549,22 +618,33 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                     children: [
                       Text(
                         item['name'] ?? 'Product',
-                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      if (item['category'] != null && (item['category'] as String).isNotEmpty)
+                      if (item['category'] != null &&
+                          (item['category'] as String).isNotEmpty)
                         Text(
                           item['category'],
-                          style: TextStyle(color: const Color(0xFFD2691E).withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                              color: const Color(0xFFBB694A).withOpacity(0.9),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       const SizedBox(height: 6),
                       Text(
-                        'Size: ${item['selectedSize']}  •  Color: ${item['selectedColor']}',
-                        style: TextStyle(color: Colors.grey[300], fontSize: 12),
+                        item['category'] == 'Perfumes'
+                            ? 'Type: ${item['selectedColor']}'
+                            : 'Size: ${item['selectedSize']}  •  Color: ${item['selectedColor']}',
+                        style: TextStyle(
+                            color: isDark ? Colors.grey[300] : Colors.grey[600],
+                            fontSize: 12),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -576,26 +656,40 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                             children: [
                               Text(
                                 '₹${itemTotal.toStringAsFixed(0)}',
-                                style: const TextStyle(color: Color(0xFFD2691E), fontSize: 16, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: Color(0xFFBB694A),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
                               ),
                               if (item['originalPrice'] != null)
                                 Text(
                                   'Unit: ${item['price']}',
-                                  style: TextStyle(color: Colors.grey[500], fontSize: 11),
+                                  style: TextStyle(
+                                      color: isDark
+                                          ? Colors.grey[500]
+                                          : Colors.grey[500],
+                                      fontSize: 11),
                                 ),
                             ],
                           ),
                           const Spacer(),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFD2691E).withOpacity(0.08),
+                              color: const Color(0xFFBB694A).withOpacity(0.08),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: const Color(0xFFD2691E).withOpacity(0.28), width: 1),
+                              border: Border.all(
+                                  color:
+                                      const Color(0xFFBB694A).withOpacity(0.28),
+                                  width: 1),
                             ),
                             child: Text(
                               'Qty: ${item['quantity'] ?? 1}',
-                              style: const TextStyle(color: Color(0xFFD2691E), fontSize: 12, fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                  color: Color(0xFFBB694A),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -614,19 +708,21 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                     icon: Icons.delete_outline,
                     label: 'Remove',
                     color: Colors.red[600]!,
-                    onTap: () => _removeFromCart(item['id'], item['selectedSize'], item['selectedColor']),
+                    onTap: () => _removeFromCart(item['id'],
+                        item['selectedSize'], item['selectedColor']),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _buildWishlistActionButton(item: item, isInWishlist: isInWishlist),
+                  child: _buildWishlistActionButton(
+                      item: item, isInWishlist: isInWishlist, isDark: isDark),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _buildActionButton(
                     icon: Icons.shopping_bag_outlined,
                     label: 'Buy Now',
-                    color: const Color(0xFFD2691E),
+                    color: const Color(0xFFBB694A),
                     onTap: () => _buyNow(item),
                   ),
                 ),
@@ -661,7 +757,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
             const SizedBox(width: 6),
             Text(
               label,
-              style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                  color: color, fontSize: 12, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -673,6 +770,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
   Widget _buildWishlistActionButton({
     required Map<String, dynamic> item,
     required bool isInWishlist,
+    required bool isDark,
   }) {
     return GestureDetector(
       onTap: () => _toggleWishlist(item),
@@ -680,10 +778,18 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
         duration: const Duration(milliseconds: 220),
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isInWishlist ? const Color(0xFFD2691E).withOpacity(0.12) : Colors.grey[700]!.withOpacity(0.08),
+          color: isInWishlist
+              ? const Color(0xFFBB694A).withOpacity(0.12)
+              : (isDark
+                  ? Colors.grey[700]!.withOpacity(0.08)
+                  : Colors.grey[700]!.withOpacity(0.08)),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isInWishlist ? const Color(0xFFD2691E).withOpacity(0.5) : Colors.grey[600]!.withOpacity(0.28),
+            color: isInWishlist
+                ? const Color(0xFFBB694A).withOpacity(0.5)
+                : (isDark
+                    ? Colors.grey[600]!.withOpacity(0.28)
+                    : Colors.grey[400]!.withOpacity(0.5)),
             width: isInWishlist ? 1.2 : 1,
           ),
         ),
@@ -692,10 +798,13 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
           children: [
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
-              transitionBuilder: (Widget child, Animation<double> animation) => ScaleTransition(scale: animation, child: child),
+              transitionBuilder: (Widget child, Animation<double> animation) =>
+                  ScaleTransition(scale: animation, child: child),
               child: Icon(
                 isInWishlist ? Icons.favorite : Icons.favorite_border,
-                color: isInWishlist ? const Color(0xFFD2691E) : Colors.grey[600]!,
+                color: isInWishlist
+                    ? const Color(0xFFBB694A)
+                    : (isDark ? Colors.grey[600]! : Colors.grey[500]!),
                 size: 16,
                 key: ValueKey<bool>(isInWishlist),
               ),
@@ -704,7 +813,9 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 220),
               style: TextStyle(
-                color: isInWishlist ? const Color(0xFFD2691E) : Colors.grey[600]!,
+                color: isInWishlist
+                    ? const Color(0xFFBB694A)
+                    : (isDark ? Colors.grey[600]! : Colors.grey[600]!),
                 fontSize: 12,
                 fontWeight: isInWishlist ? FontWeight.w600 : FontWeight.w600,
               ),
@@ -716,18 +827,24 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildBottomSection(double totalAmount) {
+  Widget _buildBottomSection(double totalAmount, bool isDark) {
     return SlideTransition(
-      position: Tween<Offset>(begin: const Offset(0, 1.0), end: Offset.zero).animate(
-        CurvedAnimation(parent: _slideController, curve: const Interval(0.7, 1.0, curve: Curves.easeOutCubic)),
+      position:
+          Tween<Offset>(begin: const Offset(0, 1.0), end: Offset.zero).animate(
+        CurvedAnimation(
+            parent: _slideController,
+            curve: const Interval(0.7, 1.0, curve: Curves.easeOutCubic)),
       ),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 420),
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.grey[900],
-          border: Border(top: BorderSide(color: Colors.grey[800]!, width: 1)),
+          color: isDark ? Colors.grey[900] : Colors.white,
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                  width: 1)),
         ),
         child: SafeArea(
           top: false,
@@ -740,15 +857,24 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Total Amount', style: TextStyle(color: Colors.grey[400], fontSize: 12, fontWeight: FontWeight.w500)),
+                    Text('Total Amount',
+                        style: TextStyle(
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500)),
                     const SizedBox(height: 2),
                     Text(
                       '₹${totalAmount.toStringAsFixed(0)}',
-                      style: const TextStyle(color: Color(0xFFD2691E), fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          color: Color(0xFFBB694A),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
                     Text(
                       '${main_app.CartManager().getCartItemCount()} items',
-                      style: TextStyle(color: Colors.grey[500], fontSize: 11),
+                      style: TextStyle(
+                          color: isDark ? Colors.grey[500] : Colors.grey[600],
+                          fontSize: 11),
                     ),
                   ],
                 ),
@@ -760,18 +886,24 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                 child: ElevatedButton(
                   onPressed: _checkout,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD2691E),
+                    backgroundColor: const Color(0xFFBB694A),
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22)),
                     elevation: 2,
-                    shadowColor: const Color(0xFFD2691E).withOpacity(0.2),
+                    shadowColor: const Color(0xFFBB694A).withOpacity(0.2),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Icon(Icons.shopping_cart_checkout, color: Colors.white, size: 18),
+                      Icon(Icons.shopping_cart_checkout,
+                          color: Colors.white, size: 18),
                       SizedBox(width: 6),
-                      Text('Checkout', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+                      Text('Checkout',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700)),
                     ],
                   ),
                 ),
