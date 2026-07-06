@@ -9,12 +9,12 @@ class ProductCard extends StatelessWidget {
   final bool isDark;
 
   const ProductCard({
-    Key? key,
+    super.key,
     required this.product,
     this.onTap,
     this.onWishlistToggle,
     this.isDark = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class ProductCard extends StatelessWidget {
               color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.0 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.0 : 0.05),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -48,14 +48,15 @@ class ProductCard extends StatelessWidget {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(16)),
+                          const BorderRadius.vertical(top: Radius.circular(16)),
                       image: DecorationImage(
                         image: product.image.startsWith('assets/')
                             ? AssetImage(product.image) as ImageProvider
                             : NetworkImage(product.image),
                         fit: BoxFit.cover,
                         onError: (exception, stackTrace) {
-                          print('Error loading image for product ${product.name}: ${product.image}');
+                          print(
+                              'Error loading image for product ${product.name}: ${product.image}');
                           print('Exception: $exception');
                         },
                       ),
@@ -65,14 +66,15 @@ class ProductCard extends StatelessWidget {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Color(0xFFBB694A),
+                        color: const Color(0xFFBB694A),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         product.discount,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -92,14 +94,14 @@ class ProductCard extends StatelessWidget {
                         }
                       },
                       child: Container(
-                        padding: EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
+                          color: Colors.black.withValues(alpha: 0.7),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: isDark
-                                ? const Color(0xFFF5F5F5).withOpacity(0.5)
-                                : Colors.white.withOpacity(0.5),
+                                ? const Color(0xFFF5F5F5).withValues(alpha: 0.5)
+                                : Colors.white.withValues(alpha: 0.5),
                             width: 1,
                           ),
                         ),
@@ -123,7 +125,7 @@ class ProductCard extends StatelessWidget {
             Expanded(
               flex: 2,
               child: Padding(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -140,18 +142,18 @@ class ProductCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         Text(
                           product.price,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(0xFFBB694A),
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             product.originalPrice,
@@ -183,10 +185,10 @@ class ProductCard extends StatelessWidget {
         SnackBar(
           content: Text(
             '${product.name} removed from wishlist',
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.grey[800],
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -199,10 +201,10 @@ class ProductCard extends StatelessWidget {
         SnackBar(
           content: Text(
             '${product.name} added to wishlist!',
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
-          backgroundColor: Color(0xFFBB694A),
-          duration: Duration(seconds: 2),
+          backgroundColor: const Color(0xFFBB694A),
+          duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
