@@ -611,7 +611,6 @@ class _AddressCard extends StatelessWidget {
   final bool isDark;
 
   const _AddressCard({
-    super.key,
     required this.index,
     required this.fullName,
     required this.addressType,
@@ -782,7 +781,6 @@ class _OptionsDialog extends StatelessWidget {
   final VoidCallback onDelete;
 
   const _OptionsDialog({
-    super.key,
     required this.onClose,
     required this.onEdit,
     required this.onDelete,
@@ -899,7 +897,6 @@ class _DialogActionButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const _DialogActionButton({
-    super.key,
     required this.icon,
     required this.label,
     required this.color,
