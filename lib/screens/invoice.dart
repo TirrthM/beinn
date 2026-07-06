@@ -36,7 +36,7 @@ class InvoiceService {
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
-          margin: pw.EdgeInsets.all(32),
+          margin: const pw.EdgeInsets.all(32),
           build: (pw.Context context) {
             return [
               // Header with Company Logo and Info
@@ -124,7 +124,7 @@ class InvoiceService {
             pw.SizedBox(height: 8),
             pw.Text(
               'Premium Fashion & Lifestyle',
-              style: pw.TextStyle(
+              style: const pw.TextStyle(
                 fontSize: 14,
                 color: PdfColors.grey700,
               ),
@@ -132,11 +132,11 @@ class InvoiceService {
             pw.SizedBox(height: 4),
             pw.Text(
               'Email: beinnlifestyle@gmail.com',
-              style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
+              style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
             ),
             pw.Text(
               'Phone: +91 9876543210',
-              style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
+              style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
             ),
           ],
         ),
@@ -193,11 +193,11 @@ class InvoiceService {
           children: [
             pw.Text(
               'Date: ${DateFormat('MMM dd, yyyy').format(orderDate)}',
-              style: pw.TextStyle(fontSize: 14, color: PdfColors.grey700),
+              style: const pw.TextStyle(fontSize: 14, color: PdfColors.grey700),
             ),
             pw.Text(
               'Time: ${DateFormat('hh:mm a').format(orderDate)}',
-              style: pw.TextStyle(fontSize: 14, color: PdfColors.grey700),
+              style: const pw.TextStyle(fontSize: 14, color: PdfColors.grey700),
             ),
           ],
         ),
@@ -233,11 +233,13 @@ class InvoiceService {
               pw.SizedBox(height: 4),
               pw.Text(
                 customerInfo['email']?.toString() ?? 'N/A',
-                style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
+                style:
+                    const pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
               ),
               pw.Text(
                 customerInfo['mobile']?.toString() ?? 'N/A',
-                style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
+                style:
+                    const pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
               ),
             ],
           ),
@@ -266,7 +268,8 @@ class InvoiceService {
               pw.SizedBox(height: 4),
               pw.Text(
                 fullAddress.isNotEmpty ? fullAddress : 'Address not available',
-                style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
+                style:
+                    const pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
                 maxLines: 4,
               ),
             ],
@@ -296,12 +299,12 @@ class InvoiceService {
         pw.Table(
           border: pw.TableBorder.all(color: PdfColors.grey300, width: 1),
           columnWidths: {
-            0: pw.FlexColumnWidth(3),
-            1: pw.FlexColumnWidth(1),
-            2: pw.FlexColumnWidth(1),
-            3: pw.FlexColumnWidth(1),
-            4: pw.FlexColumnWidth(1.5),
-            5: pw.FlexColumnWidth(1.5),
+            0: const pw.FlexColumnWidth(3),
+            1: const pw.FlexColumnWidth(1),
+            2: const pw.FlexColumnWidth(1),
+            3: const pw.FlexColumnWidth(1),
+            4: const pw.FlexColumnWidth(1.5),
+            5: const pw.FlexColumnWidth(1.5),
           },
           children: [
             // Header row
@@ -338,7 +341,7 @@ class InvoiceService {
                   _buildTableCell('Rs. ${totalItemPrice.toStringAsFixed(0)}'),
                 ],
               );
-            }).toList(),
+            }),
           ],
         ),
       ],
@@ -347,7 +350,7 @@ class InvoiceService {
 
   pw.Widget _buildTableCell(String text, {bool isHeader = false}) {
     return pw.Container(
-      padding: pw.EdgeInsets.all(8),
+      padding: const pw.EdgeInsets.all(8),
       child: pw.Text(
         text,
         style: pw.TextStyle(
@@ -370,7 +373,6 @@ class InvoiceService {
             children: [
               _buildPriceRow('Subtotal (${pricing['totalItems'] ?? 0} items)',
                   'Rs. ${(pricing['subtotal'] ?? 0).toStringAsFixed(0)}'),
-
               _buildPriceRow(
                   'Shipping',
                   (pricing['shipping'] ?? 0) == 0
@@ -389,7 +391,7 @@ class InvoiceService {
 
   pw.Widget _buildPriceRow(String label, String value, {bool isTotal = false}) {
     return pw.Padding(
-      padding: pw.EdgeInsets.symmetric(vertical: 4),
+      padding: const pw.EdgeInsets.symmetric(vertical: 4),
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
@@ -433,7 +435,7 @@ class InvoiceService {
         ),
         pw.SizedBox(height: 12),
         pw.Container(
-          padding: pw.EdgeInsets.all(16),
+          padding: const pw.EdgeInsets.all(16),
           decoration: pw.BoxDecoration(
             border: pw.Border.all(color: PdfColors.grey300),
             borderRadius: pw.BorderRadius.circular(8),
@@ -444,8 +446,8 @@ class InvoiceService {
               pw.Row(
                 children: [
                   pw.Text('Payment Method: ',
-                      style:
-                          pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
+                      style: const pw.TextStyle(
+                          fontSize: 12, color: PdfColors.grey600)),
                   pw.Text(isCOD ? 'Cash on Delivery' : 'Razorpay',
                       style: pw.TextStyle(
                           fontSize: 12, fontWeight: pw.FontWeight.bold)),
@@ -456,7 +458,7 @@ class InvoiceService {
                 pw.Row(
                   children: [
                     pw.Text('Payment ID: ',
-                        style: pw.TextStyle(
+                        style: const pw.TextStyle(
                             fontSize: 12, color: PdfColors.grey600)),
                     pw.Text(paymentId,
                         style: pw.TextStyle(
@@ -468,11 +470,11 @@ class InvoiceService {
               pw.Row(
                 children: [
                   pw.Text('Status: ',
-                      style:
-                          pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
+                      style: const pw.TextStyle(
+                          fontSize: 12, color: PdfColors.grey600)),
                   pw.Container(
-                    padding:
-                        pw.EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const pw.EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 2),
                     decoration: pw.BoxDecoration(
                       color: status == 'COMPLETED'
                           ? PdfColors.green100
@@ -516,7 +518,7 @@ class InvoiceService {
         pw.SizedBox(height: 8),
         pw.Text(
           'We appreciate your business and hope you love your new items.',
-          style: pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
+          style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
           textAlign: pw.TextAlign.center,
         ),
         pw.SizedBox(height: 16),
@@ -525,14 +527,14 @@ class InvoiceService {
           children: [
             pw.Text(
               'For support, contact us at beinnlifestyle@gmail.com or +91 9876543210',
-              style: pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
             ),
           ],
         ),
         pw.SizedBox(height: 8),
         pw.Text(
           'This is a computer-generated invoice and does not require a signature.',
-          style: pw.TextStyle(fontSize: 8, color: PdfColors.grey400),
+          style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey400),
           textAlign: pw.TextAlign.center,
         ),
       ],
@@ -554,7 +556,7 @@ class InvoiceService {
 
         // Try to use Downloads folder
         if (directory != null) {
-          final downloadsPath = '/storage/emulated/0/Download';
+          const downloadsPath = '/storage/emulated/0/Download';
           final downloadsDir = Directory(downloadsPath);
           if (await downloadsDir.exists()) {
             directory = downloadsDir;
