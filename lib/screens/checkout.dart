@@ -622,8 +622,8 @@ class _CheckoutScreenState extends State<CheckoutScreen>
   }
 
   int _getTotalItems() {
-    return widget.items
-        .fold(0, (currentSum, item) => currentSum + (item['quantity'] as int? ?? 1));
+    return widget.items.fold(
+        0, (currentSum, item) => currentSum + (item['quantity'] as int? ?? 1));
   }
 
   Future<void> _validateAndApplyCoupon(String couponCode) async {
@@ -762,7 +762,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
       final orderData = json.decode(response.body);
 
       var options = {
-        'key': dotenv.env['RAZORPAY_KEY_ID'], 
+        'key': dotenv.env['RAZORPAY_KEY_ID'],
         'order_id': orderData['id'],
         'name': 'Beinn',
         'description': 'Order Payment for ${_getTotalItems()} items',

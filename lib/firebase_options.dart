@@ -64,8 +64,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '392208399642',
     projectId: 'beinn-a7664',
     storageBucket: 'beinn-a7664.firebasestorage.app',
-    androidClientId: '392208399642-qd9rnui9vrevd0hqbkekme3cf2t7s4q6.apps.googleusercontent.com',
-    iosClientId: '392208399642-o24m9scfdtolvh3misd3njrp2pclqaq2.apps.googleusercontent.com',
+    androidClientId:
+        '392208399642-qd9rnui9vrevd0hqbkekme3cf2t7s4q6.apps.googleusercontent.com',
+    iosClientId:
+        '392208399642-o24m9scfdtolvh3misd3njrp2pclqaq2.apps.googleusercontent.com',
     iosBundleId: 'com.example.beinn1',
   );
 
@@ -75,8 +77,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '392208399642',
     projectId: 'beinn-a7664',
     storageBucket: 'beinn-a7664.firebasestorage.app',
-    androidClientId: '392208399642-qd9rnui9vrevd0hqbkekme3cf2t7s4q6.apps.googleusercontent.com',
-    iosClientId: '392208399642-o24m9scfdtolvh3misd3njrp2pclqaq2.apps.googleusercontent.com',
+    androidClientId:
+        '392208399642-qd9rnui9vrevd0hqbkekme3cf2t7s4q6.apps.googleusercontent.com',
+    iosClientId:
+        '392208399642-o24m9scfdtolvh3misd3njrp2pclqaq2.apps.googleusercontent.com',
     iosBundleId: 'com.example.beinn1',
   );
 
@@ -89,5 +93,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'beinn-a7664.firebasestorage.app',
     measurementId: 'G-08K9H1JYV4',
   );
-
 }
