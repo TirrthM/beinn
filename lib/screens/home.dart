@@ -13,6 +13,8 @@ import '../data/products_data.dart';
 import 'package:video_player/video_player.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -40,9 +42,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String _selectedSection = 'Clothing';
   Timer? _bannerTimer;
 
-  PageController _bannerController = PageController();
+  final PageController _bannerController = PageController();
   VideoPlayerController? _videoController;
-  ScrollController _categoriesScrollController = ScrollController();
+  final ScrollController _categoriesScrollController = ScrollController();
   bool _showSeeAll = true; // true for "See All", false for "Back"
 
   final List<Map<String, dynamic>> _bannerData = [
@@ -79,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     {
       'name': 'Shirts',
       'type': 'image',
-      'image':'assets/images/shirtwithoutbg.png',
+      'image': 'assets/images/shirtwithoutbg.png',
     },
     {
       'name': 'Hoodies',
@@ -91,12 +93,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'name': 'Sweatshirts',
       'type': 'image',
       'image':
-          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Sweatshirt_appimg.PNG-stbgbQ97A0VBOYJiwv3GAzpP8JvyrA.png', 
+          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Sweatshirt_appimg.PNG-stbgbQ97A0VBOYJiwv3GAzpP8JvyrA.png',
     },
     {
       'name': 'Tank Tops',
       'type': 'image',
-      'image':'assets/images/tanktopfinal.png',
+      'image': 'assets/images/tanktopfinal.png',
     },
     {
       'name': 'Zipper Hoodies',
@@ -357,7 +359,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'details': 'High-quality denim fabric. Classic fit.',
       'category': 'Shirts',
     },
-
   ];
 
   List<Map<String, dynamic>> get _featuredPerfumes {
@@ -414,27 +415,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   void _initializeAnimations() {
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
     _slideController = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
     _scaleController = AnimationController(
-      duration: Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
 
     _bannerSlideController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
     _sectionSwitchController = AnimationController(
-      duration: Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
 
@@ -447,7 +448,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     ));
 
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.3),
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _slideController,
@@ -463,7 +464,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     ));
 
     _bannerSlideAnimation = Tween<Offset>(
-      begin: Offset(0, -0.5),
+      begin: const Offset(0, -0.5),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _bannerSlideController,
@@ -471,7 +472,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     ));
 
     _sectionSlideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.3),
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _sectionSwitchController,
@@ -485,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _startBannerTimer() {
-    _bannerTimer = Timer.periodic(Duration(seconds: 7), (timer) {
+    _bannerTimer = Timer.periodic(const Duration(seconds: 7), (timer) {
       if (_currentBannerIndex < _bannerData.length - 1) {
         _currentBannerIndex++;
       } else {
@@ -494,7 +495,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       if (_bannerController.hasClients) {
         _bannerController.animateToPage(
           _currentBannerIndex,
-          duration: Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOut,
         );
       }
@@ -502,12 +503,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _initializeVideo() {
-    _videoController = VideoPlayerController.asset('assets/images/beinnvideo.mp4')
-      ..initialize().then((_) {
-        setState(() {}); // Ensure the first frame is shown after the video is initialized
-        _videoController!.setLooping(true);
-        _videoController!.play();
-      });
+    _videoController =
+        VideoPlayerController.asset('assets/images/beinnvideo.mp4')
+          ..initialize().then((_) {
+            setState(
+                () {}); // Ensure the first frame is shown after the video is initialized
+            _videoController!.setLooping(true);
+            _videoController!.play();
+          });
   }
 
   Future<void> _checkWelcomeCardStatus() async {
@@ -585,11 +588,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
-              WelcomeScreen(),
+              const WelcomeScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return SlideTransition(
               position: Tween<Offset>(
-                begin: Offset(-1.0, 0.0),
+                begin: const Offset(-1.0, 0.0),
                 end: Offset.zero,
               ).animate(CurvedAnimation(
                 parent: animation,
@@ -601,7 +604,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             );
           },
-          transitionDuration: Duration(milliseconds: 400),
+          transitionDuration: const Duration(milliseconds: 400),
         ),
       );
     } catch (e) {
@@ -617,10 +620,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           SnackBar(
             content: Text(
               '${product['name']} removed from wishlist',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.grey[800],
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -633,10 +636,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           SnackBar(
             content: Text(
               '${product['name']} is added to your wishlist!',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
-            backgroundColor: Color(0xFFBB694A),
-            duration: Duration(seconds: 2),
+            backgroundColor: const Color(0xFFBB694A),
+            duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -664,7 +667,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           _categoriesScrollController.position.maxScrollExtent;
       _categoriesScrollController.animateTo(
         maxScrollExtent,
-        duration: Duration(milliseconds: 2000),
+        duration: const Duration(milliseconds: 2000),
         curve: Curves.easeInOut,
       );
     }
@@ -674,7 +677,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (_categoriesScrollController.hasClients) {
       _categoriesScrollController.animateTo(
         0.0,
-        duration: Duration(milliseconds: 2000),
+        duration: const Duration(milliseconds: 2000),
         curve: Curves.easeInOut,
       );
     }
@@ -705,10 +708,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFBB694A).withOpacity(0.1),
+                    color: const Color(0xFFBB694A).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFFBB694A).withOpacity(0.3),
+                      color: const Color(0xFFBB694A).withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -802,18 +805,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFFBB694A).withOpacity(0.1),
-              const Color(0xFFBB694A).withOpacity(0.05),
+              const Color(0xFFBB694A).withValues(alpha: 0.1),
+              const Color(0xFFBB694A).withValues(alpha: 0.05),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0xFFBB694A).withOpacity(0.2),
+            color: const Color(0xFFBB694A).withValues(alpha: 0.2),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -823,7 +826,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           children: [
             CircleAvatar(
               radius: 25,
-              backgroundColor: const Color(0xFFBB694A).withOpacity(0.2),
+              backgroundColor: const Color(0xFFBB694A).withValues(alpha: 0.2),
               backgroundImage: _currentUser?.photoURL != null
                   ? NetworkImage(_currentUser!.photoURL!)
                   : null,
@@ -883,15 +886,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (_videoController == null || !_videoController!.value.isInitialized) {
       return Container(
         height: 180,
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.grey[800],
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Center(child: CircularProgressIndicator(color: Color(0xFFBB694A))),
+        child: const Center(
+            child: CircularProgressIndicator(color: Color(0xFFBB694A))),
       );
     }
-    
+
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(1.0, 0.0),
@@ -913,7 +917,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -967,10 +971,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         decoration: BoxDecoration(
           color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -992,12 +997,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: _selectedSection == 'Clothing'
                         ? [
-                      BoxShadow(
-                        color: const Color(0xFFBB694A).withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
+                            BoxShadow(
+                              color: const Color(0xFFBB694A)
+                                  .withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
                         : null,
                   ),
                   child: Text(
@@ -1028,12 +1034,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: _selectedSection == 'Perfumes'
                         ? [
-                      BoxShadow(
-                        color: const Color(0xFFBB694A).withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
+                            BoxShadow(
+                              color: const Color(0xFFBB694A)
+                                  .withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
                         : null,
                   ),
                   child: Text(
@@ -1121,16 +1128,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             width: 60,
                             height: 60,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFBB694A).withOpacity(0.1),
+                              color: const Color(0xFFBB694A)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: const Color(0xFFBB694A).withOpacity(0.3),
+                                color: const Color(0xFFBB694A)
+                                    .withValues(alpha: 0.3),
                                 width: 1,
                               ),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black
-                                      .withOpacity(isDark ? 0.2 : 0.05),
+                                      .withValues(alpha: isDark ? 0.2 : 0.05),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 ),
@@ -1170,8 +1179,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         },
                                         loadingBuilder:
                                             (context, child, loadingProgress) {
-                                          if (loadingProgress == null)
+                                          if (loadingProgress == null) {
                                             return child;
+                                          }
                                           return const Center(
                                             child: SizedBox(
                                               width: 20,
@@ -1301,7 +1311,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -1355,7 +1365,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
+                          color: Colors.black.withValues(alpha: 0.7),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Icon(
@@ -1454,10 +1464,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 MaterialPageRoute(builder: (context) => const ChatbotScreen()),
               );
             },
-            backgroundColor: const Color(0xFFBB694A),
-            child: const Icon(Icons.mark_chat_unread_rounded,
-                color: Colors.white), // Use a chat icon
+            backgroundColor: const Color(0xFFBB694A), // Use a chat icon
             tooltip: 'Chat with Assistant',
+            child:
+                const Icon(Icons.mark_chat_unread_rounded, color: Colors.white),
           ),
           body: FadeTransition(
             opacity: _fadeAnimation,
