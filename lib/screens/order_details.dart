@@ -10,7 +10,7 @@ import 'invoice.dart';
 class OrderDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> order;
 
-  const OrderDetailsScreen({Key? key, required this.order}) : super(key: key);
+  const OrderDetailsScreen({super.key, required this.order});
 
   @override
   _OrderDetailsScreenState createState() => _OrderDetailsScreenState();
@@ -33,7 +33,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
   Map<String, dynamic>? _orderDetails;
   bool _isLoading = false;
   bool _hasError = false;
-  String _errorMessage = '';
+  final String _errorMessage = '';
 
   // Extended thank you messages (25 total) - same as order_placed.dart
   final List<String> _thankYouMessages = [
@@ -81,22 +81,22 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
 
   void _initializeAnimations() {
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
     _slideController = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
     _scaleController = AnimationController(
-      duration: Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
 
     _bounceController = AnimationController(
-      duration: Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
 
@@ -109,7 +109,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     ));
 
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.3),
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _slideController,
@@ -190,7 +190,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
             // Updated to add 9 days from order date
             updatedOrderDetails['estimatedDelivery'] =
                 (updatedOrderDetails['orderDate'] as DateTime)
-                    .add(Duration(days: 9));
+                    .add(const Duration(days: 9));
           }
 
           // Handle other data
@@ -282,8 +282,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
             backgroundColor: isDark ? Colors.grey[900] : Colors.white,
             content: Row(
               children: [
-                CircularProgressIndicator(color: Color(0xFFBB694A)),
-                SizedBox(width: 16),
+                const CircularProgressIndicator(color: Color(0xFFBB694A)),
+                const SizedBox(width: 16),
                 Text(
                   'Generating invoice...',
                   style: TextStyle(color: isDark ? Colors.white : Colors.black),
@@ -303,7 +303,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(
+          content: const Row(
             children: [
               Icon(Icons.check_circle, color: Colors.white),
               SizedBox(width: 8),
@@ -316,7 +316,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          duration: Duration(seconds: 3),
+          duration: const Duration(seconds: 3),
         ),
       );
     } catch (e) {
@@ -324,7 +324,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(
+          content: const Row(
             children: [
               Icon(Icons.error, color: Colors.white),
               SizedBox(width: 8),
@@ -336,7 +336,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          duration: Duration(seconds: 3),
+          duration: const Duration(seconds: 3),
         ),
       );
       print('Invoice generation error: $e');
@@ -356,10 +356,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
           valueListenable: isDarkModeNotifier,
           builder: (context, isDark, child) {
             return Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey[900] : Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -372,7 +373,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Text(
                     'Rate Your Order',
                     style: TextStyle(
@@ -381,7 +382,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
                     'How was your shopping experience?',
                     style: TextStyle(
@@ -389,7 +390,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
@@ -401,19 +402,19 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                           });
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Icon(
                             selectedRating > index
                                 ? Icons.star
                                 : Icons.star_border,
-                            color: Color(0xFFBB694A),
+                            color: const Color(0xFFBB694A),
                             size: 40,
                           ),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextField(
                     controller: reviewController,
                     style:
@@ -431,7 +432,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                     ),
                     maxLines: 3,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     children: [
                       Expanded(
@@ -442,7 +443,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                 color: isDark
                                     ? Colors.grey[600]!
                                     : Colors.grey[400]!),
-                            padding: EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -456,7 +457,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                           ),
                         ),
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: selectedRating > 0
@@ -467,13 +468,13 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                 }
                               : null,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFBB694A),
-                            padding: EdgeInsets.symmetric(vertical: 12),
+                            backgroundColor: const Color(0xFFBB694A),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Submit Rating',
                             style: TextStyle(color: Colors.white),
                           ),
@@ -517,12 +518,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
             SnackBar(
               content: Row(
                 children: [
-                  Icon(Icons.star, color: Colors.white),
-                  SizedBox(width: 8),
+                  const Icon(Icons.star, color: Colors.white),
+                  const SizedBox(width: 8),
                   Text('Thank you for rating us $rating stars!'),
                 ],
               ),
-              backgroundColor: Color(0xFFBB694A),
+              backgroundColor: const Color(0xFFBB694A),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
@@ -542,7 +543,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to save rating. Please try again.'),
+            content: const Text('Failed to save rating. Please try again.'),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape:
@@ -589,7 +590,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                       ScaleTransition(
                         scale: _scaleAnimation,
                         child: Container(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 16),
                           child: Row(
                             children: [
@@ -618,8 +619,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 16),
-                              Text(
+                              const SizedBox(width: 16),
+                              const Text(
                                 'Order Details',
                                 style: TextStyle(
                                   color: Color(0xFFBB694A),
@@ -627,21 +628,23 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                               GestureDetector(
                                 onTap: _generateInvoice,
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: Color(0xFFBB694A).withOpacity(0.1),
+                                    color: const Color(0xFFBB694A)
+                                        .withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(18),
                                     border: Border.all(
-                                      color: Color(0xFFBB694A).withOpacity(0.3),
+                                      color: const Color(0xFFBB694A)
+                                          .withValues(alpha: 0.3),
                                       width: 1,
                                     ),
                                   ),
-                                  child: Row(
+                                  child: const Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
@@ -689,11 +692,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
+            const CircularProgressIndicator(
               color: Color(0xFFBB694A),
               strokeWidth: 3,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'Loading order details...',
               style: TextStyle(
@@ -716,7 +719,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               size: 80,
               color: Colors.red[400],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               _errorMessage,
               style: TextStyle(
@@ -725,7 +728,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
                 setState(() {
@@ -735,13 +738,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                 _fetchLatestOrderDetails();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFBB694A),
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                backgroundColor: const Color(0xFFBB694A),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Retry',
                 style: TextStyle(
                   color: Colors.white,
@@ -767,58 +771,58 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     }
 
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Thank You Message
           SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(-1.0, 0.0),
+              begin: const Offset(-1.0, 0.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: _slideController,
-              curve: Interval(0.1, 0.5, curve: Curves.easeOutCubic),
+              curve: const Interval(0.1, 0.5, curve: Curves.easeOutCubic),
             )),
             child: _buildUniqueThankYouMessage(isDark),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Order Information - Updated with Order ID
           SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(1.0, 0.0),
+              begin: const Offset(1.0, 0.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: _slideController,
-              curve: Interval(0.15, 0.55, curve: Curves.easeOutCubic),
+              curve: const Interval(0.15, 0.55, curve: Curves.easeOutCubic),
             )),
             child: _buildOrderInformation(isDark),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Delivery Address
           SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(-1.0, 0.0),
+              begin: const Offset(-1.0, 0.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: _slideController,
-              curve: Interval(0.2, 0.6, curve: Curves.easeOutCubic),
+              curve: const Interval(0.2, 0.6, curve: Curves.easeOutCubic),
             )),
             child: _buildDeliveryAddress(isDark),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Order Summary
           SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(1.0, 0.0),
+              begin: const Offset(1.0, 0.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: _slideController,
-              curve: Interval(0.3, 0.7, curve: Curves.easeOutCubic),
+              curve: const Interval(0.3, 0.7, curve: Curves.easeOutCubic),
             )),
             child: Text(
               'Order Summary',
@@ -829,50 +833,50 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // Order Items
           ..._buildOrderItems(isDark),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Price Details
           SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(0.0, 1.0),
+              begin: const Offset(0.0, 1.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: _slideController,
-              curve: Interval(0.5, 0.9, curve: Curves.easeOutCubic),
+              curve: const Interval(0.5, 0.9, curve: Curves.easeOutCubic),
             )),
             child: _buildPriceDetails(isDark),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Payment Information
           SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(0.0, 1.0),
+              begin: const Offset(0.0, 1.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: _slideController,
-              curve: Interval(0.6, 1.0, curve: Curves.easeOutCubic),
+              curve: const Interval(0.6, 1.0, curve: Curves.easeOutCubic),
             )),
             child: _buildPaymentInfo(isDark),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Need Help
           SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(0.0, 1.0),
+              begin: const Offset(0.0, 1.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: _slideController,
-              curve: Interval(0.7, 1.0, curve: Curves.easeOutCubic),
+              curve: const Interval(0.7, 1.0, curve: Curves.easeOutCubic),
             )),
             child: _buildNeedHelp(isDark),
           ),
-          SizedBox(height: 100),
+          const SizedBox(height: 100),
         ],
       ),
     );
@@ -881,21 +885,21 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
   Widget _buildUniqueThankYouMessage(bool isDark) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(24),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: isDark ? Colors.transparent : Colors.white,
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFBB694A).withOpacity(0.15),
-            Color(0xFFBB694A).withOpacity(0.05),
-            Colors.purple.withOpacity(0.05),
+            const Color(0xFFBB694A).withValues(alpha: 0.15),
+            const Color(0xFFBB694A).withValues(alpha: 0.05),
+            Colors.purple.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Color(0xFFBB694A).withOpacity(0.3),
+          color: const Color(0xFFBB694A).withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
@@ -907,32 +911,32 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               Container(
                 width: 8,
                 height: 8,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFFBB694A),
                   shape: BoxShape.circle,
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Container(
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: Color(0xFFBB694A).withOpacity(0.7),
+                  color: const Color(0xFFBB694A).withValues(alpha: 0.7),
                   shape: BoxShape.circle,
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Container(
                 width: 8,
                 height: 8,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFFBB694A),
                   shape: BoxShape.circle,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
             _getUniqueThankYouMessage(),
             style: TextStyle(
@@ -944,11 +948,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Text(
             'We\'re thrilled to be part of your style journey!',
             style: TextStyle(
-              color: Color(0xFFBB694A).withOpacity(0.9),
+              color: const Color(0xFFBB694A).withValues(alpha: 0.9),
               fontSize: 14,
               fontWeight: FontWeight.w500,
               fontStyle: FontStyle.italic,
@@ -965,10 +969,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     // Updated estimated delivery to 9 days from order date
     final estimatedDelivery =
         _orderDetails!['estimatedDelivery'] as DateTime? ??
-            orderDate.add(Duration(days: 9));
+            orderDate.add(const Duration(days: 9));
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -980,12 +984,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.info_outline,
                 color: Color(0xFFBB694A),
                 size: 20,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'Order Information',
                 style: TextStyle(
@@ -996,16 +1000,17 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
           // Order ID Section
           Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color(0xFFBB694A).withOpacity(0.1),
+              color: const Color(0xFFBB694A).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                  color: Color(0xFFBB694A).withOpacity(0.3), width: 1),
+                  color: const Color(0xFFBB694A).withValues(alpha: 0.3),
+                  width: 1),
             ),
             child: Row(
               children: [
@@ -1013,16 +1018,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Color(0xFFBB694A).withOpacity(0.2),
+                    color: const Color(0xFFBB694A).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.receipt_outlined,
                     color: Color(0xFFBB694A),
                     size: 20,
                   ),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1035,10 +1040,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         '#${_orderDetails!['orderNumber']}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFFBB694A),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -1051,13 +1056,13 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
             ),
           ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.grey[800]?.withOpacity(0.5)
+                  ? Colors.grey[800]?.withValues(alpha: 0.5)
                   : Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
@@ -1070,16 +1075,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.2),
+                    color: Colors.green.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.check_circle_outline,
                     color: Colors.green,
                     size: 20,
                   ),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1092,7 +1097,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         '${_formatDate(orderDate)} at ${_formatTime(orderDate)}',
                         style: TextStyle(
@@ -1107,15 +1112,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
             ),
           ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color(0xFFBB694A).withOpacity(0.1),
+              color: const Color(0xFFBB694A).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                  color: Color(0xFFBB694A).withOpacity(0.3), width: 1),
+                  color: const Color(0xFFBB694A).withValues(alpha: 0.3),
+                  width: 1),
             ),
             child: Row(
               children: [
@@ -1123,16 +1129,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Color(0xFFBB694A).withOpacity(0.2),
+                    color: const Color(0xFFBB694A).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.local_shipping_outlined,
                     color: Color(0xFFBB694A),
                     size: 20,
                   ),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1145,16 +1151,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         _formatDate(estimatedDelivery),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFFBB694A),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      SizedBox(height: 2),
+                      const SizedBox(height: 2),
                       Text(
                         'Delivery time may vary based on location and weather conditions.',
                         style: TextStyle(
@@ -1182,7 +1188,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     final formattedAddress = _formatAddress(deliveryAddress['address']);
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -1194,12 +1200,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.location_on,
                 color: Color(0xFFBB694A),
                 size: 20,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'Delivery Address',
                 style: TextStyle(
@@ -1210,7 +1216,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             children: [
               Text(
@@ -1221,20 +1227,20 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Color(0xFFBB694A).withOpacity(0.2),
+                  color: const Color(0xFFBB694A).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color: Color(0xFFBB694A).withOpacity(0.5),
+                    color: const Color(0xFFBB694A).withValues(alpha: 0.5),
                     width: 1,
                   ),
                 ),
                 child: Text(
                   deliveryAddress['addressType'] ?? 'HOME',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xFFBB694A),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -1243,7 +1249,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Text(
             formattedAddress,
             style: TextStyle(
@@ -1252,15 +1258,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               height: 1.4,
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.phone_outlined,
                 color: Color(0xFFBB694A),
                 size: 16,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'Mobile: ',
                 style: TextStyle(
@@ -1279,15 +1285,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.email_outlined,
                 color: Color(0xFFBB694A),
                 size: 16,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'Email: ',
                 style: TextStyle(
@@ -1320,7 +1326,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
       Map<String, dynamic> item = entry.value;
       return SlideTransition(
         position: Tween<Offset>(
-          begin: Offset(1.0, 0.0),
+          begin: const Offset(1.0, 0.0),
           end: Offset.zero,
         ).animate(CurvedAnimation(
           parent: _slideController,
@@ -1341,8 +1347,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     final totalPrice = price * quantity;
 
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -1372,7 +1378,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                 ? Icon(Icons.image, color: Colors.grey[500], size: 20)
                 : null,
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1387,11 +1393,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 if (item['selectedSize'] != null &&
                     item['selectedColor'] != null)
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: isDark ? Colors.grey[800] : Colors.grey[100],
                       borderRadius: BorderRadius.circular(4),
@@ -1406,31 +1413,32 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                       ),
                     ),
                   ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Text(
                       '\u20B9${totalPrice.toStringAsFixed(0)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color(0xFFBB694A),
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Color(0xFFBB694A).withOpacity(0.1),
+                        color: const Color(0xFFBB694A).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Color(0xFFBB694A).withOpacity(0.3),
+                          color: const Color(0xFFBB694A).withValues(alpha: 0.3),
                           width: 1,
                         ),
                       ),
                       child: Text(
                         'Qty: $quantity',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFFBB694A),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -1451,7 +1459,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     final pricing = _orderDetails!['pricing'] as Map<String, dynamic>;
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -1463,12 +1471,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.receipt_long,
                 color: Color(0xFFBB694A),
                 size: 20,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'Price Details',
                 style: TextStyle(
@@ -1479,11 +1487,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           _buildPriceRow('Subtotal (${safeToInt(pricing['totalItems'])} items)',
               '\u20B9${safeToDouble(pricing['subtotal']).toStringAsFixed(0)}',
               isDark: isDark),
-
           _buildPriceRow(
             'Shipping',
             safeToDouble(pricing['shipping']) == 0
@@ -1526,12 +1533,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
           ),
           if (isShipping && value == 'FREE')
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.2),
+                color: Colors.green.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Text(
+              child: const Text(
                 'FREE',
                 style: TextStyle(
                   color: Colors.green,
@@ -1545,7 +1552,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               value,
               style: TextStyle(
                 color: isTotal
-                    ? Color(0xFFBB694A)
+                    ? const Color(0xFFBB694A)
                     : (isDark ? Colors.white : Colors.black),
                 fontSize: isTotal ? 16 : 14,
                 fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
@@ -1560,7 +1567,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     final payment = _orderDetails!['payment'] as Map<String, dynamic>;
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -1572,12 +1579,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.payment,
                 color: Color(0xFFBB694A),
                 size: 20,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'Payment Information',
                 style: TextStyle(
@@ -1588,7 +1595,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             children: [
               Text(
@@ -1608,7 +1615,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Row(
             children: [
               Text(
@@ -1630,7 +1637,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Row(
             children: [
               Text(
@@ -1641,14 +1648,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
+                  color: Colors.green.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   payment['status'] ?? 'Completed',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.green,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -1664,7 +1671,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
 
   Widget _buildNeedHelp(bool isDark) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -1676,12 +1683,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.support_agent,
                 color: Color(0xFFBB694A),
                 size: 20,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'Need Help?',
                 style: TextStyle(
@@ -1692,7 +1699,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
             'Our customer support team is here to help you with any questions about your order.',
             style: TextStyle(
@@ -1701,13 +1708,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               height: 1.4,
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           GestureDetector(
             onTap: () async {
               final Uri emailLaunchUri = Uri(
                 scheme: 'mailto',
                 path: 'beinnlifestyle@gmail.com',
-                query: 'subject=Support Request for Order ${widget.order['orderNumber'] ?? ''}',
+                query:
+                    'subject=Support Request for Order ${widget.order['orderNumber'] ?? ''}',
               );
               try {
                 await launchUrl(emailLaunchUri);
@@ -1717,10 +1725,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
             },
             child: Container(
               width: double.infinity,
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.grey[800]?.withOpacity(0.5)
+                    ? Colors.grey[800]?.withValues(alpha: 0.5)
                     : Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
@@ -1729,12 +1737,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               ),
               child: Column(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.email_outlined,
                     color: Color(0xFFBB694A),
                     size: 28,
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
                     'Email Support',
                     style: TextStyle(
@@ -1743,7 +1751,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
                     'beinnlifestyle@gmail.com',
                     style: TextStyle(
@@ -1764,7 +1772,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     final hasRating = _orderDetails?['isRated'] == true;
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[900] : Colors.white,
         border: Border(
@@ -1782,13 +1790,13 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Color(0xFFBB694A), width: 2),
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  side: const BorderSide(color: Color(0xFFBB694A), width: 2),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
                   ),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
@@ -1809,14 +1817,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                 ),
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
                 onPressed: hasRating ? null : _rateOrder,
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      hasRating ? Colors.grey[600] : Color(0xFFBB694A),
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                      hasRating ? Colors.grey[600] : const Color(0xFFBB694A),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
                   ),
@@ -1830,10 +1838,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                       color: Colors.white,
                       size: 18,
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
                       hasRating ? 'Rated' : 'Rate Order',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
