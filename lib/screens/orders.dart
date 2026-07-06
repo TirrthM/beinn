@@ -7,6 +7,8 @@ import 'order_details.dart';
 import '../main.dart' as main_app;
 
 class OrdersScreen extends StatefulWidget {
+  const OrdersScreen({super.key});
+
   @override
   _OrdersScreenState createState() => _OrdersScreenState();
 }
@@ -185,11 +187,12 @@ class _OrdersScreenState extends State<OrdersScreen>
             } else if (data['estimatedDelivery'] is String) {
               orderData['estimatedDelivery'] =
                   DateTime.tryParse(data['estimatedDelivery']) ??
-                      DateTime.now().add(Duration(days: 7));
+                      DateTime.now().add(const Duration(days: 7));
             }
           } else {
             orderData['estimatedDelivery'] =
-                (orderData['orderDate'] as DateTime).add(Duration(days: 7));
+                (orderData['orderDate'] as DateTime)
+                    .add(const Duration(days: 7));
           }
 
           orderData['customerInfo'] = data['customerInfo'] ?? {};
@@ -283,10 +286,11 @@ class _OrdersScreenState extends State<OrdersScreen>
           valueListenable: isDarkModeNotifier,
           builder: (context, isDark, child) {
             return Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey[900] : Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -299,7 +303,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
                     'Rate Your Order',
                     style: TextStyle(
@@ -308,7 +312,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     'How was your shopping experience?',
                     style: TextStyle(
@@ -316,7 +320,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                       fontSize: 14,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
@@ -328,19 +332,19 @@ class _OrdersScreenState extends State<OrdersScreen>
                           });
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Icon(
                             selectedRating > index
                                 ? Icons.star
                                 : Icons.star_border,
-                            color: Color(0xFFBB694A),
+                            color: const Color(0xFFBB694A),
                             size: 32,
                           ),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextField(
                     controller: reviewController,
                     style: TextStyle(
@@ -352,7 +356,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                           color: isDark ? Colors.grey[400] : Colors.grey[500]),
                       filled: true,
                       fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
-                      contentPadding: EdgeInsets.all(12),
+                      contentPadding: const EdgeInsets.all(12),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -360,7 +364,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                     ),
                     maxLines: 3,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
@@ -371,7 +375,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                                 color: isDark
                                     ? Colors.grey[600]!
                                     : Colors.grey[400]!),
-                            padding: EdgeInsets.symmetric(vertical: 10),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -386,7 +390,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                           ),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: selectedRating > 0
@@ -399,13 +403,13 @@ class _OrdersScreenState extends State<OrdersScreen>
                                 }
                               : null,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFBB694A),
-                            padding: EdgeInsets.symmetric(vertical: 10),
+                            backgroundColor: const Color(0xFFBB694A),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Submit Rating',
                             style: TextStyle(color: Colors.white, fontSize: 14),
                           ),
@@ -450,12 +454,12 @@ class _OrdersScreenState extends State<OrdersScreen>
             SnackBar(
               content: Row(
                 children: [
-                  Icon(Icons.star, color: Colors.white, size: 16),
-                  SizedBox(width: 6),
+                  const Icon(Icons.star, color: Colors.white, size: 16),
+                  const SizedBox(width: 6),
                   Text('Thank you for rating us $rating stars!'),
                 ],
               ),
-              backgroundColor: Color(0xFFBB694A),
+              backgroundColor: const Color(0xFFBB694A),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
@@ -478,7 +482,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to save rating. Please try again.'),
+            content: const Text('Failed to save rating. Please try again.'),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape:
@@ -507,7 +511,7 @@ class _OrdersScreenState extends State<OrdersScreen>
 
           return SlideTransition(position: offsetAnimation, child: child);
         },
-        transitionDuration: Duration(milliseconds: 300),
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
   }
@@ -517,7 +521,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            main_app.MainNavigationWrapper(initialIndex: 0),
+            const main_app.MainNavigationWrapper(initialIndex: 0),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
@@ -571,11 +575,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                       ScaleTransition(
                         scale: _scaleAnimation,
                         child: Padding(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 12),
                           child: Row(
                             children: [
-                              Text(
+                              const Text(
                                 'My Orders',
                                 style: TextStyle(
                                   color: Color(0xFFBB694A),
@@ -583,27 +587,27 @@ class _OrdersScreenState extends State<OrdersScreen>
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                               if (_orders.isNotEmpty)
                                 ScaleTransition(
                                   scale: _bounceAnimation,
                                   child: AnimatedContainer(
-                                    duration: Duration(milliseconds: 300),
-                                    padding: EdgeInsets.symmetric(
+                                    duration: const Duration(milliseconds: 300),
+                                    padding: const EdgeInsets.symmetric(
                                         horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color:
-                                          Color(0xFFBB694A).withOpacity(0.08),
+                                      color: const Color(0xFFBB694A)
+                                          .withValues(alpha: 0.08),
                                       borderRadius: BorderRadius.circular(14),
                                       border: Border.all(
-                                        color:
-                                            Color(0xFFBB694A).withOpacity(0.25),
+                                        color: const Color(0xFFBB694A)
+                                            .withValues(alpha: 0.25),
                                         width: 1,
                                       ),
                                     ),
                                     child: Text(
                                       '${_orders.length} ${_orders.length == 1 ? 'order' : 'orders'}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Color(0xFFBB694A),
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -635,11 +639,11 @@ class _OrdersScreenState extends State<OrdersScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
+            const CircularProgressIndicator(
               color: Color(0xFFBB694A),
               strokeWidth: 2,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               'Loading your orders...',
               style: TextStyle(
@@ -647,7 +651,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                 fontSize: 14,
               ),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
               'Fetching from order_placed collection',
               style: TextStyle(
@@ -663,7 +667,7 @@ class _OrdersScreenState extends State<OrdersScreen>
     if (_hasError) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -672,7 +676,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                 size: 64,
                 color: Colors.red[400],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 'Failed to load orders',
                 style: TextStyle(
@@ -682,7 +686,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 _errorMessage,
                 style: TextStyle(
@@ -692,17 +696,18 @@ class _OrdersScreenState extends State<OrdersScreen>
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               ElevatedButton(
                 onPressed: _refreshOrders,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFBB694A),
-                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  backgroundColor: const Color(0xFFBB694A),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   'Retry',
                   style: TextStyle(
                     color: Colors.white,
@@ -723,11 +728,11 @@ class _OrdersScreenState extends State<OrdersScreen>
 
     return RefreshIndicator(
       onRefresh: _refreshOrders,
-      color: Color(0xFFBB694A),
+      color: const Color(0xFFBB694A),
       backgroundColor: isDark ? Colors.grey[900] : Colors.white,
       child: ListView.builder(
-        physics: BouncingScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _orders.length,
         itemBuilder: (context, index) {
           return SlideTransition(
@@ -766,8 +771,8 @@ class _OrdersScreenState extends State<OrdersScreen>
               ScaleTransition(
                 scale: _bounceAnimation,
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 500),
-                  padding: EdgeInsets.all(18),
+                  duration: const Duration(milliseconds: 500),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     color: isDark ? Colors.grey[900] : Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -776,9 +781,10 @@ class _OrdersScreenState extends State<OrdersScreen>
                         width: 1),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                        color:
+                            Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                         blurRadius: 8,
-                        offset: Offset(0, 3),
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
@@ -789,14 +795,14 @@ class _OrdersScreenState extends State<OrdersScreen>
                   ),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               SlideTransition(
                 position: Tween<Offset>(
-                  begin: Offset(0, 0.4),
+                  begin: const Offset(0, 0.4),
                   end: Offset.zero,
                 ).animate(CurvedAnimation(
                   parent: _slideController,
-                  curve: Interval(0.3, 1.0, curve: Curves.easeOutCubic),
+                  curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
                 )),
                 child: Text(
                   'No orders found',
@@ -807,14 +813,14 @@ class _OrdersScreenState extends State<OrdersScreen>
                   ),
                 ),
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               SlideTransition(
                 position: Tween<Offset>(
-                  begin: Offset(0, 0.2),
+                  begin: const Offset(0, 0.2),
                   end: Offset.zero,
                 ).animate(CurvedAnimation(
                   parent: _slideController,
-                  curve: Interval(0.5, 1.0, curve: Curves.easeOutCubic),
+                  curve: const Interval(0.5, 1.0, curve: Curves.easeOutCubic),
                 )),
                 child: Text(
                   'Your order history will appear here\nonce you place your first order',
@@ -826,21 +832,22 @@ class _OrdersScreenState extends State<OrdersScreen>
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ScaleTransition(
                 scale: _bounceAnimation,
                 child: ElevatedButton(
                   onPressed: _navigateToHome,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFBB694A),
-                    padding: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                    backgroundColor: const Color(0xFFBB694A),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 22, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                     elevation: 2,
-                    shadowColor: Color(0xFFBB694A).withOpacity(0.2),
+                    shadowColor: const Color(0xFFBB694A).withValues(alpha: 0.2),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
@@ -882,7 +889,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300 + (index * 80)),
         curve: Curves.easeOutCubic,
-        margin: EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: isDark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -890,9 +897,9 @@ class _OrdersScreenState extends State<OrdersScreen>
               color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.18 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.05),
               blurRadius: 8,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -900,7 +907,7 @@ class _OrdersScreenState extends State<OrdersScreen>
           children: [
             // Main order info
             Padding(
-              padding: EdgeInsets.all(14),
+              padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -916,20 +923,20 @@ class _OrdersScreenState extends State<OrdersScreen>
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
                       Text(
                         totalAmount > 0
                             ? '\u20B9${totalAmount.toStringAsFixed(0)}'
                             : 'Amount not available',
                         style: TextStyle(
                           color: totalAmount > 0
-                              ? Color(0xFFBB694A)
+                              ? const Color(0xFFBB694A)
                               : Colors.grey[500],
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
                       Row(
                         children: [
                           Expanded(
@@ -952,12 +959,12 @@ class _OrdersScreenState extends State<OrdersScreen>
                       ),
                     ],
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
                   // Items preview
                   if (items.isNotEmpty)
                     Container(
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: isDark ? Colors.grey[850] : Colors.grey[100],
                         borderRadius: BorderRadius.circular(10),
@@ -976,8 +983,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                               borderRadius: BorderRadius.circular(8),
                               image: items[0]['image'] != null
                                   ? DecorationImage(
-                                      image: items[0]['image'].toString().startsWith('assets/')
-                                          ? AssetImage(items[0]['image']) as ImageProvider
+                                      image: items[0]['image']
+                                              .toString()
+                                              .startsWith('assets/')
+                                          ? AssetImage(items[0]['image'])
+                                              as ImageProvider
                                           : NetworkImage(items[0]['image']),
                                       fit: BoxFit.cover,
                                     )
@@ -993,7 +1003,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                                     color: Colors.grey[500], size: 18)
                                 : null,
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1010,7 +1020,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
                                   '$totalItems items',
                                   style: TextStyle(
@@ -1025,17 +1035,17 @@ class _OrdersScreenState extends State<OrdersScreen>
                           ),
                           if (hasRating)
                             Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 6, vertical: 3),
                               decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.16),
+                                color: Colors.green.withValues(alpha: 0.16),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: Colors.green.withOpacity(0.5),
+                                  color: Colors.green.withValues(alpha: 0.5),
                                   width: 1,
                                 ),
                               ),
-                              child: Row(
+                              child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
@@ -1060,7 +1070,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                     )
                   else
                     Container(
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: isDark ? Colors.grey[850] : Colors.grey[100],
                         borderRadius: BorderRadius.circular(10),
@@ -1075,7 +1085,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                               color:
                                   isDark ? Colors.grey[500] : Colors.grey[400],
                               size: 32),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               'Order items not available',
@@ -1098,15 +1108,15 @@ class _OrdersScreenState extends State<OrdersScreen>
             if (!hasRating)
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.fromLTRB(14, 0, 14, 12),
+                padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
                 child: ElevatedButton(
                   onPressed: () => _rateOrder(order),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
-                    padding: EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
+                      side: const BorderSide(
                         color: Color(0xFFBB694A),
                         width: 1,
                       ),
@@ -1114,7 +1124,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                     elevation: 0,
                     shadowColor: Colors.transparent,
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
