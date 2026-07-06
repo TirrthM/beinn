@@ -5,6 +5,8 @@ import '../main.dart' as main_app;
 import '../theme_notifier.dart';
 
 class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
+
   @override
   _CartScreenState createState() => _CartScreenState();
 }
@@ -24,7 +26,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
   bool _isLoading = true;
 
   // Track wishlist status for each item
-  Set<String> _wishlistItemIds = Set<String>();
+  Set<String> _wishlistItemIds = <String>{};
 
   @override
   void initState() {
@@ -171,8 +173,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
-          children: const [
+        content: const Row(
+          children: [
             Icon(Icons.check_circle, color: Colors.white, size: 18),
             SizedBox(width: 8),
             Text('Item removed from cart',
@@ -193,7 +195,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        final docId = '${productId}_${size}_${color}';
+        final docId = '${productId}_${size}_$color';
         await _firestore
             .collection('users')
             .doc(user.uid)
@@ -280,8 +282,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     if (main_app.CartManager().cartItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(
-            children: const [
+          content: const Row(
+            children: [
               Icon(Icons.warning, color: Colors.white, size: 18),
               SizedBox(width: 8),
               Text('Your cart is empty', style: TextStyle(color: Colors.white)),
@@ -309,7 +311,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            main_app.MainNavigationWrapper(initialIndex: 0),
+            const main_app.MainNavigationWrapper(initialIndex: 0),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
@@ -397,11 +399,11 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                                       horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFBB694A)
-                                        .withOpacity(0.08),
+                                        .withValues(alpha: 0.08),
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
                                       color: const Color(0xFFBB694A)
-                                          .withOpacity(0.28),
+                                          .withValues(alpha: 0.28),
                                       width: 1,
                                     ),
                                   ),
@@ -512,11 +514,11 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     elevation: 2,
-                    shadowColor: const Color(0xFFBB694A).withOpacity(0.2),
+                    shadowColor: const Color(0xFFBB694A).withValues(alpha: 0.2),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(Icons.home, color: Colors.white, size: 18),
                       SizedBox(width: 6),
                       Text('Continue Shopping',
@@ -631,7 +633,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                         Text(
                           item['category'],
                           style: TextStyle(
-                              color: const Color(0xFFBB694A).withOpacity(0.9),
+                              color: const Color(0xFFBB694A)
+                                  .withValues(alpha: 0.9),
                               fontSize: 11,
                               fontWeight: FontWeight.w500),
                           maxLines: 1,
@@ -677,11 +680,12 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFBB694A).withOpacity(0.08),
+                              color: const Color(0xFFBB694A)
+                                  .withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                  color:
-                                      const Color(0xFFBB694A).withOpacity(0.28),
+                                  color: const Color(0xFFBB694A)
+                                      .withValues(alpha: 0.28),
                                   width: 1),
                             ),
                             child: Text(
@@ -746,9 +750,9 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.28), width: 1),
+          border: Border.all(color: color.withValues(alpha: 0.28), width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -779,17 +783,17 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isInWishlist
-              ? const Color(0xFFBB694A).withOpacity(0.12)
+              ? const Color(0xFFBB694A).withValues(alpha: 0.12)
               : (isDark
-                  ? Colors.grey[700]!.withOpacity(0.08)
-                  : Colors.grey[700]!.withOpacity(0.08)),
+                  ? Colors.grey[700]!.withValues(alpha: 0.08)
+                  : Colors.grey[700]!.withValues(alpha: 0.08)),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isInWishlist
-                ? const Color(0xFFBB694A).withOpacity(0.5)
+                ? const Color(0xFFBB694A).withValues(alpha: 0.5)
                 : (isDark
-                    ? Colors.grey[600]!.withOpacity(0.28)
-                    : Colors.grey[400]!.withOpacity(0.5)),
+                    ? Colors.grey[600]!.withValues(alpha: 0.28)
+                    : Colors.grey[400]!.withValues(alpha: 0.5)),
             width: isInWishlist ? 1.2 : 1,
           ),
         ),
@@ -891,11 +895,11 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(22)),
                     elevation: 2,
-                    shadowColor: const Color(0xFFBB694A).withOpacity(0.2),
+                    shadowColor: const Color(0xFFBB694A).withValues(alpha: 0.2),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Icon(Icons.shopping_cart_checkout,
                           color: Colors.white, size: 18),
                       SizedBox(width: 6),
