@@ -1,34 +1,34 @@
-# Security Policy
+# Security Guidelines
 
-At Beinn, we take the security of our customers' data and our infrastructure extremely seriously. We have established this policy to ensure that any security issues are handled swiftly, responsibly, and transparently.
+This document outlines the security architecture and best practices implemented in the Beinn application. Because the application processes payments and handles personal data, strict security measures are enforced at both the client and server levels.
 
-## Supported Versions
+## Payment Processing Architecture
 
-To ensure you are protected against known vulnerabilities, please verify that you are running a supported version of our application.
+The application uses Razorpay for payment processing. To prevent malicious users from modifying order amounts on their devices, we use a server-side order generation flow.
 
-Currently, we support the following version branches:
+1. The client application never calculates the final payment amount. When a user proceeds to checkout, the mobile app sends a request containing their user ID to the backend server.
+2. The backend server uses the Firebase Admin SDK to securely fetch the user's current cart directly from the database. It computes the total price on the server, ensuring the amount cannot be tampered with.
+3. The server then contacts the Razorpay API to generate a unique order ID for that specific amount.
+4. The server returns this order ID to the mobile app, which then uses it to initialize the Razorpay checkout overlay.
 
-- **Version 5.1.x and newer:** Fully supported. These versions receive regular feature updates and all necessary security patches.
-- **Version 4.0.x:** Maintenance mode. This version no longer receives new features but will continue to receive critical security patches until it reaches its end of life.
-- **Versions 5.0.x and anything older than 4.0:** End of life. These versions are no longer supported and do not receive security updates. If you are using one of these versions, please upgrade your environment as soon as possible.
+## Environment Variables and Secrets Management
 
-## Infrastructure Security Measures
+Sensitive keys must never be hardcoded into the source code or pushed to version control. We use environment files to manage these secrets.
 
-We employ several layers of security across our hybrid architecture to protect user data:
+### Backend Configuration
 
-- **Authentication:** All user authentication and session management is handled by Firebase Authentication, which adheres to industry-standard security protocols.
-- **Database Rules:** Access to Firestore is strictly governed by custom security rules. Users can only read and write data that belongs to their specific authenticated profile, such as their own shopping carts and order histories. Product data is globally readable but strictly write-protected.
-- **Real-Time Data Transmission:** The NestJS tracking gateway encrypts all WebSocket communications using TLS. We avoid exposing direct database connections to the client.
+The backend requires high-privilege access keys. You must create a file named .env inside the backend directory. This file must contain:
+- Your Razorpay Secret Key, which allows the server to create financial orders.
+- Your Firebase Admin SDK credentials. You can generate these by navigating to your Firebase Console, opening Project Settings, selecting the Service Accounts tab, and clicking Generate New Private Key. You need to extract the project ID, client email, and the raw private key string from the downloaded JSON file and place them in the backend environment file.
 
-## Reporting a Vulnerability
+### Frontend Configuration
 
-If you are a security researcher or a user who has discovered a potential security vulnerability in this project, we kindly ask for your cooperation in disclosing it to us responsibly.
+The frontend requires non-sensitive configuration values. You must create a file named .env in the root directory of the project. This file must contain:
+- Your Razorpay Key ID. This is a public key used to identify your merchant account to the Razorpay checkout interface.
+- The base URL for your backend server.
 
-Please follow these steps to report an issue:
+Both of these environment files are explicitly listed in the .gitignore file to ensure they are never uploaded to GitHub.
 
-1. **Do not open a public issue:** To protect our users, please do not disclose the vulnerability in a public GitHub issue, forum, or social media platform before we have had a chance to patch it.
-2. **Email the security team:** Send a detailed report to our dedicated security team at <security@beinn.example.com>. Please include clear steps to reproduce the issue, the potential impact, and any proof-of-concept code if available.
-3. **Wait for acknowledgment:** We will acknowledge receipt of your vulnerability report within 48 hours.
-4. **Resolution timeline:** After verifying the issue, we will provide you with an estimated timeline for deploying a fix. We will keep you updated on our progress throughout the investigation and patching process.
+## Database Security Rules
 
-We genuinely appreciate the efforts of the security community in helping us maintain a safe platform for everyone.
+All interactions with the Firebase database directly from the mobile app are restricted by Firebase Security Rules. Users are only granted permission to read and write data that corresponds to their own authenticated user ID. Any attempt to query or modify data belonging to another user will be rejected by the database.
