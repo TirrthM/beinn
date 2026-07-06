@@ -623,7 +623,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
 
   int _getTotalItems() {
     return widget.items
-        .fold(0, (sum, item) => sum + (item['quantity'] as int? ?? 1));
+        .fold(0, (currentSum, item) => currentSum + (item['quantity'] as int? ?? 1));
   }
 
   Future<void> _validateAndApplyCoupon(String couponCode) async {
