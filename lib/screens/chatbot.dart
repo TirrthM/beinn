@@ -10,7 +10,7 @@ import '../theme_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // For rate limiting
 
 class ChatbotScreen extends StatefulWidget {
-  const ChatbotScreen({Key? key}) : super(key: key);
+  const ChatbotScreen({super.key});
 
   @override
   State<ChatbotScreen> createState() => _ChatbotScreenState();
@@ -254,10 +254,10 @@ class _ChatbotScreenState extends State<ChatbotScreen>
               onPressed: () => Navigator.pop(context),
             ),
             centerTitle: true,
-            title: Text(
+            title: const Text(
               'BEINN Assistant',
               style: TextStyle(
-                color: const Color(0xFFBB694A), // Orange color as requested
+                color: Color(0xFFBB694A), // Orange color as requested
                 fontSize: 22, // Bigger
                 fontWeight: FontWeight.bold, // Bold
                 letterSpacing: 0.5,
@@ -312,7 +312,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -321,13 +321,12 @@ class _ChatbotScreenState extends State<ChatbotScreen>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
+          const SizedBox(
             width: 12,
             height: 12,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(const Color(0xFFBB694A)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFBB694A)),
             ),
           ),
           const SizedBox(width: 8),
@@ -370,7 +369,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
           boxShadow: [
             if (!isUser)
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -422,7 +421,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
               const EdgeInsets.fromLTRB(16, 12, 16, 30), // Extra bottom padding
           decoration: BoxDecoration(
             color: (isDark ? const Color(0xFF121212) : const Color(0xFFF7F7F7))
-                .withOpacity(0.8), // Semi-transparent for blur effect
+                .withValues(alpha: 0.8), // Semi-transparent for blur effect
           ),
           child: Container(
             padding:
@@ -432,7 +431,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
               borderRadius: BorderRadius.circular(30), // Capsule shape
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 5,
                   offset: const Offset(0, 2),
                 ),
