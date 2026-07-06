@@ -5,8 +5,7 @@ import '../theme_notifier.dart';
 class ProductDetailScreen extends StatefulWidget {
   final Map<String, dynamic> product;
 
-  const ProductDetailScreen({Key? key, required this.product})
-      : super(key: key);
+  const ProductDetailScreen({super.key, required this.product});
 
   @override
   _ProductDetailScreenState createState() => _ProductDetailScreenState();
@@ -19,7 +18,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   String _selectedColor = 'Black';
   int _selectedQuantity = 1;
   int _currentImageIndex = 0;
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
 
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -47,27 +46,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
 
   void _initializeAnimations() {
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
 
     _slideController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
     _scaleController = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
     _bounceController = AnimationController(
-      duration: Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
 
     _rotationController = AnimationController(
-      duration: Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
 
@@ -80,7 +79,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     ));
 
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.5),
+      begin: const Offset(0, 0.5),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _slideController,
@@ -113,16 +112,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
 
     // Start animations with staggered timing
     _fadeController.forward();
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) _slideController.forward();
     });
-    Future.delayed(Duration(milliseconds: 400), () {
+    Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) _scaleController.forward();
     });
-    Future.delayed(Duration(milliseconds: 600), () {
+    Future.delayed(const Duration(milliseconds: 600), () {
       if (mounted) _bounceController.forward();
     });
-    Future.delayed(Duration(milliseconds: 800), () {
+    Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) _rotationController.forward();
     });
   }
@@ -141,18 +140,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.shopping_cart, color: Colors.white, size: 20),
-            SizedBox(width: 8),
+            const Icon(Icons.shopping_cart, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 '${widget.product['name']} added to cart!',
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],
         ),
-        backgroundColor: Color(0xFFBB694A),
-        duration: Duration(seconds: 2),
+        backgroundColor: const Color(0xFFBB694A),
+        duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -177,7 +176,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       main_app.CartManager().removeFromWishlist(widget.product['id']);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(
+          content: const Row(
             children: [
               Icon(Icons.heart_broken, color: Colors.white, size: 20),
               SizedBox(width: 8),
@@ -188,7 +187,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             ],
           ),
           backgroundColor: Colors.grey[700],
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -199,7 +198,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       main_app.CartManager().addToWishlist(widget.product);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(
+          content: const Row(
             children: [
               Icon(Icons.favorite, color: Colors.white, size: 20),
               SizedBox(width: 8),
@@ -209,8 +208,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               ),
             ],
           ),
-          backgroundColor: Color(0xFFBB694A),
-          duration: Duration(seconds: 2),
+          backgroundColor: const Color(0xFFBB694A),
+          duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -292,8 +291,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black
-                                          .withOpacity(isDark ? 0.0 : 0.05),
+                                      color: Colors.black.withValues(
+                                          alpha: isDark ? 0.0 : 0.05),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
@@ -325,8 +324,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                     borderRadius: BorderRadius.circular(12),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black
-                                            .withOpacity(isDark ? 0.0 : 0.05),
+                                        color: Colors.black.withValues(
+                                            alpha: isDark ? 0.0 : 0.05),
                                         blurRadius: 4,
                                         offset: const Offset(0, 2),
                                       ),
@@ -419,7 +418,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                     ),
                                   ),
                                   const SizedBox(height: 24),
-                                  if (widget.product['category'] != 'Perfumes') ...[
+                                  if (widget.product['category'] !=
+                                      'Perfumes') ...[
                                     // Size Selection
                                     SlideTransition(
                                       position: Tween<Offset>(
@@ -497,8 +497,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                             width: 1),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                                isDark ? 0.0 : 0.05),
+                                            color: Colors.black.withValues(
+                                                alpha: isDark ? 0.0 : 0.05),
                                             blurRadius: 8,
                                             offset: const Offset(0, 2),
                                           ),
@@ -572,8 +572,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                               width: 1),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                  isDark ? 0.0 : 0.05),
+                                              color: Colors.black.withValues(
+                                                  alpha: isDark ? 0.0 : 0.05),
                                               blurRadius: 8,
                                               offset: const Offset(0, 2),
                                             ),
@@ -659,19 +659,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                      image: DecorationImage(
-                        image: images[index].startsWith('assets/')
-                            ? AssetImage(images[index]) as ImageProvider
-                            : NetworkImage(images[index]),
-                        fit: BoxFit.cover,
-                        onError: (exception, stackTrace) {
-                          print('Error loading detail image ${images[index]} for product ${widget.product['name']}');
-                          print('Exception: $exception');
-                        },
-                      ),
+                    image: DecorationImage(
+                      image: images[index].startsWith('assets/')
+                          ? AssetImage(images[index]) as ImageProvider
+                          : NetworkImage(images[index]),
+                      fit: BoxFit.cover,
+                      onError: (exception, stackTrace) {
+                        print(
+                            'Error loading detail image ${images[index]} for product ${widget.product['name']}');
+                        print('Exception: $exception');
+                      },
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
+                        color:
+                            Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -886,7 +888,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: const Color(0xFFBB694A).withOpacity(0.3),
+                            color:
+                                const Color(0xFFBB694A).withValues(alpha: 0.3),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -967,7 +970,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: const Color(0xFFBB694A).withOpacity(0.3),
+                            color:
+                                const Color(0xFFBB694A).withValues(alpha: 0.3),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -1018,12 +1022,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             color: isDark ? Colors.grey[800] : Colors.white,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: const Color(0xFFBB694A).withOpacity(0.3),
+              color: const Color(0xFFBB694A).withValues(alpha: 0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -1090,7 +1094,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),
@@ -1143,7 +1147,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 4,
-                    shadowColor: const Color(0xFFF5F5F5).withOpacity(0.3),
+                    shadowColor: const Color(0xFFF5F5F5).withValues(alpha: 0.3),
                   ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
