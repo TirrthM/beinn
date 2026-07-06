@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+# Allow the workflow to push commits (used by the auto-format step)
+permissions:
+  contents: write
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -19,6 +23,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: true
       
       - uses: subosito/flutter-action@v2
         with:
@@ -27,8 +32,12 @@ jobs:
 
       - name: Show Flutter and Dart versions
         run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
           
       - name: Format and commit if needed
+        if: github.actor != 'github-actions[bot]'
         run: |
           dart format .
           if [ -n "$(git status --porcelain)" ]; then
