@@ -7,7 +7,7 @@ import 'profile_completion.dart';
 import '../main.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
@@ -151,11 +151,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            MainNavigationWrapper(),
+            const MainNavigationWrapper(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(1.0, 0.0),
+              begin: const Offset(1.0, 0.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: animation,
@@ -164,7 +164,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             child: child,
           );
         },
-        transitionDuration: Duration(milliseconds: 300),
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
   }
@@ -178,7 +178,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(1.0, 0.0),
+              begin: const Offset(1.0, 0.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: animation,
@@ -187,7 +187,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             child: child,
           );
         },
-        transitionDuration: Duration(milliseconds: 300),
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
   }
@@ -201,8 +201,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         title: Row(
           children: [
             Icon(Icons.error_outline, color: Colors.red[400]),
-            SizedBox(width: 8),
-            Text(
+            const SizedBox(width: 8),
+            const Text(
               'Error',
               style: TextStyle(color: Colors.white),
             ),
@@ -215,7 +215,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
+            child: const Text(
               'OK',
               style: TextStyle(
                 color: Color(0xFFF5F5F5),
@@ -245,7 +245,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 if (loadingProgress == null) return child;
                 return Container(
                   color: Colors.black,
-                  child: Center(
+                  child: const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -283,19 +283,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          padding: EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.checkroom,
                             size: 80,
                             color: Colors.white70,
                           ),
                         ),
-                        SizedBox(height: 24),
-                        Text(
+                        const SizedBox(height: 24),
+                        const Text(
                           'BEINN',
                           style: TextStyle(
                             color: Colors.white,
@@ -304,8 +304,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             letterSpacing: 4,
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Text(
+                        const SizedBox(height: 8),
+                        const Text(
                           'Premium Clothing Collection',
                           style: TextStyle(
                             color: Colors.white70,
@@ -333,13 +333,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withOpacity(0.1),
-                    Colors.black.withOpacity(0.3),
-                    Colors.black.withOpacity(0.6),
-                    Colors.black.withOpacity(0.8),
-                    Colors.black.withOpacity(0.95),
+                    Colors.black.withValues(alpha: 0.1),
+                    Colors.black.withValues(alpha: 0.3),
+                    Colors.black.withValues(alpha: 0.6),
+                    Colors.black.withValues(alpha: 0.8),
+                    Colors.black.withValues(alpha: 0.95),
                   ],
-                  stops: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
+                  stops: const [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
                 ),
               ),
             ),
@@ -351,7 +351,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             right: 0,
             child: SafeArea(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -367,49 +367,50 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         letterSpacing: -0.5,
                         shadows: [
                           Shadow(
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                             blurRadius: 8,
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     // Description
                     Text(
                       'Welcome to Beinn - your ultimate destination\nfor premium quality clothing. Discover our\ncurated collection of trendy and comfortable wear.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         fontSize: 13,
                         height: 1.4,
                         fontWeight: FontWeight.w300,
                         shadows: [
                           Shadow(
-                            offset: Offset(0, 1),
+                            offset: const Offset(0, 1),
                             blurRadius: 4,
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     // Continue with Google Button
-                    Container(
+                    SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _continueWithGoogle,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFBB694A),
+                          backgroundColor: const Color(0xFFBB694A),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 8,
-                          shadowColor: Color(0xFFBB694A).withOpacity(0.4),
+                          shadowColor:
+                              const Color(0xFFBB694A).withValues(alpha: 0.4),
                         ),
                         child: _isLoading
-                            ? SizedBox(
+                            ? const SizedBox(
                                 height: 24,
                                 width: 24,
                                 child: CircularProgressIndicator(
@@ -427,14 +428,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: Icon(
+                                    child: const Icon(
                                       Icons.g_mobiledata,
                                       color: Color(0xFFBB694A),
                                       size: 20,
                                     ),
                                   ),
-                                  SizedBox(width: 12),
-                                  Text(
+                                  const SizedBox(width: 12),
+                                  const Text(
                                     'Continue with Google',
                                     style: TextStyle(
                                       fontSize: 17,
@@ -447,25 +448,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               ),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     // Terms and Privacy
                     Text(
                       'By continuing, you agree to our Terms of Service\nand Privacy Policy',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         height: 1.4,
                         shadows: [
                           Shadow(
-                            offset: Offset(0, 1),
+                            offset: const Offset(0, 1),
                             blurRadius: 4,
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                           ),
                         ],
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
