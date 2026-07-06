@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,6 +37,7 @@ const AndroidNotificationChannel highImportanceChannel =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
+    await dotenv.load(fileName: ".env");
     await Firebase.initializeApp();
     print('Firebase initialized successfully');
 
@@ -51,7 +53,7 @@ void main() async {
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  runApp(BeinnApp());
+  runApp(const BeinnApp());
 }
 
 class BeinnApp extends StatelessWidget {
@@ -77,7 +79,7 @@ class BeinnApp extends StatelessWidget {
           },
         ),
       ),
-      home: AuthWrapper(),
+      home: const AuthWrapper(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -666,9 +668,9 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
 
   // Updated screens list - removed CategoriesScreen
   final List<Widget> _screens = [
-    HomeScreen(),
-    CartScreen(),
-    OrdersScreen(),
+    const HomeScreen(),
+    const CartScreen(),
+    const OrdersScreen(),
     const ProfileScreen(),
   ];
 
