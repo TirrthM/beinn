@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme_notifier.dart';
 
 class TermsConditionsScreen extends StatefulWidget {
-  const TermsConditionsScreen({Key? key}) : super(key: key);
+  const TermsConditionsScreen({super.key});
 
   @override
   State<TermsConditionsScreen> createState() => _TermsConditionsScreenState();
