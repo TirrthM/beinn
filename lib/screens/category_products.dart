@@ -10,8 +10,7 @@ import '../theme_notifier.dart';
 class CategoryProductsScreen extends StatefulWidget {
   final String categoryName;
 
-  const CategoryProductsScreen({Key? key, required this.categoryName})
-      : super(key: key);
+  const CategoryProductsScreen({super.key, required this.categoryName});
 
   @override
   _CategoryProductsScreenState createState() => _CategoryProductsScreenState();
@@ -37,11 +36,11 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
 
   void _initializeAnimations() {
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
     _slideController = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
@@ -54,7 +53,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
     ));
 
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.3),
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _slideController,
@@ -81,10 +80,10 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
           SnackBar(
             content: Text(
               '${product.name} removed from wishlist',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.grey[800],
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -97,10 +96,10 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
           SnackBar(
             content: Text(
               '${product.name} added to wishlist!',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
-            backgroundColor: Color(0xFFBB694A),
-            duration: Duration(seconds: 2),
+            backgroundColor: const Color(0xFFBB694A),
+            duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -166,7 +165,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.0 : 0.05),
+                    color: Colors.black.withValues(alpha: isDark ? 0.0 : 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -192,7 +191,6 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
               ),
             ),
           ),
-
         ],
       ),
     );
@@ -210,20 +208,20 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFFBB694A).withOpacity(0.1),
-            const Color(0xFFBB694A).withOpacity(0.05),
+            const Color(0xFFBB694A).withValues(alpha: 0.1),
+            const Color(0xFFBB694A).withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFBB694A).withOpacity(0.2),
+          color: const Color(0xFFBB694A).withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: isDark
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -235,10 +233,10 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: const Color(0xFFBB694A).withOpacity(0.1),
+              color: const Color(0xFFBB694A).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFFBB694A).withOpacity(0.3),
+                color: const Color(0xFFBB694A).withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
