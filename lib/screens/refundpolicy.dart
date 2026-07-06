@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme_notifier.dart';
 
 class RefundPolicyScreen extends StatefulWidget {
-  const RefundPolicyScreen({Key? key}) : super(key: key);
+  const RefundPolicyScreen({super.key});
 
   @override
   State<RefundPolicyScreen> createState() => _RefundPolicyScreenState();
