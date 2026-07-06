@@ -645,7 +645,7 @@ class CartManager {
 
   int getCartItemCount() {
     return _cartItems.fold(
-        0, (sum, item) => sum + (item['quantity'] as int? ?? 1));
+        0, (currentSum, item) => currentSum + (item['quantity'] as int? ?? 1));
   }
 
   int getWishlistItemCount() {
