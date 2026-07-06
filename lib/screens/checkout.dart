@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'new_address.dart';
 import 'order_placed.dart';
 import '../theme_notifier.dart';
@@ -725,7 +728,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
   }
 
   // Razorpay Payment Methods
-  void _openRazorpayCheckout() {
+  Future<void> _openRazorpayCheckout() async {
     if (_selectedAddress == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -741,23 +744,39 @@ class _CheckoutScreenState extends State<CheckoutScreen>
       _isProcessingPayment = true;
     });
 
-    var options = {
-      'key': 'rzp_test_RB4Zp3Z8ZOVtU4', // Your test key
-      'amount': (_calculateGrandTotal() * 100).toInt(), // Amount in paise
-      'name': 'Beinn',
-      'description': 'Order Payment for ${_getTotalItems()} items',
-      'retry': {'enabled': true, 'max_count': 1},
-      'send_sms_hash': true,
-      'prefill': {
-        'contact': '+91$_userMobile',
-        'email': _userEmail,
-      },
-      'external': {
-        'wallets': ['paytm']
-      }
-    };
-
     try {
+      final user = _auth.currentUser;
+      if (user == null) throw Exception("User not logged in");
+
+      // Secure Backend Order Creation
+      final response = await http.post(
+        Uri.parse('${dotenv.env['BACKEND_API_URL']}/payment/create-order'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'userId': user.uid}),
+      );
+
+      if (response.statusCode != 201 && response.statusCode != 200) {
+        throw Exception('Failed to create order on server: ${response.body}');
+      }
+
+      final orderData = json.decode(response.body);
+
+      var options = {
+        'key': dotenv.env['RAZORPAY_KEY_ID'], 
+        'order_id': orderData['id'],
+        'name': 'Beinn',
+        'description': 'Order Payment for ${_getTotalItems()} items',
+        'retry': {'enabled': true, 'max_count': 1},
+        'send_sms_hash': true,
+        'prefill': {
+          'contact': '+91$_userMobile',
+          'email': _userEmail,
+        },
+        'external': {
+          'wallets': ['paytm']
+        }
+      };
+
       _razorpay.open(options);
     } catch (e) {
       // ignore: avoid_print
