@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'new_address.dart';
 
 class ProfileAddressesScreen extends StatefulWidget {
-  const ProfileAddressesScreen({Key? key}) : super(key: key);
+  const ProfileAddressesScreen({super.key});
 
   @override
   State<ProfileAddressesScreen> createState() => _ProfileAddressesScreenState();
@@ -269,7 +269,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Address Options',
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       transitionDuration: const Duration(milliseconds: 220),
       pageBuilder: (context, anim1, anim2) {
         return const SizedBox.shrink();
@@ -452,7 +452,8 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
                                                   : [
                                                       BoxShadow(
                                                         color: Colors.black
-                                                            .withOpacity(0.05),
+                                                            .withValues(
+                                                                alpha: 0.05),
                                                         blurRadius: 4,
                                                         offset:
                                                             const Offset(0, 2),
@@ -465,8 +466,8 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
                                                   width: 36,
                                                   height: 36,
                                                   decoration: BoxDecoration(
-                                                    color: orange
-                                                        .withOpacity(0.12),
+                                                    color: orange.withValues(
+                                                        alpha: 0.12),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             8),
@@ -546,7 +547,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
                                   width: 1)),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 8,
                               offset: const Offset(0, -3),
                             ),
@@ -565,7 +566,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen>
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(22)),
                                 elevation: 3,
-                                shadowColor: orange.withOpacity(0.25),
+                                shadowColor: orange.withValues(alpha: 0.25),
                               ),
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -610,7 +611,7 @@ class _AddressCard extends StatelessWidget {
   final bool isDark;
 
   const _AddressCard({
-    Key? key,
+    super.key,
     required this.index,
     required this.fullName,
     required this.addressType,
@@ -620,7 +621,7 @@ class _AddressCard extends StatelessWidget {
     required this.showMenu,
     required this.onMenuTap,
     required this.isDark,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -646,7 +647,7 @@ class _AddressCard extends StatelessWidget {
               color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -659,7 +660,7 @@ class _AddressCard extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: orange.withOpacity(0.12),
+                color: orange.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(Icons.location_on, color: orange, size: 18),
@@ -687,10 +688,10 @@ class _AddressCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: orange.withOpacity(0.18),
+                          color: orange.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
-                              color: orange.withOpacity(0.5), width: 1),
+                              color: orange.withValues(alpha: 0.5), width: 1),
                         ),
                         child: Text(
                           addressType,
@@ -781,11 +782,11 @@ class _OptionsDialog extends StatelessWidget {
   final VoidCallback onDelete;
 
   const _OptionsDialog({
-    Key? key,
+    super.key,
     required this.onClose,
     required this.onEdit,
     required this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -807,7 +808,7 @@ class _OptionsDialog extends StatelessWidget {
                     width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.35),
+                    color: Colors.black.withValues(alpha: 0.35),
                     blurRadius: 24,
                     offset: const Offset(0, 12),
                   ),
@@ -846,7 +847,7 @@ class _OptionsDialog extends StatelessWidget {
                               icon: Icons.edit_outlined,
                               label: 'Edit',
                               color: orange,
-                              bg: orange.withOpacity(0.12),
+                              bg: orange.withValues(alpha: 0.12),
                               onTap: onEdit,
                             ),
                           ),
@@ -856,7 +857,7 @@ class _OptionsDialog extends StatelessWidget {
                               icon: Icons.delete_outline,
                               label: 'Delete',
                               color: Colors.red,
-                              bg: Colors.red.withOpacity(0.12),
+                              bg: Colors.red.withValues(alpha: 0.12),
                               onTap: onDelete,
                             ),
                           ),
@@ -898,13 +899,13 @@ class _DialogActionButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const _DialogActionButton({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.color,
     required this.bg,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -922,7 +923,7 @@ class _DialogActionButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: bg,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withOpacity(0.35), width: 1),
+            border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
