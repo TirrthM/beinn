@@ -7,6 +7,8 @@ import 'package:email_validator/email_validator.dart';
 import 'login.dart';
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
@@ -100,7 +102,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -328,8 +330,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         title: Row(
           children: [
             Icon(Icons.error_outline, color: Colors.red[400]),
-            SizedBox(width: 8),
-            Text(
+            const SizedBox(width: 8),
+            const Text(
               'Error',
               style: TextStyle(color: Colors.white),
             ),
@@ -342,7 +344,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
+            child: const Text(
               'OK',
               style: TextStyle(
                 color: Color(0xFFF5F5F5),
@@ -365,8 +367,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         title: Row(
           children: [
             Icon(Icons.check_circle, color: Colors.green[400]),
-            SizedBox(width: 8),
-            Text(
+            const SizedBox(width: 8),
+            const Text(
               'Success!',
               style: TextStyle(color: Colors.white),
             ),
@@ -386,7 +388,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 MaterialPageRoute(builder: (context) => LoginScreen()),
               );
             },
-            child: Text(
+            child: const Text(
               'Continue to Login',
               style: TextStyle(
                 color: Color(0xFFF5F5F5),
@@ -401,7 +403,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildValidationItem(String text, bool isValid) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -410,7 +412,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             color: isValid ? Colors.green[600] : Colors.red[400],
             size: 14,
           ),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Flexible(
             child: Text(
               text,
@@ -433,14 +435,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: Colors.black,
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Header Icon with Beinn branding
                 Container(
@@ -451,24 +453,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFFF5F5F5).withOpacity(0.1),
-                        Color(0xFFF5F5F5).withOpacity(0.2),
+                        const Color(0xFFF5F5F5).withValues(alpha: 0.1),
+                        const Color(0xFFF5F5F5).withValues(alpha: 0.2),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(60),
                     border: Border.all(
-                      color: Color(0xFFF5F5F5).withOpacity(0.3),
+                      color: const Color(0xFFF5F5F5).withValues(alpha: 0.3),
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xFFF5F5F5).withOpacity(0.2),
+                        color: const Color(0xFFF5F5F5).withValues(alpha: 0.2),
                         blurRadius: 20,
-                        offset: Offset(0, 10),
+                        offset: const Offset(0, 10),
                       ),
                     ],
                   ),
-                  child: Column(
+                  child: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
@@ -490,10 +492,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
 
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
 
                 // Title
-                Text(
+                const Text(
                   'Create an Account',
                   style: TextStyle(
                     fontSize: 26,
@@ -502,7 +504,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
 
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
 
                 Text(
                   'Sign up to get started with Beinn!',
@@ -512,7 +514,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
 
-                SizedBox(height: 28),
+                const SizedBox(height: 28),
 
                 // Email Field
                 Container(
@@ -525,16 +527,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 10,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       prefixIcon:
                           Icon(Icons.email_outlined, color: Colors.grey[500]),
@@ -542,7 +544,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ? Icon(
                               _isEmailValid ? Icons.check_circle : Icons.error,
                               color: _isEmailValid
-                                  ? Color(0xFFF5F5F5)
+                                  ? const Color(0xFFF5F5F5)
                                   : Colors.red[400],
                               size: 20,
                             )
@@ -555,13 +557,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 18),
                     ),
                   ),
                 ),
 
-                SizedBox(height: 14),
+                const SizedBox(height: 14),
 
                 // Mobile Number Field
                 Row(
@@ -579,13 +581,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
+                            color: Colors.black.withValues(alpha: 0.3),
                             blurRadius: 10,
-                            offset: Offset(0, 4),
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -602,7 +604,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
 
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
 
                     // Mobile Number Input
                     Expanded(
@@ -616,16 +618,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: Colors.black.withValues(alpha: 0.3),
                               blurRadius: 10,
-                              offset: Offset(0, 4),
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
                         child: TextFormField(
                           controller: _mobileController,
                           keyboardType: TextInputType.number,
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(10),
@@ -639,7 +641,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         ? Icons.check_circle
                                         : Icons.error,
                                     color: _isMobileValid
-                                        ? Color(0xFFF5F5F5)
+                                        ? const Color(0xFFF5F5F5)
                                         : Colors.red[400],
                                     size: 20,
                                   )
@@ -652,7 +654,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             filled: true,
                             fillColor: Colors.transparent,
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 18),
                           ),
                         ),
@@ -661,7 +663,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ],
                 ),
 
-                SizedBox(height: 14),
+                const SizedBox(height: 14),
 
                 // Password Field
                 Container(
@@ -674,16 +676,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 10,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: TextFormField(
                     controller: _passwordController,
                     obscureText: !_isPasswordVisible,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       prefixIcon:
                           Icon(Icons.lock_outline, color: Colors.grey[500]),
@@ -708,13 +710,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 18),
                     ),
                   ),
                 ),
 
-                SizedBox(height: 14),
+                const SizedBox(height: 14),
 
                 // Confirm Password Field
                 Container(
@@ -727,16 +729,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 10,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: !_isConfirmPasswordVisible,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       prefixIcon:
                           Icon(Icons.lock_outline, color: Colors.grey[500]),
@@ -749,7 +751,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ? Icons.check_circle
                                   : Icons.error,
                               color: _passwordsMatch
-                                  ? Color(0xFFF5F5F5)
+                                  ? const Color(0xFFF5F5F5)
                                   : Colors.red[400],
                               size: 20,
                             ),
@@ -777,18 +779,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 18),
                     ),
                   ),
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Validation Requirements
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: Colors.grey[900],
                     borderRadius: BorderRadius.circular(14),
@@ -798,9 +800,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 10,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
@@ -813,53 +815,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             child: _buildValidationItem(
                                 'Min 8 Characters', _hasMinLength),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: _buildValidationItem(
                                 'Min 1 Number', _hasNumber),
                           ),
                         ],
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
                           Expanded(
                             child: _buildValidationItem(
                                 'Min 1 Uppercase', _hasUppercase),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: _buildValidationItem(
                                 'Min 1 Special', _hasSpecialChar),
                           ),
                         ],
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       _buildValidationItem(
                           'Min 1 Lowercase letter', _hasLowercase),
                     ],
                   ),
                 ),
 
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
 
                 // Sign Up Button (Changed to OutlinedButton that becomes filled when valid)
-                Container(
+                SizedBox(
                   width: double.infinity,
                   height: 56,
                   child: _isFormValid
                       ? ElevatedButton(
                           onPressed: _isLoading ? null : _signUp,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFF5F5F5),
+                            backgroundColor: const Color(0xFFF5F5F5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
                             elevation: 4,
-                            shadowColor: Color(0xFFF5F5F5).withOpacity(0.3),
+                            shadowColor:
+                                const Color(0xFFF5F5F5).withValues(alpha: 0.3),
                           ),
                           child: _isLoading
-                              ? SizedBox(
+                              ? const SizedBox(
                                   height: 20,
                                   width: 20,
                                   child: CircularProgressIndicator(
@@ -867,7 +870,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : Row(
+                              : const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(Icons.person_add,
@@ -888,14 +891,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       : OutlinedButton(
                           onPressed: _signUp,
                           style: OutlinedButton.styleFrom(
-                            side:
-                                BorderSide(color: Color(0xFFF5F5F5), width: 1),
+                            side: const BorderSide(
+                                color: Color(0xFFF5F5F5), width: 1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
                             backgroundColor: Colors.transparent,
                           ),
-                          child: Row(
+                          child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.person_add,
@@ -915,7 +918,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // OR Divider
                 Row(
@@ -923,7 +926,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Expanded(
                         child: Divider(color: Colors.grey[700], thickness: 1)),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'OR',
                         style: TextStyle(
@@ -938,10 +941,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ],
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Google Sign Up Button
-                Container(
+                SizedBox(
                   width: double.infinity,
                   height: 56,
                   child: OutlinedButton(
@@ -969,8 +972,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             size: 18,
                           ),
                         ),
-                        SizedBox(width: 12),
-                        Text(
+                        const SizedBox(width: 12),
+                        const Text(
                           'Sign Up with Google',
                           style: TextStyle(
                             fontSize: 16,
@@ -983,7 +986,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
 
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
 
                 // Login Link
                 Row(
@@ -1004,7 +1007,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               builder: (context) => LoginScreen()),
                         );
                       },
-                      child: Text(
+                      child: const Text(
                         'Login',
                         style: TextStyle(
                           color: Color(0xFFF5F5F5),
@@ -1016,7 +1019,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ],
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
               ],
             ),
           ),
