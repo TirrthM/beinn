@@ -2,7 +2,7 @@
 import '../theme_notifier.dart';
 
 class AboutUsScreen extends StatefulWidget {
-  const AboutUsScreen({Key? key}) : super(key: key);
+  const AboutUsScreen({super.key});
 
   @override
   State<AboutUsScreen> createState() => _AboutUsScreenState();
@@ -165,7 +165,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                                 color: isDark ? Colors.grey[900] : Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: orange.withOpacity(0.4),
+                                  color: orange.withValues(alpha: 0.4),
                                   width: 2,
                                 ),
                               ),
@@ -184,7 +184,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                                     ),
                                   ),
                                   const SizedBox(height: 12),
-                                  Text(
+                                  const Text(
                                     'It\'s a lifestyle.',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
