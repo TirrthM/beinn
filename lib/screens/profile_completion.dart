@@ -9,7 +9,7 @@ import 'dart:async';
 class ProfileCompletionScreen extends StatefulWidget {
   final User user;
 
-  ProfileCompletionScreen({required this.user});
+  const ProfileCompletionScreen({super.key, required this.user});
 
   @override
   _ProfileCompletionScreenState createState() =>
@@ -49,7 +49,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
 
   void _initializeAnimations() {
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
@@ -93,7 +93,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
             backgroundColor: Colors.grey[900],
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Text(
+            title: const Text(
               'Please confirm your mobile number',
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
@@ -105,7 +105,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                   'Order updates and delivery OTP will be sent to this number.',
                   style: TextStyle(color: Colors.grey[400], fontSize: 14),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 RichText(
                   text: TextSpan(
                     text: 'Mobile Number: ',
@@ -113,7 +113,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                     children: [
                       TextSpan(
                         text: number,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFFBB694A),
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -127,16 +127,18 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: Text('Edit', style: TextStyle(color: Colors.white)),
+                child:
+                    const Text('Edit', style: TextStyle(color: Colors.white)),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(true),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFBB694A),
+                  backgroundColor: const Color(0xFFBB694A),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),
-                child: Text('Confirm', style: TextStyle(color: Colors.white)),
+                child: const Text('Confirm',
+                    style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -199,11 +201,11 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            MainNavigationWrapper(),
+            const MainNavigationWrapper(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(1.0, 0.0),
+              begin: const Offset(1.0, 0.0),
               end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: animation,
@@ -212,7 +214,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
             child: child,
           );
         },
-        transitionDuration: Duration(milliseconds: 300),
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
   }
@@ -221,10 +223,10 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Color(0xFFBB694A),
+        backgroundColor: const Color(0xFFBB694A),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -240,16 +242,16 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
     int maxLines = 1,
   }) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.grey[900],
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.grey[800]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -258,7 +260,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
         maxLines: maxLines,
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
         validator: required
             ? (value) =>
                 value?.isEmpty ?? true ? 'This field is required' : null
@@ -275,7 +277,8 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
           ),
           filled: true,
           fillColor: Colors.transparent,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         ),
       ),
     );
@@ -283,28 +286,28 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
 
   Widget _buildGenderSelector() {
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.grey[900],
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.grey[800]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.person_outline, color: const Color(0xFFBB694A)),
-                SizedBox(width: 12),
+                const Icon(Icons.person_outline, color: Color(0xFFBB694A)),
+                const SizedBox(width: 12),
                 Text(
                   'Gender',
                   style: TextStyle(
@@ -315,22 +318,22 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: GestureDetector(
                     onTap: () => setState(() => _selectedGender = 'Male'),
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Male'
-                            ? Color(0xFFBB694A).withOpacity(0.2)
+                            ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _selectedGender == 'Male'
-                              ? Color(0xFFBB694A)
+                              ? const Color(0xFFBB694A)
                               : Colors.grey[700]!,
                         ),
                       ),
@@ -339,7 +342,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: _selectedGender == 'Male'
-                              ? Color(0xFFBB694A)
+                              ? const Color(0xFFBB694A)
                               : Colors.grey[300],
                           fontWeight: FontWeight.w500,
                         ),
@@ -347,20 +350,20 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                     ),
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: GestureDetector(
                     onTap: () => setState(() => _selectedGender = 'Female'),
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Female'
-                            ? Color(0xFFBB694A).withOpacity(0.2)
+                            ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _selectedGender == 'Female'
-                              ? Color(0xFFBB694A)
+                              ? const Color(0xFFBB694A)
                               : Colors.grey[700]!,
                         ),
                       ),
@@ -369,7 +372,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: _selectedGender == 'Female'
-                              ? Color(0xFFBB694A)
+                              ? const Color(0xFFBB694A)
                               : Colors.grey[300],
                           fontWeight: FontWeight.w500,
                         ),
@@ -377,20 +380,20 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                     ),
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: GestureDetector(
                     onTap: () => setState(() => _selectedGender = 'Other'),
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Other'
-                            ? Color(0xFFBB694A).withOpacity(0.2)
+                            ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _selectedGender == 'Other'
-                              ? Color(0xFFBB694A)
+                              ? const Color(0xFFBB694A)
                               : Colors.grey[700]!,
                         ),
                       ),
@@ -399,7 +402,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: _selectedGender == 'Other'
-                              ? Color(0xFFBB694A)
+                              ? const Color(0xFFBB694A)
                               : Colors.grey[300],
                           fontWeight: FontWeight.w500,
                         ),
@@ -417,7 +420,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
 
   Widget _buildPhoneField() {
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
           // Country Code
@@ -430,13 +433,13 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
               border: Border.all(color: Colors.grey[800]!, width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   blurRadius: 10,
-                  offset: Offset(0, 4),
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: Center(
+            child: const Center(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Row(
@@ -457,7 +460,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
               ),
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           // Phone Number Input
           Expanded(
             child: Container(
@@ -467,31 +470,33 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                 border: Border.all(color: Colors.grey[800]!, width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 10,
-                    offset: Offset(0, 4),
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: TextFormField(
                 controller: _phoneController,
                 keyboardType: TextInputType.number,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(10),
                 ],
                 validator: (value) {
                   if (value?.isEmpty ?? true) return 'Phone number is required';
-                  if (!_isValidIndianMobile(value!))
+                  if (!_isValidIndianMobile(value!)) {
                     return 'Enter valid 10-digit number (Starts with 6-9)';
-                  if (_isDummyNumber(value))
+                  }
+                  if (_isDummyNumber(value)) {
                     return 'Invalid number pattern (e.g. 1111111111)';
+                  }
                   return null;
                 },
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone_outlined,
-                      color: const Color(0xFFBB694A)),
+                  prefixIcon: const Icon(Icons.phone_outlined,
+                      color: Color(0xFFBB694A)),
                   labelText: 'Mobile Number',
                   hintText: 'Enter 10-digit number',
                   labelStyle: TextStyle(color: Colors.grey[400]),
@@ -503,7 +508,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                   filled: true,
                   fillColor: Colors.transparent,
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                 ),
               ),
             ),
@@ -521,13 +526,13 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+            MaterialPageRoute(builder: (context) => const WelcomeScreen()),
           ),
         ),
-        title: Text(
+        title: const Text(
           'Complete Your Profile',
           style: TextStyle(
             color: Colors.white,
@@ -541,8 +546,8 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
         opacity: _fadeAnimation,
         child: SafeArea(
           child: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            padding: EdgeInsets.all(24),
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.all(24),
             child: Form(
               key: _formKey,
               child: Column(
@@ -550,26 +555,26 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                 children: [
                   // Welcome message
                   Container(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Color(0xFFBB694A).withOpacity(0.1),
-                          Color(0xFFBB694A).withOpacity(0.05),
+                          const Color(0xFFBB694A).withValues(alpha: 0.1),
+                          const Color(0xFFBB694A).withValues(alpha: 0.05),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Color(0xFFBB694A).withOpacity(0.2),
+                        color: const Color(0xFFBB694A).withValues(alpha: 0.2),
                         width: 1,
                       ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        const Row(
                           children: [
                             Icon(Icons.person_add, color: Color(0xFFBB694A)),
                             SizedBox(width: 8),
@@ -586,7 +591,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                             ),
                           ],
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           'Complete your profile to start shopping with Beinn. We need these details to process your orders and deliveries.',
                           style: TextStyle(
@@ -599,10 +604,10 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                     ),
                   ),
 
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
                   // Personal Information Section
-                  Text(
+                  const Text(
                     'Personal Information',
                     style: TextStyle(
                       color: Colors.white,
@@ -610,7 +615,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   _buildTextField(
                     controller: _firstNameController,
@@ -628,10 +633,10 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
 
                   _buildGenderSelector(),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Contact Information Section
-                  Text(
+                  const Text(
                     'Contact Information',
                     style: TextStyle(
                       color: Colors.white,
@@ -639,14 +644,14 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   _buildPhoneField(),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Address Information Section
-                  Text(
+                  const Text(
                     'Address Information',
                     style: TextStyle(
                       color: Colors.white,
@@ -654,7 +659,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   _buildTextField(
                     controller: _buildingController,
@@ -688,7 +693,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                           icon: Icons.location_city_outlined,
                         ),
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: _buildTextField(
                           controller: _stateController,
@@ -712,24 +717,25 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                     ],
                   ),
 
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
                   // Complete Profile Button
-                  Container(
+                  SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _completeProfile,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFBB694A),
+                        backgroundColor: const Color(0xFFBB694A),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 8,
-                        shadowColor: Color(0xFFBB694A).withOpacity(0.4),
+                        shadowColor:
+                            const Color(0xFFBB694A).withValues(alpha: 0.4),
                       ),
                       child: _isLoading
-                          ? SizedBox(
+                          ? const SizedBox(
                               height: 24,
                               width: 24,
                               child: CircularProgressIndicator(
@@ -737,7 +743,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                                 strokeWidth: 2.5,
                               ),
                             )
-                          : Row(
+                          : const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.check_circle,
@@ -757,7 +763,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen>
                     ),
                   ),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
