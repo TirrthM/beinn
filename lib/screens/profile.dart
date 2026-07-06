@@ -17,7 +17,7 @@ import 'faqs.dart';
 import '../theme_notifier.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -239,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
         return Container();
@@ -356,7 +356,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       icon: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: orange.withOpacity(0.1),
+          color: orange.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: const Icon(Icons.waving_hand_rounded, color: orange, size: 32),
@@ -375,7 +375,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       icon: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.redAccent.withOpacity(0.1),
+          color: Colors.redAccent.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: const Icon(Icons.heart_broken_rounded,
@@ -752,8 +752,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? Colors.white.withOpacity(0.1)
-                                      : Colors.grey.withOpacity(0.1),
+                                      ? Colors.white.withValues(alpha: 0.1)
+                                      : Colors.grey.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -778,15 +778,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
                                         color: isDark
-                                            ? Colors.white.withOpacity(0.05)
-                                            : Colors.grey.withOpacity(0.05),
+                                            ? Colors.white
+                                                .withValues(alpha: 0.05)
+                                            : Colors.grey
+                                                .withValues(alpha: 0.05),
                                       ),
                                       child: Row(
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.all(6),
                                             decoration: BoxDecoration(
-                                              color: orange.withOpacity(0.15),
+                                              color: orange.withValues(
+                                                  alpha: 0.15),
                                               shape: BoxShape.circle,
                                             ),
                                             child: const Icon(
@@ -820,8 +823,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                                           horizontal: 12, vertical: 8),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
-                                        color:
-                                            Colors.redAccent.withOpacity(0.08),
+                                        color: Colors.redAccent
+                                            .withValues(alpha: 0.08),
                                       ),
                                       child: Row(
                                         children: [
@@ -829,7 +832,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                             padding: const EdgeInsets.all(6),
                                             decoration: BoxDecoration(
                                               color: Colors.redAccent
-                                                  .withOpacity(0.15),
+                                                  .withValues(alpha: 0.15),
                                               shape: BoxShape.circle,
                                             ),
                                             child: const Icon(
@@ -966,19 +969,19 @@ class _ProfileScreenState extends State<ProfileScreen>
                                               onChanged: (val) {
                                                 setTheme(val);
                                               },
-                                              activeColor:
+                                              activeThumbColor:
                                                   const Color(0xFFBB694A),
                                               activeTrackColor:
                                                   const Color(0xFFBB694A)
-                                                      .withOpacity(0.3),
+                                                      .withValues(alpha: 0.3),
                                               inactiveThumbColor:
                                                   const Color(0xFFBB694A),
                                               inactiveTrackColor: Colors.grey[
                                                   400], // Visible in light
-                                              thumbIcon: MaterialStateProperty
+                                              thumbIcon: WidgetStateProperty
                                                   .resolveWith<Icon?>((states) {
                                                 if (states.contains(
-                                                    MaterialState.selected)) {
+                                                    WidgetState.selected)) {
                                                   // Dark mode -> Moon
                                                   return const Icon(
                                                       Icons.nightlight_round,
@@ -1127,7 +1130,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
 class _SectionTitle extends StatelessWidget {
   final String text;
-  const _SectionTitle({Key? key, required this.text}) : super(key: key);
+  const _SectionTitle({super.key, required this.text});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
@@ -1148,7 +1151,7 @@ class _SectionTitle extends StatelessWidget {
 
 class _CardSection extends StatelessWidget {
   final List<Widget> children;
-  const _CardSection({Key? key, required this.children}) : super(key: key);
+  const _CardSection({super.key, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -1176,12 +1179,12 @@ class _InfoItem extends StatelessWidget {
   final bool multiline;
 
   const _InfoItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.value,
     this.multiline = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1219,8 +1222,8 @@ class _InfoItem extends StatelessWidget {
                         label,
                         style: TextStyle(
                           color: isDark
-                              ? Colors.white.withOpacity(.6)
-                              : Colors.black.withOpacity(.6),
+                              ? Colors.white.withValues(alpha: .6)
+                              : Colors.black.withValues(alpha: .6),
                           fontSize: 12.5,
                           height: 1.1,
                         ),
@@ -1281,11 +1284,11 @@ class _ActionRow extends StatelessWidget {
   final VoidCallback onTap;
 
   const _ActionRow({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1298,8 +1301,8 @@ class _ActionRow extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: onTap,
-              splashColor: orange.withOpacity(.08),
-              highlightColor: orange.withOpacity(.05),
+              splashColor: orange.withValues(alpha: .08),
+              highlightColor: orange.withValues(alpha: .05),
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
