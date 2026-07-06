@@ -2,7 +2,7 @@
 import '../theme_notifier.dart';
 
 class FAQsScreen extends StatefulWidget {
-  const FAQsScreen({Key? key}) : super(key: key);
+  const FAQsScreen({super.key});
 
   @override
   State<FAQsScreen> createState() => _FAQsScreenState();
@@ -205,12 +205,12 @@ class _FAQsScreenState extends State<FAQsScreen> with TickerProviderStateMixin {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isExpanded
-            ? orange.withOpacity(0.05)
+            ? orange.withValues(alpha: 0.05)
             : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isExpanded
-              ? orange.withOpacity(0.3)
+              ? orange.withValues(alpha: 0.3)
               : (isDark ? Colors.grey[850]! : Colors.grey[300]!),
           width: 1,
         ),
@@ -223,8 +223,8 @@ class _FAQsScreenState extends State<FAQsScreen> with TickerProviderStateMixin {
               _expandedIndex = isExpanded ? null : index;
             });
           },
-          splashColor: orange.withOpacity(.08),
-          highlightColor: orange.withOpacity(.05),
+          splashColor: orange.withValues(alpha: .08),
+          highlightColor: orange.withValues(alpha: .05),
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(14),
