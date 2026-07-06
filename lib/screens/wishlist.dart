@@ -9,10 +9,10 @@ class WishlistScreen extends StatefulWidget {
   final Function(String) onRemoveFromWishlist;
 
   const WishlistScreen({
-    Key? key,
+    super.key,
     required this.wishlistItems,
     required this.onRemoveFromWishlist,
-  }) : super(key: key);
+  });
 
   @override
   _WishlistScreenState createState() => _WishlistScreenState();
@@ -151,8 +151,8 @@ class _WishlistScreenState extends State<WishlistScreen>
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black
-                                          .withOpacity(isDark ? 0.3 : 0.05),
+                                      color: Colors.black.withValues(
+                                          alpha: isDark ? 0.3 : 0.05),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
@@ -169,11 +169,11 @@ class _WishlistScreenState extends State<WishlistScreen>
                             ),
                             const SizedBox(width: 16),
                             // Title
-                            Expanded(
+                            const Expanded(
                               child: Text(
                                 'My Wishlist',
                                 style: TextStyle(
-                                  color: const Color(0xFFBB694A),
+                                  color: Color(0xFFBB694A),
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -187,12 +187,12 @@ class _WishlistScreenState extends State<WishlistScreen>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color:
-                                      const Color(0xFFBB694A).withOpacity(0.08),
+                                  color: const Color(0xFFBB694A)
+                                      .withValues(alpha: 0.08),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: const Color(0xFFBB694A)
-                                        .withOpacity(0.28),
+                                        .withValues(alpha: 0.28),
                                     width: 1,
                                   ),
                                 ),
@@ -305,7 +305,7 @@ class _WishlistScreenState extends State<WishlistScreen>
                       borderRadius: BorderRadius.circular(20),
                     ),
                     elevation: 2,
-                    shadowColor: const Color(0xFFBB694A).withOpacity(0.2),
+                    shadowColor: const Color(0xFFBB694A).withValues(alpha: 0.2),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
@@ -387,7 +387,7 @@ class _WishlistScreenState extends State<WishlistScreen>
               color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -442,7 +442,8 @@ class _WishlistScreenState extends State<WishlistScreen>
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFBB694A).withOpacity(0.3),
+                                color: const Color(0xFFBB694A)
+                                    .withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),
@@ -472,12 +473,13 @@ class _WishlistScreenState extends State<WishlistScreen>
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: isDark
-                                  ? const Color(0xFFF5F5F5).withOpacity(0.5)
-                                  : Colors.white.withOpacity(0.5),
+                                  ? const Color(0xFFF5F5F5)
+                                      .withValues(alpha: 0.5)
+                                  : Colors.white.withValues(alpha: 0.5),
                               width: 1,
                             ),
                           ),
@@ -563,18 +565,18 @@ class _WishlistScreenState extends State<WishlistScreen>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.heart_broken, color: Colors.white, size: 20),
-            SizedBox(width: 8),
+            const Icon(Icons.heart_broken, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 '${product['name']} removed from wishlist',
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],
         ),
         backgroundColor: Colors.grey[800],
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -597,7 +599,7 @@ class _WishlistScreenState extends State<WishlistScreen>
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            main_app.MainNavigationWrapper(initialIndex: 0),
+            const main_app.MainNavigationWrapper(initialIndex: 0),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
