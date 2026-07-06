@@ -1130,7 +1130,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
 class _SectionTitle extends StatelessWidget {
   final String text;
-  const _SectionTitle({super.key, required this.text});
+  const _SectionTitle({required this.text});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
@@ -1151,7 +1151,7 @@ class _SectionTitle extends StatelessWidget {
 
 class _CardSection extends StatelessWidget {
   final List<Widget> children;
-  const _CardSection({super.key, required this.children});
+  const _CardSection({required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -1179,7 +1179,6 @@ class _InfoItem extends StatelessWidget {
   final bool multiline;
 
   const _InfoItem({
-    super.key,
     required this.icon,
     required this.label,
     required this.value,
@@ -1284,7 +1283,6 @@ class _ActionRow extends StatelessWidget {
   final VoidCallback onTap;
 
   const _ActionRow({
-    super.key,
     required this.icon,
     required this.label,
     required this.onTap,
