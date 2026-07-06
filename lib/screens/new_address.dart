@@ -9,10 +9,10 @@ class NewAddressScreen extends StatefulWidget {
   final bool isEditing;
 
   const NewAddressScreen({
-    Key? key,
+    super.key,
     this.existingAddress,
     this.isEditing = false,
-  }) : super(key: key);
+  });
 
   @override
   State<NewAddressScreen> createState() => _NewAddressScreenState();
@@ -239,7 +239,7 @@ class _NewAddressScreenState extends State<NewAddressScreen>
             color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -286,7 +286,7 @@ class _NewAddressScreenState extends State<NewAddressScreen>
             color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -321,7 +321,7 @@ class _NewAddressScreenState extends State<NewAddressScreen>
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Male'
-                            ? const Color(0xFFBB694A).withOpacity(0.2)
+                            ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
@@ -353,7 +353,7 @@ class _NewAddressScreenState extends State<NewAddressScreen>
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Female'
-                            ? const Color(0xFFBB694A).withOpacity(0.2)
+                            ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
@@ -385,7 +385,7 @@ class _NewAddressScreenState extends State<NewAddressScreen>
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Other'
-                            ? const Color(0xFFBB694A).withOpacity(0.2)
+                            ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
@@ -434,7 +434,7 @@ class _NewAddressScreenState extends State<NewAddressScreen>
                   width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -474,7 +474,7 @@ class _NewAddressScreenState extends State<NewAddressScreen>
                     width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -489,8 +489,9 @@ class _NewAddressScreenState extends State<NewAddressScreen>
                   LengthLimitingTextInputFormatter(10),
                 ],
                 validator: (value) {
-                  if (value?.isEmpty ?? true)
+                  if (value?.isEmpty ?? true) {
                     return 'Mobile number is required';
+                  }
                   if (value!.length != 10) return 'Enter valid 10-digit number';
                   return null;
                 },
@@ -530,7 +531,7 @@ class _NewAddressScreenState extends State<NewAddressScreen>
             color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -571,7 +572,7 @@ class _NewAddressScreenState extends State<NewAddressScreen>
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
                             color: _selectedAddressType == type
-                                ? const Color(0xFFBB694A).withOpacity(0.2)
+                                ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
@@ -652,13 +653,14 @@ class _NewAddressScreenState extends State<NewAddressScreen>
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                const Color(0xFFBB694A).withOpacity(0.1),
-                                const Color(0xFFBB694A).withOpacity(0.05),
+                                const Color(0xFFBB694A).withValues(alpha: 0.1),
+                                const Color(0xFFBB694A).withValues(alpha: 0.05),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: const Color(0xFFBB694A).withOpacity(0.2),
+                              color: const Color(0xFFBB694A)
+                                  .withValues(alpha: 0.2),
                               width: 1,
                             ),
                           ),
@@ -856,8 +858,8 @@ class _NewAddressScreenState extends State<NewAddressScreen>
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               elevation: 8,
-                              shadowColor:
-                                  const Color(0xFFBB694A).withOpacity(0.4),
+                              shadowColor: const Color(0xFFBB694A)
+                                  .withValues(alpha: 0.4),
                             ),
                             child: _loading
                                 ? const SizedBox(
