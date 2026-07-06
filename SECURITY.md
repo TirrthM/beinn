@@ -2,20 +2,16 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+We take security seriously and provide ongoing support for our application. Please ensure you are running a supported version to receive the latest security patches.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+Currently, we support the following versions:
+
+- Version 5.1.x and newer are fully supported and receive regular security updates.
+- Version 4.0.x is in maintenance mode and receives critical security patches only.
+- Versions 5.0.x and anything older than 4.0 are no longer supported. Please upgrade as soon as possible.
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability in this project, we appreciate your help in disclosing it to us responsibly.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Please reach out directly to our security team via email at <security@example.com> instead of opening a public issue. We will review your report within 48 hours and provide a timeline for addressing the issue. You can expect regular updates as we investigate and deploy a fix.
