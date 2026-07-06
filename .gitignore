@@ -45,3 +45,6 @@ app.*.map.json
 # Environment variables
 .env
 backend/.env
+
+# Node related
+node_modules/
