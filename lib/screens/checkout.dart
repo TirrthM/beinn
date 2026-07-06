@@ -9,7 +9,7 @@ import '../theme_notifier.dart';
 class CheckoutScreen extends StatefulWidget {
   final List<Map<String, dynamic>> items;
 
-  const CheckoutScreen({Key? key, required this.items}) : super(key: key);
+  const CheckoutScreen({super.key, required this.items});
 
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
@@ -354,7 +354,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color(0xFFBB694A).withOpacity(0.12),
+                color: const Color(0xFFBB694A).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -388,11 +388,12 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFBB694A).withOpacity(0.18),
+                          color:
+                              const Color(0xFFBB694A).withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
                             color: const Color(0xFFBB694A)
-                                .withOpacity(isSelected ? 1 : 0.6),
+                                .withValues(alpha: isSelected ? 1 : 0.6),
                             width: 1,
                           ),
                         ),
@@ -547,7 +548,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            NewAddressScreen(),
+            const NewAddressScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
@@ -857,7 +858,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                   color: isDark ? Colors.grey[850] : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                      color: const Color(0xFFBB694A).withOpacity(0.3),
+                      color: const Color(0xFFBB694A).withValues(alpha: 0.3),
                       width: 1.5),
                 ),
                 child: Row(
@@ -866,7 +867,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFBB694A).withOpacity(0.15),
+                        color: const Color(0xFFBB694A).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
@@ -925,7 +926,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                   color: isDark ? Colors.grey[850] : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                      color: const Color(0xFFBB694A).withOpacity(0.3),
+                      color: const Color(0xFFBB694A).withValues(alpha: 0.3),
                       width: 1.5),
                 ),
                 child: Row(
@@ -934,7 +935,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFBB694A).withOpacity(0.15),
+                        color: const Color(0xFFBB694A).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
@@ -1011,18 +1012,26 @@ class _CheckoutScreenState extends State<CheckoutScreen>
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final totalAmount = _calculateGrandTotal().toStringAsFixed(0);
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           backgroundColor: isDark ? Colors.grey[900] : Colors.white,
           title: Row(
             children: [
               Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(color: Color(0xFFBB694A).withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
-                child: Icon(Icons.local_shipping, color: Color(0xFFBB694A), size: 24),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                    color: const Color(0xFFBB694A).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.local_shipping,
+                    color: Color(0xFFBB694A), size: 24),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
-                child: Text('Confirm COD Order', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text('Confirm COD Order',
+                    style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -1032,27 +1041,48 @@ class _CheckoutScreenState extends State<CheckoutScreen>
             children: [
               Text(
                 'Are you sure you want to proceed with Cash on Delivery for this order?',
-                style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[700], fontSize: 14, height: 1.5),
+                style: TextStyle(
+                    color: isDark ? Colors.grey[300] : Colors.grey[700],
+                    fontSize: 14,
+                    height: 1.5),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Container(
-                 padding: EdgeInsets.all(12),
-                 decoration: BoxDecoration(color: Color(0xFFBB694A).withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: Color(0xFFBB694A).withOpacity(0.3))),
-                 child: Row(
-                   crossAxisAlignment: CrossAxisAlignment.start,
-                   children: [
-                     Icon(Icons.info_outline, color: Color(0xFFBB694A), size: 20),
-                     SizedBox(width: 12),
-                     Expanded(child: Text('Kindly keep ₹$totalAmount ready to hand over to the delivery executive at the time of delivery.', style: TextStyle(color: isDark ? Colors.grey[200] : Colors.grey[800], fontSize: 13, height: 1.4, fontWeight: FontWeight.w500))),
-                   ],
-                 ),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                    color: const Color(0xFFBB694A).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: const Color(0xFFBB694A).withValues(alpha: 0.3))),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.info_outline,
+                        color: Color(0xFFBB694A), size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                        child: Text(
+                            'Kindly keep ₹$totalAmount ready to hand over to the delivery executive at the time of delivery.',
+                            style: TextStyle(
+                                color: isDark
+                                    ? Colors.grey[200]
+                                    : Colors.grey[800],
+                                fontSize: 13,
+                                height: 1.4,
+                                fontWeight: FontWeight.w500))),
+                  ],
+                ),
               )
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600], fontSize: 15, fontWeight: FontWeight.w600)),
+              child: Text('Cancel',
+                  style: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1060,13 +1090,16 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                 _executeCODOrder();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFBB694A),
+                backgroundColor: const Color(0xFFBB694A),
                 foregroundColor: Colors.white,
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
-              child: Text('Place Order', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+              child: const Text('Place Order',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -1270,7 +1303,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
               color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -1310,7 +1343,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
               color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -1363,7 +1396,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
             color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -1408,10 +1441,10 @@ class _CheckoutScreenState extends State<CheckoutScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFBB694A).withOpacity(0.18),
+                  color: const Color(0xFFBB694A).withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color: const Color(0xFFBB694A).withOpacity(0.5),
+                    color: const Color(0xFFBB694A).withValues(alpha: 0.5),
                     width: 1,
                   ),
                 ),
@@ -1501,9 +1534,9 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                         width: 1,
                       ),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(
                           Icons.edit_location_alt_outlined,
                           color: Color(0xFFBB694A),
@@ -1538,9 +1571,9 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                         width: 1,
                       ),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(
                           Icons.add,
                           color: Colors.white,
@@ -1586,7 +1619,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
             color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -1669,10 +1702,10 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFBB694A).withOpacity(0.12),
+                        color: const Color(0xFFBB694A).withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: const Color(0xFFBB694A).withOpacity(0.3),
+                          color: const Color(0xFFBB694A).withValues(alpha: 0.3),
                           width: 1,
                         ),
                       ),
@@ -1706,7 +1739,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
             color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -1742,10 +1775,10 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.15),
+                  color: Colors.green.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: Colors.green.withOpacity(0.6),
+                    color: Colors.green.withValues(alpha: 0.6),
                     width: 1,
                   ),
                 ),
@@ -1897,7 +1930,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
             color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -1927,7 +1960,6 @@ class _CheckoutScreenState extends State<CheckoutScreen>
           const SizedBox(height: 12),
           _buildPriceRow('Subtotal (${_getTotalItems()} items)',
               '₹${_calculateSubtotal().toStringAsFixed(0)}', isDark),
-
           _buildPriceRow(
             'Shipping',
             _calculateShipping() == 0
@@ -1938,7 +1970,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
           ),
           if (_appliedCoupon != null) ...[
             _buildPriceRow(
-              'Discount (${'${_appliedCoupon!['discountType'] == 'percentage' ? '${_appliedCoupon!['value']}%' : ''}'})',
+              'Discount (${_appliedCoupon!['discountType'] == 'percentage' ? '${_appliedCoupon!['value']}%' : ''})',
               '-₹${_getDiscountAmount().toStringAsFixed(0)}',
               isDark,
               isDiscount: true,
@@ -1987,7 +2019,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.18),
+                    color: Colors.green.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Text(
@@ -2032,7 +2064,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, -3),
           ),
@@ -2215,7 +2247,8 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                                       width: 1),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.05),
                                       blurRadius: 6,
                                       offset: const Offset(0, 3),
                                     ),
@@ -2263,8 +2296,8 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            children: const [
+                                          const Row(
+                                            children: [
                                               Icon(Icons.info_outline_rounded,
                                                   color: Color(0xFFBB694A),
                                                   size: 20),
@@ -2315,7 +2348,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                                         )),
                                         child: _buildOrderItem(item, isDark),
                                       );
-                                    }).toList(),
+                                    }),
                                   ],
                                 ),
                               ),
