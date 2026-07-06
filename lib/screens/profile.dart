@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -139,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         setState(() {
           _fullName = combined;
           _email = emailFromDb;
-          _mobile = mobile ?? '';
+          _mobile = mobile;
           _gender = gender;
           _address = address;
           _loading = false;
