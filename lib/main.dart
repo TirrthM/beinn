@@ -55,15 +55,17 @@ void main() async {
 }
 
 class BeinnApp extends StatelessWidget {
+  const BeinnApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Beinn - Premium Clothing',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Color(0xFFBB694A),
-          primary: Color(0xFFBB694A),
-          secondary: Color(0xFFBB694A),
+          seedColor: const Color(0xFFBB694A),
+          primary: const Color(0xFFBB694A),
+          secondary: const Color(0xFFBB694A),
           brightness: Brightness.dark,
         ),
         scaffoldBackgroundColor: Colors.black,
@@ -82,6 +84,8 @@ class BeinnApp extends StatelessWidget {
 }
 
 class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+
   @override
   _AuthWrapperState createState() => _AuthWrapperState();
 }
@@ -165,7 +169,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
     // Animate BEINN - faster (150ms per char)
     for (int i = 0; i < text1.length; i++) {
-      await Future.delayed(Duration(milliseconds: 150));
+      await Future.delayed(const Duration(milliseconds: 150));
       if (mounted) {
         setState(() {
           _displayedText1 = text1.substring(0, i + 1);
@@ -174,11 +178,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
     }
 
     // Pause between lines - reduced (100ms)
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 100));
 
     // Animate Be Real - faster (50ms per char)
     for (int i = 0; i < text2.length; i++) {
-      await Future.delayed(Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 50));
       if (mounted) {
         setState(() {
           _displayedText2 = text2.substring(0, i + 1);
@@ -187,7 +191,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
     }
 
     // Final pause - reduced (500ms)
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   Future<void> _checkAuthStatus() async {
@@ -254,12 +258,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       switchInCurve: Curves.easeOut,
       switchOutCurve: Curves.easeIn,
       child: _isLoading
           ? Scaffold(
-              key: ValueKey('loading'),
+              key: const ValueKey('loading'),
               backgroundColor: Colors.black,
               body: Center(
                 child: Column(
@@ -267,7 +271,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
                   children: [
                     Text(
                       _displayedText1,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 64,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -275,10 +279,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
                         fontFamily: 'SF Pro Display',
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text(
                       _displayedText2,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.w300,
@@ -292,10 +296,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
             )
           : (_isLoggedIn
               ? (_isProfileComplete
-                  ? MainNavigationWrapper(key: ValueKey('home'))
+                  ? const MainNavigationWrapper(key: ValueKey('home'))
                   : ProfileCompletionScreen(
                       user: FirebaseAuth.instance.currentUser!))
-              : WelcomeScreen(key: ValueKey('welcome'))),
+              : const WelcomeScreen(key: ValueKey('welcome'))),
     );
   }
 }
@@ -331,8 +335,8 @@ class CartManager {
   factory CartManager() => _instance;
   CartManager._internal();
 
-  List<Map<String, dynamic>> _cartItems = [];
-  List<Map<String, dynamic>> _wishlistItems = [];
+  final List<Map<String, dynamic>> _cartItems = [];
+  final List<Map<String, dynamic>> _wishlistItems = [];
 
   List<Map<String, dynamic>> get cartItems => _cartItems;
   List<Map<String, dynamic>> get wishlistItems => _wishlistItems;
@@ -568,7 +572,7 @@ class CartManager {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        final docId = '${productId}_${size}_${color}';
+        final docId = '${productId}_${size}_$color';
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
@@ -650,8 +654,7 @@ class CartManager {
 // Main Navigation Wrapper
 class MainNavigationWrapper extends StatefulWidget {
   final int initialIndex;
-  const MainNavigationWrapper({Key? key, this.initialIndex = 0})
-      : super(key: key);
+  const MainNavigationWrapper({super.key, this.initialIndex = 0});
 
   @override
   _MainNavigationWrapperState createState() => _MainNavigationWrapperState();
@@ -666,7 +669,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
     HomeScreen(),
     CartScreen(),
     OrdersScreen(),
-    ProfileScreen(),
+    const ProfileScreen(),
   ];
 
   // Updated navigation items - removed Categories
@@ -707,7 +710,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
       });
       _pageController.animateToPage(
         index,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOutCubic,
       );
     }
@@ -743,7 +746,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),
@@ -775,8 +778,8 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _onItemTapped(index),
-        splashColor: const Color(0xFFBB694A).withOpacity(0.2),
-        highlightColor: const Color(0xFFBB694A).withOpacity(0.1),
+        splashColor: const Color(0xFFBB694A).withValues(alpha: 0.2),
+        highlightColor: const Color(0xFFBB694A).withValues(alpha: 0.1),
         child: SizedBox(
           height: 70,
           child: Column(
@@ -789,7 +792,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFFBB694A).withOpacity(0.15)
+                          ? const Color(0xFFBB694A).withValues(alpha: 0.15)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -899,7 +902,7 @@ void navigateToWishlist(
           ),
         );
       },
-      transitionDuration: Duration(milliseconds: 400),
+      transitionDuration: const Duration(milliseconds: 400),
     ),
   );
 }
@@ -927,7 +930,7 @@ void navigateToProductDetail(
           ),
         );
       },
-      transitionDuration: Duration(milliseconds: 400),
+      transitionDuration: const Duration(milliseconds: 400),
     ),
   );
 }
@@ -954,7 +957,7 @@ void navigateToCategoryProducts(BuildContext context, String categoryName) {
           ),
         );
       },
-      transitionDuration: Duration(milliseconds: 400),
+      transitionDuration: const Duration(milliseconds: 400),
     ),
   );
 }
@@ -982,7 +985,7 @@ void navigateToCheckout(
           ),
         );
       },
-      transitionDuration: Duration(milliseconds: 400),
+      transitionDuration: const Duration(milliseconds: 400),
     ),
   );
 }
