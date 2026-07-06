@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme_notifier.dart';
 
 class ShippingReturnsScreen extends StatefulWidget {
-  const ShippingReturnsScreen({Key? key}) : super(key: key);
+  const ShippingReturnsScreen({super.key});
 
   @override
   State<ShippingReturnsScreen> createState() => _ShippingReturnsScreenState();
