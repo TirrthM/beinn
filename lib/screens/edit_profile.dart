@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({Key? key}) : super(key: key);
+  const EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -232,7 +232,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -279,7 +279,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -292,7 +292,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           children: [
             Row(
               children: [
-                Icon(Icons.person_outline, color: const Color(0xFFBB694A)),
+                const Icon(Icons.person_outline, color: Color(0xFFBB694A)),
                 const SizedBox(width: 12),
                 Text(
                   'Gender',
@@ -314,7 +314,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Male'
-                            ? const Color(0xFFBB694A).withOpacity(0.2)
+                            ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
@@ -346,7 +346,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Female'
-                            ? const Color(0xFFBB694A).withOpacity(0.2)
+                            ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
@@ -378,7 +378,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _selectedGender == 'Other'
-                            ? const Color(0xFFBB694A).withOpacity(0.2)
+                            ? const Color(0xFFBB694A).withValues(alpha: 0.2)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
@@ -427,7 +427,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                   width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -467,7 +467,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                     width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -482,14 +482,15 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                   LengthLimitingTextInputFormatter(10),
                 ],
                 validator: (value) {
-                  if (value?.isEmpty ?? true)
+                  if (value?.isEmpty ?? true) {
                     return 'Mobile number is required';
+                  }
                   if (value!.length != 10) return 'Enter valid 10-digit number';
                   return null;
                 },
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone_outlined,
-                      color: const Color(0xFFBB694A)),
+                  prefixIcon: const Icon(Icons.phone_outlined,
+                      color: Color(0xFFBB694A)),
                   labelText: 'Mobile Number',
                   hintText: 'Enter 10-digit number',
                   labelStyle: TextStyle(
@@ -569,29 +570,29 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                                           end: Alignment.bottomRight,
                                           colors: [
                                             const Color(0xFFBB694A)
-                                                .withOpacity(0.1),
+                                                .withValues(alpha: 0.1),
                                             const Color(0xFFBB694A)
-                                                .withOpacity(0.05),
+                                                .withValues(alpha: 0.05),
                                           ],
                                         )
                                       : null,
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
                                     color: const Color(0xFFBB694A)
-                                        .withOpacity(0.2),
+                                        .withValues(alpha: 0.2),
                                     width: 1,
                                   ),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
+                                    const Row(
                                       children: [
-                                        const Icon(Icons.edit,
+                                        Icon(Icons.edit,
                                             color: Color(0xFFBB694A)),
-                                        const SizedBox(width: 8),
+                                        SizedBox(width: 8),
                                         Expanded(
-                                          child: const Text(
+                                          child: Text(
                                             'Update Your Profile',
                                             style: TextStyle(
                                               color: Color(0xFFBB694A),
@@ -763,7 +764,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                                     ),
                                     elevation: 8,
                                     shadowColor: const Color(0xFFBB694A)
-                                        .withOpacity(0.4),
+                                        .withValues(alpha: 0.4),
                                   ),
                                   child: _loading
                                       ? const SizedBox(
