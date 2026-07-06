@@ -8,9 +8,10 @@ on:
     branches:
       - main
 
-# Allow the workflow to push commits (used by the auto-format step)
+# Allow the workflow to create branches and PRs when running in-repo
 permissions:
   contents: write
+  pull-requests: write
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -24,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: true
-      
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.44.4'
@@ -35,24 +36,62 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-          
-      - name: Format and commit if needed
-        if: github.actor != 'github-actions[bot]'
+
+      - name: Run dart format and detect changes
+        id: format
         run: |
+          # Run formatter
           dart format .
-          if [ -n "$(git status --porcelain)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A
-            git commit -m "chore: apply dart format (CI)"
-            git push
+          # Detect changes
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
-        
+
+      - name: Produce format diff artifact
+        if: steps.format.outputs.changed == 'true'
+        run: |
+          git --no-pager diff > format.diff || true
+      - name: Upload format diff artifact
+        if: steps.format.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: format-diff
+          path: format.diff
+
+      - name: Create formatting PR (in-repo runs only)
+        if: steps.format.outputs.changed == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: chore: apply dart format (CI)
+          branch: format/auto-format-${{ github.run_id }}
+          title: chore: apply dart format (CI)
+          body: |
+            This PR applies dart format changes detected by CI.
+
+            The CI run produced an artifact named `format-diff` containing the full diff if you want to inspect changes before merging.
+          labels: ci, auto-format
+
+      - name: Notify maintainers for forked PRs (cannot push from forks)
+        if: steps.format.outputs.changed == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const body = `CI detected formatting changes but cannot push from forked PRs. Please run ` +
+              '`dart format .` locally and push the result, or a repo maintainer can apply formatting.\n\n' +
+              `Workflow run: ${runUrl}`;
+            await github.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number, body });
+
       - name: Analyze
         run: flutter analyze
-        
+
       - name: Run tests
         run: flutter test
-        
+
       - name: Build APK
         run: flutter build apk --release
