@@ -65,9 +65,9 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: chore: apply dart format (CI)
+          commit-message: 'chore: apply dart format (CI)'
           branch: format/auto-format-${{ github.run_id }}
-          title: chore: apply dart format (CI)
+          title: 'chore: apply dart format (CI)'
           body: |
             This PR applies dart format changes detected by CI.
 
