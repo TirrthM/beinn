@@ -1,35 +1,92 @@
-# Beinn Project Documentation
+# Beinn: E-Commerce and Delivery Platform
 
-This repository contains the source code for the Beinn e-commerce and delivery application. The project is split into a Flutter mobile frontend and a NestJS backend. This document provides a straightforward guide on how to set up the project locally.
+## Overview
 
-## Project Structure
+Beinn is a full-stack e-commerce and delivery platform focused on modern retail. The project is split into two primary components: a cross-platform mobile application developed with Flutter, and a high-performance backend microservice architecture developed with NestJS. 
 
-The codebase is organized into two main parts. The root directory contains the Flutter application, which handles the customer storefront and the driver delivery interface. The backend directory contains the NestJS service, which manages secure operations like server-side payment generation and high-frequency location tracking. Firebase is used as the primary database for user profiles, product catalogs, and order history.
+The platform provides a unified experience handling the customer storefront, seamless checkout, and a specialized interface for delivery drivers to receive dispatch assignments and track deliveries in real-time.
 
-## Development Requirements
+## Key Features
 
-To run this project, you need to install the following software on your machine:
-- Flutter SDK (version 3.3.0 or higher)
-- Node.js (version 18 or higher)
-- A local PostgreSQL instance with the PostGIS extension
-- A local Redis server
+### Customer Storefront
+*   Rich Product Catalog: Browse products with categorized feeds and engaging UI components.
+*   Seamless Authentication: Secure login via Firebase Auth (Email/Password and Google Sign-In).
+*   Secure Payments: Native Razorpay integration for fast, compliant checkout experiences.
+*   Live Order Tracking: Real-time map tracking of deliveries using flutter_map and Socket.IO.
 
-## Backend Setup
+### Delivery Driver Interface
+*   Real-Time Dispatch: Receive and accept delivery assignments dynamically.
+*   Background Geolocation: Accurate driver tracking in the background using flutter_background_geolocation.
+*   Smart Routing: Geofencing and route optimization handled via PostgreSQL and PostGIS.
 
-1. Open your terminal and change into the backend directory.
-2. Install the necessary Node packages by running npm install.
-3. You need to configure your environment variables. Create a file named .env inside the backend directory. You will need to provide your Razorpay secret key, your Firebase Admin SDK credentials, and your database connection strings. Please refer to the security document for detailed instructions on handling these credentials.
-4. Once your environment variables are set, start the development server by running npm run start:dev. The server will start on port 3000.
+### Backend Infrastructure
+*   High-Frequency Real-Time Engine: WebSocket integration for instant state updates.
+*   Secure Transaction Handling: Server-side Razorpay order generation and webhook verification.
+*   Geospatial Queries: PostgreSQL with PostGIS for fast spatial lookups.
 
-## Frontend Setup
+## Technology Stack
 
-1. Make sure your Firebase project is configured for your mobile application. You must place the google-services.json file in the android/app directory and the GoogleService-Info.plist file in the ios/Runner directory.
-2. Navigate to the root directory of the project in your terminal.
-3. Create a file named .env in the root directory. Add your public Razorpay Key ID and the URL of your local backend server (for example, http://localhost:3000).
-4. Download the required Dart dependencies by running flutter pub get.
-5. Connect your physical device or start an emulator.
-6. Build and run the application by running flutter run.
+*   Frontend: Flutter (Dart)
+*   Backend: NestJS (TypeScript / Node.js)
+*   Database: PostgreSQL (with PostGIS)
+*   Caching & WebSockets: Redis, Socket.IO
+*   Cloud Services: Firebase (Auth, Firestore, Analytics)
+
+## Development Setup
+
+### Prerequisites
+*   Flutter SDK: Version 3.44.4 or higher
+*   Node.js: Version 18.x or higher
+*   PostgreSQL: With PostGIS extension installed locally
+*   Redis: A local Redis server instance
+
+### 1. Backend Configuration
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Install Node dependencies:
+   ```bash
+   npm install
+   ```
+3. Configure Environment Variables:
+   Create a `.env` file in the `backend/` directory and define:
+   * `RAZORPAY_KEY_ID`
+   * `RAZORPAY_KEY_SECRET`
+   * `DATABASE_URL`
+   * `REDIS_URL`
+   * `FIREBASE_ADMIN_CREDENTIALS` (absolute path to `serviceAccountKey.json`)
+4. Start the development server:
+   ```bash
+   npm run start:dev
+   ```
+
+### 2. Frontend Configuration
+1. Navigate to the project root:
+   ```bash
+   cd ..
+   ```
+2. Configure Environment Variables:
+   Create a `.env` file in the project root:
+   ```env
+   RAZORPAY_KEY_ID=rzp_test_YourKeyHere
+   BACKEND_API_URL=http://localhost:3000
+   ```
+3. Firebase Configuration:
+   * Place your `google-services.json` in `android/app/`
+   * Place your `GoogleService-Info.plist` in `ios/Runner/`
+4. Fetch dependencies and run:
+   ```bash
+   flutter pub get
+   flutter run
+   ```
 
 ## CI/CD Pipeline
 
-The project uses GitHub Actions to automate testing and builds. Every push to the main branch triggers a workflow that runs the Dart analyzer, executes the test suite, and builds a release APK. This ensures that the codebase remains stable and ready for deployment.
+We use GitHub Actions for continuous integration. Every push or pull request to the `main` branch triggers a workflow that runs:
+*   Dart formatter (with automatic pull requests for formatting changes).
+*   Static code analysis (`flutter analyze`).
+*   Automated test suite (`flutter test`).
+*   Release APK build verification.
+
+Note: Since the `.env` file is excluded via `.gitignore` for security, the CI pipeline automatically generates a blank `.env` placeholder to ensure the Flutter analyzer completes successfully.
