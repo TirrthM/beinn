@@ -39,6 +39,39 @@ Beinn addresses all of these problems as first-class features within a unified c
 
 ## Architecture
 
+###  GitHub Gamification & Activity Games
+
+####  My Contribution Grid Game
+![GitHub Snake Animation](https://githubusercontent.com)
+
+####  GitHub Trophies Unlocked
+[![trophy](https://github-profile-trophy.vercel.app/?username=TirrthM&theme=radical&no-frame=true&no-bg=true&margin-w=15)](https://github.com/ryo-ma/github-profile-trophy)
+
+####  Live Player Stats & Streak
+<p align="left">
+  <img src="https://github-readme-stats.vercel.app/api?username=TirrthM&show_icons=true&theme=radical&rank_icon=github" alt="GitHub Stats" />
+  <img src="https://github-readme-streak-stats.herokuapp.com/?user=TirrthM&theme=radical" alt="GitHub Streak" />
+</p>
+
+#### Top Languages Mastered
+<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=TirrthM&layout=compact&theme=radical" alt="Top Languages" />
+
+#### Beinn App Live Stats & Activity
+[![Beinn Repository](https://github-readme-stats.vercel.app/api/pin/?username=TirrthM&repo=beinn&theme=radical)](https://github.com/TirrthM/beinn)
+
+#### App Development Team
+<a href="https://github.com/TirrthM/beinn/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=TirrthM/beinn" alt="Beinn Contributors Grid" />
+</a>
+
+#### Interactive Tech Stack
+<p align="left">
+  <a href="https://flutter.dev/"><img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white" alt="Flutter" /></a>
+  <a href="https://nestjs.com/"><img src="https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" /></a>
+  <a href="https://postgresql.org/"><img src="https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" /></a>
+  <a href="https://firebase.google.com/"><img src="https://img.shields.io/badge/firebase-%23039BE5.svg?style=for-the-badge&logo=firebase" alt="Firebase" /></a>
+</p>
+
 ```text
 Client (Flutter Mobile App)
     |
