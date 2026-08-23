@@ -19,6 +19,37 @@ This document outlines the zero-trust security architecture and best practices i
 
 ## Payment Processing Architecture
 
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Client (Flutter)
+    participant F as Firebase (Auth/Firestore)
+    participant B as Backend (NestJS)
+    participant R as Razorpay API
+    participant DB as PostgreSQL
+
+    C->>F: Authenticate & Get JWT
+    F-->>C: Returns JWT ID Token
+    
+    C->>B: POST /checkout (Bearer JWT)
+    B->>F: Verify JWT Signature (Admin SDK)
+    F-->>B: Token Valid (Role & UID)
+    
+    B->>B: Calculate Total (Server-side trust)
+    B->>R: Generate Order Request (TLS 1.3 + Basic Auth)
+    R-->>B: Returns razorpay_order_id
+    B-->>C: Returns order_id to Client
+    
+    C->>R: Initialize Checkout UI (order_id)
+    R-->>C: Payment Success / Processing
+    
+    R->>B: Webhook POST /orders/verify
+    B->>B: Generate HMAC SHA256 Signature
+    B->>B: Verify Signature matches 'x-razorpay-signature'
+    B->>DB: Commit Order to DB (Status: PAID)
+    B-->>R: 200 OK
+```
+
 The application uses Razorpay for enterprise-grade payment processing. To completely eliminate the risk of malicious users utilizing Man-in-the-Middle (MITM) attacks or memory hooking to modify order amounts on their devices, we employ a strict **server-side order generation flow**:
 
 1. **Client Isolation**: The client application (Flutter) acts merely as a presentation layer and never calculates the final payment amount. When a user proceeds to checkout, the mobile app sends a zero-trust request containing only their user ID to the backend server.
