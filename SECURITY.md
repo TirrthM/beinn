@@ -22,9 +22,9 @@ This document outlines the zero-trust security architecture and best practices i
 ```mermaid
 sequenceDiagram
     autonumber
-    actor C as Client (Flutter)
-    participant F as Firebase (Auth/Firestore)
-    participant B as Backend (NestJS)
+    actor C as Client
+    participant F as Firebase
+    participant B as Backend
     participant R as Razorpay API
     participant DB as PostgreSQL
 

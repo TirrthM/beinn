@@ -6,38 +6,38 @@ This document provides a deep dive into the architectural design of the Beinn pl
 
 ```mermaid
 flowchart TD
-  subgraph Client [Client Tier (Flutter)]
-    C_APP[Customer App]
-    D_APP[Driver App\nwith Background GPS]
+  subgraph Client ["Client Tier - Flutter"]
+    C_APP["Customer App"]
+    D_APP["Driver App\nwith Background GPS"]
   end
 
-  subgraph API [API Gateway & Routing]
-    LB[Load Balancer]
-    N_API[NestJS REST API]
-    N_WS[NestJS WebSocket Server]
+  subgraph API ["API Gateway & Routing"]
+    LB["Load Balancer"]
+    N_API["NestJS REST API"]
+    N_WS["NestJS WebSocket Server"]
   end
 
-  subgraph Cloud [Firebase Services]
-    AUTH[Firebase Auth]
-    FCM[Cloud Messaging]
-    FIRESTORE[(Firestore NoSQL\nCatalog & Profiles)]
+  subgraph Cloud ["Firebase Services"]
+    AUTH["Firebase Auth"]
+    FCM["Cloud Messaging"]
+    FIRESTORE[("Firestore NoSQL\nCatalog & Profiles")]
   end
 
-  subgraph Persistence [Data Tier (PostgreSQL + Redis)]
-    PG[(PostgreSQL\nOrders, Payments)]
-    POSTGIS[(PostGIS\nDriver Locations & Geofences)]
-    REDIS[(Redis\nSocket.IO Ephemeral State)]
+  subgraph Persistence ["Data Tier - PostgreSQL + Redis"]
+    PG[("PostgreSQL\nOrders, Payments")]
+    POSTGIS[("PostGIS\nDriver Locations & Geofences")]
+    REDIS[("Redis\nSocket.IO Ephemeral State")]
   end
 
-  subgraph External [External APIs]
-    RAZORPAY[Razorpay Payment Gateway]
+  subgraph External ["External APIs"]
+    RAZORPAY["Razorpay Payment Gateway"]
   end
 
   %% Client Connections
-  C_APP & D_APP -->|HTTP/REST| LB
-  D_APP <-->|Socket.IO| LB
-  C_APP & D_APP <-->|Live Sync Streams| FIRESTORE
-  C_APP & D_APP -->|Authentication| AUTH
+  C_APP & D_APP -->|"HTTP/REST"| LB
+  D_APP <-->|"Socket.IO"| LB
+  C_APP & D_APP <-->|"Live Sync Streams"| FIRESTORE
+  C_APP & D_APP -->|"Authentication"| AUTH
 
   %% Gateway Routing
   LB --> N_API
@@ -50,8 +50,8 @@ flowchart TD
   N_WS <--> POSTGIS
   
   %% Notifications
-  N_API -->|Dispatch Events| FCM
-  FCM -->|Push Notifications| C_APP & D_APP
+  N_API -->|"Dispatch Events"| FCM
+  FCM -->|"Push Notifications"| C_APP & D_APP
 ```
 
 Beinn is a hybrid architecture utilizing serverless real-time streams (Firebase) alongside a robust microservice backend (NestJS/PostgreSQL) to handle the complex requirements of e-commerce and local delivery.
