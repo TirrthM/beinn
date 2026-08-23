@@ -82,65 +82,65 @@ Production metrics must come from persisted application data. No dashboard numbe
 
 ```mermaid
 flowchart TD
-  subgraph Client [Client Applications]
-    C[Customer Storefront\nFlutter iOS/Android]
-    D[Driver Interface\nFlutter iOS/Android\nBackground Geolocation]
+  subgraph Client ["Client Applications"]
+    C["Customer Storefront\nFlutter iOS/Android"]
+    D["Driver Interface\nFlutter iOS/Android\nBackground Geolocation"]
   end
 
-  subgraph Firebase [Firebase Cloud Services]
-    FA[Authentication\nEmail/Password, Google]
-    FCM[Cloud Messaging\nPush Notifications]
-    CF[(Cloud Firestore\nNoSQL)]
-    CF_CAT[Catalog / Products]
-    CF_PROF[User Profiles]
-    CF_ORD[Order State]
+  subgraph Firebase ["Firebase Cloud Services"]
+    FA["Authentication\nEmail/Password, Google"]
+    FCM["Cloud Messaging\nPush Notifications"]
+    CF[("Cloud Firestore\nNoSQL")]
+    CF_CAT["Catalog / Products"]
+    CF_PROF["User Profiles"]
+    CF_ORD["Order State"]
     CF --- CF_CAT & CF_PROF & CF_ORD
   end
 
-  subgraph NestJS [NestJS Backend Microservices]
-    API[API Gateway]
-    REST[REST Controller Layer]
-    WS[WebSocket Gateway]
+  subgraph NestJS ["NestJS Backend Microservices"]
+    API["API Gateway"]
+    REST["REST Controller Layer"]
+    WS["WebSocket Gateway"]
     
-    auth[auth.ts\nJWT & Signature Validation]
-    order[order.ts\nRazorpay Secure Checkouts]
-    track[tracking.ts\nSocket.IO Location Streams]
-    disp[dispatch.ts\nPostGIS Proximity Matching]
+    auth["auth.ts\nJWT & Signature Validation"]
+    order["order.ts\nRazorpay Secure Checkouts"]
+    track["tracking.ts\nSocket.IO Location Streams"]
+    disp["dispatch.ts\nPostGIS Proximity Matching"]
     
     API --> REST & WS
     REST --> auth & order
     WS --> track & disp
   end
 
-  subgraph Persistence [Data Persistence]
-    PG[(PostgreSQL 14+\nACID Transactions)]
-    POSTGIS[(PostGIS\nGeospatial Engine)]
-    REDIS[(Redis 7+\nEphemeral State & Caching)]
+  subgraph Persistence ["Data Persistence"]
+    PG[("PostgreSQL 14+\nACID Transactions")]
+    POSTGIS[("PostGIS\nGeospatial Engine")]
+    REDIS[("Redis 7+\nEphemeral State & Caching")]
     
     PG --- POSTGIS
   end
   
-  subgraph External [External Providers]
-    RZP[Razorpay\nPayment Gateway]
+  subgraph External ["External Providers"]
+    RZP["Razorpay\nPayment Gateway"]
   end
 
   %% Client to Firebase Sync
-  C & D -->|Login / Auth| FA
-  C & D <-->|Real-time Streams| CF
+  C & D -->|"Login / Auth"| FA
+  C & D <-->|"Real-time Streams"| CF
   
   %% Client to Backend
-  C -->|REST Requests| API
-  D <-->|Socket.IO Connections| API
+  C -->|"REST Requests"| API
+  D <-->|"Socket.IO Connections"| API
   
   %% Backend Logic
-  order <-->|Webhooks / Create Order| RZP
-  order -->|Commit Transactions| PG
-  track <-->|Ephemeral GPS State| REDIS
-  disp <-->|ST_Distance / ST_DWithin| POSTGIS
+  order <-->|"Webhooks / Create Order"| RZP
+  order -->|"Commit Transactions"| PG
+  track <-->|"Ephemeral GPS State"| REDIS
+  disp <-->|"ST_Distance / ST_DWithin"| POSTGIS
   
   %% Backend to Firebase
-  REST -->|Dispatch Events| FCM
-  FCM -->|Push Notifications| C & D
+  REST -->|"Dispatch Events"| FCM
+  FCM -->|"Push Notifications"| C & D
 ```
 
 ```text
