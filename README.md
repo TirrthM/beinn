@@ -9,6 +9,10 @@ Beinn eliminates the friction between digital storefronts and physical logistics
 ## Table of Contents
 
 - [Problem Statement](#problem-statement)
+- [Product Model](#product-model)
+- [Product Surface](#product-surface)
+- [Commercial Model](#commercial-model)
+- [Data Policy](#data-policy)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Features](#features)
@@ -17,8 +21,13 @@ Beinn eliminates the friction between digital storefronts and physical logistics
 - [Getting Started](#getting-started)
 - [Available Commands](#available-commands)
 - [Environment Configuration](#environment-configuration)
+- [Testing and Completion](#testing-and-completion)
+- [Security](#security)
+- [Data Sources and External APIs](#data-sources-and-external-apis)
 - [API & WebSocket Reference](#api--websocket-reference)
 - [Design Decisions](#design-decisions)
+- [Documentation](#documentation)
+- [Disclaimer](#disclaimer)
 - [License](#license)
 
 ---
@@ -37,8 +46,102 @@ Beinn addresses all of these problems as first-class features within a unified c
 
 ---
 
+## Product Model
+
+```mermaid
+flowchart LR
+  A[Customer Storefront] --> B[Browse & Checkout]
+  B --> C[Razorpay Payment]
+  C --> D[Backend Dispatch]
+  D --> E[Driver Assigned]
+  E --> F[Real-time Tracking]
+  F --> G[Delivery Completed]
+  C --> H[Analytics & Metrics]
+```
+
+## Product Surface
+
+- Public product storefront
+- Customer browsing and checkout workflows
+- Driver profile and delivery dashboard
+- Real-time location tracking interface
+- Backend order and dispatch orchestration
+- Geofencing and proximity matching boundaries
+
+## Commercial Model
+
+The application models Customer, Driver, and Admin roles. Plan entitlements and role configurations control real product access and limits. Payment processing via Razorpay is not represented as live until actual production API credentials are provided.
+
+## Data Policy
+
+Production metrics must come from persisted application data. No dashboard number is treated as authoritative merely because it is present in source code. Synthetic data may be used for controlled development fixtures only when explicitly identified as synthetic and kept separate from production evidence.
+
+---
+
 ## Architecture
 
+```mermaid
+flowchart TD
+  subgraph Client [Client Applications]
+    C[Customer Storefront\nFlutter iOS/Android]
+    D[Driver Interface\nFlutter iOS/Android\nBackground Geolocation]
+  end
+
+  subgraph Firebase [Firebase Cloud Services]
+    FA[Authentication\nEmail/Password, Google]
+    FCM[Cloud Messaging\nPush Notifications]
+    CF[(Cloud Firestore\nNoSQL)]
+    CF_CAT[Catalog / Products]
+    CF_PROF[User Profiles]
+    CF_ORD[Order State]
+    CF --- CF_CAT & CF_PROF & CF_ORD
+  end
+
+  subgraph NestJS [NestJS Backend Microservices]
+    API[API Gateway]
+    REST[REST Controller Layer]
+    WS[WebSocket Gateway]
+    
+    auth[auth.ts\nJWT & Signature Validation]
+    order[order.ts\nRazorpay Secure Checkouts]
+    track[tracking.ts\nSocket.IO Location Streams]
+    disp[dispatch.ts\nPostGIS Proximity Matching]
+    
+    API --> REST & WS
+    REST --> auth & order
+    WS --> track & disp
+  end
+
+  subgraph Persistence [Data Persistence]
+    PG[(PostgreSQL 14+\nACID Transactions)]
+    POSTGIS[(PostGIS\nGeospatial Engine)]
+    REDIS[(Redis 7+\nEphemeral State & Caching)]
+    
+    PG --- POSTGIS
+  end
+  
+  subgraph External [External Providers]
+    RZP[Razorpay\nPayment Gateway]
+  end
+
+  %% Client to Firebase Sync
+  C & D -->|Login / Auth| FA
+  C & D <-->|Real-time Streams| CF
+  
+  %% Client to Backend
+  C -->|REST Requests| API
+  D <-->|Socket.IO Connections| API
+  
+  %% Backend Logic
+  order <-->|Webhooks / Create Order| RZP
+  order -->|Commit Transactions| PG
+  track <-->|Ephemeral GPS State| REDIS
+  disp <-->|ST_Distance / ST_DWithin| POSTGIS
+  
+  %% Backend to Firebase
+  REST -->|Dispatch Events| FCM
+  FCM -->|Push Notifications| C & D
+```
 
 ```text
 Client (Flutter Mobile App)
@@ -69,6 +172,8 @@ API Gateway & State Synchronization
 The application utilizes a sophisticated hybrid architectural approach. Firebase handles client-heavy, low-latency data streams (like product catalogs and profile syncs) directly to the Flutter app via websockets, avoiding the need to poll REST APIs for state changes. 
 
 The custom NestJS backend handles secure transactions, complex geospatial calculations, and high-frequency WebSocket traffic that would otherwise overwhelm NoSQL document quotas. By combining these two paradigms, Beinn maintains enterprise-grade security and localized state-syncing simultaneously.
+
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md) and [`DATA_MODEL.md`](./DATA_MODEL.md).
 
 ---
 
@@ -166,6 +271,8 @@ The application leverages a highly specialized hybrid data model split intellige
 | `Order` | Postgres | `orderId`, `userId`, `amount`, `status`, `signature` | Handles financial truths. Validated cryptographically via backend webhooks. |
 | `DriverLocation`| Redis/Postgres| `driverId`, `lat`, `lng`, `geog`, `timestamp` | Ephemeral state is held in Redis, while persistent delivery routes map to PostGIS Points. |
 
+See [`DATA_MODEL.md`](./DATA_MODEL.md).
+
 ---
 
 ## Getting Started
@@ -216,6 +323,8 @@ flutter run
 
 To run both services locally, configure the following variables. Do not commit these files to version control.
 
+The production application requires PostgreSQL before durable data workflows can be enabled.
+
 ### Frontend (`/.env`)
 ```env
 RAZORPAY_KEY_ID=rzp_test_YourKeyHere
@@ -231,6 +340,36 @@ DATABASE_URL="postgres://user:password@localhost:5432/beinn"
 REDIS_URL="redis://localhost:6379"
 FIREBASE_ADMIN_CREDENTIALS="/absolute/path/to/serviceAccountKey.json"
 ```
+
+---
+
+## Testing and Completion
+
+A successful build is not the definition of completion. The acceptance path is:
+
+1. CI passes security, lint, test and build checks.
+2. End-to-end automated tests pass across core user journeys.
+3. Production deployment reaches a ready state.
+4. Client applications and workspace routes render without console/runtime errors.
+5. Configured API and database paths are exercised end-to-end.
+6. Role entitlements match actual feature access appropriately.
+7. No fabricated production metrics are present.
+8. Documentation matches the implementation.
+9. Post-completion production verification is repeated after the required observation window.
+
+---
+
+## Security
+
+The project uses environment-based secrets, server-side data access, parameterized database queries and production security rules. Security claims are limited to controls that are actually implemented and verified.
+
+See [`SECURITY.md`](./SECURITY.md).
+
+---
+
+## Data Sources and External APIs
+
+Provider adapters (such as Razorpay, Firebase, PostGIS) can be added without coupling credentials to the application. Until a provider is configured, the product presents an explicit unconfigured state rather than inventing delivery or risk data.
 
 ---
 
@@ -266,6 +405,23 @@ However, Firestore becomes prohibitively expensive and inefficient for high-freq
 
 ---
 
+## Documentation
+
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — system boundaries and deployment model
+- [`DATA_MODEL.md`](./DATA_MODEL.md) — persistence model
+- [`SECURITY.md`](./SECURITY.md) — security requirements
+- [`CHANGELOG.md`](./CHANGELOG.md) — implementation history
+
+---
+
+## Disclaimer
+
+This software is an engineering product for e-commerce and logistics workflows. It is not financial or legal advice and does not replace formal model validation, operational governance, regulatory review, or production controls.
+
+---
+
 ## License
 
 Copyright 2026 Beinn. All rights reserved.
+
+MIT. See [`LICENSE`](./LICENSE).
